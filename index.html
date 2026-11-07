@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -7,225 +6,76 @@
 <meta name="theme-color" content="#090817">
 <title>SINX | Neon Snakes</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap');
-
-:root{
-  --bg:#090817;
-  --purple:#a879ff;
-  --cyan:#45eaff;
-  --text:#f8f5ff;
-  --muted:#aaa4c9;
-}
+:root{--bg:#090817;--purple:#a879ff;--cyan:#45eaff;--text:#f8f5ff;--muted:#aaa4c9}
 *{box-sizing:border-box}
-body{
-  margin:0;padding:16px 11px 28px;
-  min-height:100vh;color:var(--text);
-  font-family:'Vazirmatn',sans-serif;
-  background:
-    radial-gradient(ellipse at 50% -10%,#493078 0%,transparent 48%),
-    radial-gradient(ellipse at 100% 70%,#102d55 0%,transparent 45%),
-    var(--bg);
-}
+body{margin:0;padding:16px 11px 28px;min-height:100vh;color:var(--text);font-family:'Vazirmatn',sans-serif;background:radial-gradient(ellipse at 50% -10%,#493078 0%,transparent 48%),radial-gradient(ellipse at 100% 70%,#102d55 0%,transparent 45%),var(--bg)}
 .app{max-width:540px;margin:auto}
 header{text-align:center;margin:4px 0 18px}
-.logo{
-  color:var(--cyan);font-size:11px;
-  font-weight:900;letter-spacing:5px;
-  text-shadow:0 0 14px #45eaff88;
-}
+.logo{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:5px;text-shadow:0 0 14px #45eaff88}
 h1{font-size:26px;margin:5px 0;font-weight:900}
 .subtitle{font-size:11px;color:var(--muted)}
-.panel{
-  padding:12px;border-radius:22px;
-  background:linear-gradient(145deg,#211b40,#11152b);
-  border:1px solid #51417a;
-  box-shadow:0 15px 45px #0008,0 0 22px #865aff18;
-}
-.status{
-  display:flex;justify-content:space-between;
-  align-items:center;gap:8px;margin-bottom:12px;
-}
+.panel{padding:12px;border-radius:22px;background:linear-gradient(145deg,#211b40,#11152b);border:1px solid #51417a;box-shadow:0 15px 45px #0008,0 0 22px #865aff18}
+.status{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
 .status-label{font-size:10px;color:var(--muted)}
 .status-value{font-size:13px;font-weight:800}
-.turn-pill{
-  padding:7px 12px;border-radius:30px;
-  color:#d9c8ff;background:#38265e;
-  border:1px solid #7752b8;font-size:10px;
-}
-.board-wrap{
-  position:relative;padding:6px;border-radius:16px;
-  background:linear-gradient(135deg,#a46aff,#37e5fa,#7049d8);
-  box-shadow:0 0 25px #8e5aff44,0 0 55px #35dff522;
-}
-.board{
-  position:relative;
-  display:grid;
-  grid-template-columns:repeat(10,minmax(0,1fr));
-  grid-template-rows:repeat(10,minmax(0,1fr));
-  gap:2px;direction:ltr;
-  aspect-ratio:1;
-  overflow:hidden;border-radius:11px;
-  background:#090d24;
-}
-.cell{
-  position:relative;min-width:0;min-height:0;
-  border-radius:4px;
-  background:linear-gradient(145deg,#263b6d,#171a43);
-  box-shadow:inset 0 1px 2px #ffffff18,inset 0 -2px 4px #0005;
-  overflow:hidden;
-}
+.turn-pill{padding:7px 12px;border-radius:30px;color:#d9c8ff;background:#38265e;border:1px solid #7752b8;font-size:10px}
+.board-wrap{position:relative;padding:6px;border-radius:16px;background:linear-gradient(135deg,#a46aff,#37e5fa,#7049d8);box-shadow:0 0 25px #8e5aff44,0 0 55px #35dff522}
+.board{position:relative;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:repeat(10,minmax(0,1fr));gap:2px;direction:ltr;aspect-ratio:1;overflow:hidden;border-radius:11px;background:#090d24}
+.cell{position:relative;min-width:0;min-height:0;border-radius:4px;background:linear-gradient(145deg,#263b6d,#171a43);box-shadow:inset 0 1px 2px #ffffff18,inset 0 -2px 4px #0005;overflow:hidden}
 .cell:nth-child(4n+1){background:linear-gradient(145deg,#164e70,#172b58)}
 .cell:nth-child(4n+2){background:linear-gradient(145deg,#3a286e,#1d2452)}
 .cell:nth-child(4n+3){background:linear-gradient(145deg,#234b76,#17264f)}
 .cell:nth-child(4n){background:linear-gradient(145deg,#37306e,#20244c)}
-.cell.start{
-  box-shadow:inset 0 0 0 2px #47f3b5,inset 0 0 12px #47f3b544;
-}
-.cell.finish{
-  box-shadow:inset 0 0 0 2px #ffd76a,inset 0 0 15px #ffd76a55;
-  background:linear-gradient(145deg,#66502a,#33244e);
-}
-.cell-number{
-  position:absolute;top:2px;left:3px;
-  color:#e4e7ff;font-size:clamp(6px,2vw,10px);
-  font-weight:800;opacity:.83;
-  direction:ltr;z-index:2;
-}
+.cell.start{box-shadow:inset 0 0 0 2px #47f3b5,inset 0 0 12px #47f3b544}
+.cell.finish{box-shadow:inset 0 0 0 2px #ffd76a,inset 0 0 15px #ffd76a55;background:linear-gradient(145deg,#66502a,#33244e)}
+.cell-number{position:absolute;top:2px;left:3px;color:#e4e7ff;font-size:clamp(6px,2vw,10px);font-weight:800;opacity:.83;direction:ltr;z-index:2}
 .cell.start .cell-number{color:#62ffca}
 .cell.finish .cell-number{color:#ffe28a}
-.cell-decoration{
-  position:absolute;right:2px;bottom:1px;
-  font-size:clamp(7px,2vw,11px);opacity:.55;
-}
-.board-art{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  z-index:4;pointer-events:none;overflow:visible;
-}
-.tokens-layer{
-  position:absolute;inset:0;z-index:6;
-  pointer-events:none;
-}
-.token-position{
-  position:absolute;width:10%;height:10%;
-  display:flex;align-items:center;justify-content:center;
-  transform:translate(-50%,-50%);
-}
-.token{
-  width:clamp(13px,4vw,23px);
-  height:clamp(13px,4vw,23px);
-  border-radius:50%;display:flex;
-  align-items:center;justify-content:center;
-  font-size:clamp(8px,2.4vw,13px);
-  font-weight:900;color:white;
-  border:2px solid #ffffffdd;
-  box-shadow:0 2px 5px #000a,0 0 9px currentColor;
-}
+.cell-decoration{position:absolute;right:2px;bottom:1px;font-size:clamp(7px,2vw,11px);opacity:.55}
+.board-art{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;overflow:visible}
+.tokens-layer{position:absolute;inset:0;z-index:6;pointer-events:none}
+.token-position{position:absolute;width:10%;height:10%;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%)}
+.token{width:clamp(13px,4vw,23px);height:clamp(13px,4vw,23px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(8px,2.4vw,13px);font-weight:900;color:white;border:2px solid #ffffffdd;box-shadow:0 2px 5px #000a,0 0 9px currentColor}
 .token.red{background:radial-gradient(circle at 30% 25%,#ffb0b0,#ef244f 60%,#7e092a)}
 .token.blue{background:radial-gradient(circle at 30% 25%,#b7faff,#1a9dff 60%,#063c99)}
 .token.green{background:radial-gradient(circle at 30% 25%,#caffb5,#35d878 60%,#096a39)}
 .token.yellow{background:radial-gradient(circle at 30% 25%,#fff6b0,#ffb92e 60%,#9c5100)}
-.legend{
-  display:flex;justify-content:center;gap:14px;
-  flex-wrap:wrap;margin-top:10px;
-  font-size:10px;color:#d5d0ed;
-}
+.legend{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:10px;color:#d5d0ed}
 .legend span{display:flex;align-items:center;gap:5px}
 .legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
-.players{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;margin-top:13px;
-}
-.player{
-  background:#10152b;border:1px solid #39345c;
-  border-radius:12px;padding:9px;
-  display:flex;align-items:center;gap:8px;min-width:0;
-}
-.player.active{
-  border-color:var(--cyan);
-  box-shadow:0 0 13px #45eaff2c;
-  background:#17213a;
-}
+.players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:13px}
+.player{background:#10152b;border:1px solid #39345c;border-radius:12px;padding:9px;display:flex;align-items:center;gap:8px;min-width:0}
+.player.active{border-color:var(--cyan);box-shadow:0 0 13px #45eaff2c;background:#17213a}
 .player-icon{font-size:20px}
 .player-info{min-width:0;flex:1}
-.player-name{
-  font-size:10px;font-weight:800;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
+.player-name{font-size:10px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .player-pos{font-size:9px;color:var(--muted)}
-.controls{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:9px;margin-top:13px;
-}
-.dice-box{
-  background:#10152b;border:1px solid #39345c;
-  border-radius:15px;padding:9px;text-align:center;
-}
-.dice{
-  font-size:42px;line-height:1.35;
-  filter:drop-shadow(0 0 10px #a879ff88);
-}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}
+.dice-box{background:#10152b;border:1px solid #39345c;border-radius:15px;padding:9px;text-align:center}
+.dice{font-size:42px;line-height:1.35;filter:drop-shadow(0 0 10px #a879ff88)}
 .dice.rolling{animation:shake .12s infinite alternate}
-@keyframes shake{
-  from{transform:rotate(-13deg) scale(.9)}
-  to{transform:rotate(13deg) scale(1.1)}
-}
+@keyframes shake{from{transform:rotate(-13deg) scale(.9)}to{transform:rotate(13deg) scale(1.1)}}
 .dice-caption{font-size:9px;color:var(--muted)}
-button{
-  font-family:inherit;border:0;cursor:pointer;
-  font-weight:800;
-}
-.roll{
-  min-height:85px;width:100%;
-  border-radius:15px;color:#15112a;
-  background:linear-gradient(135deg,#c09aff,#54eafa);
-  box-shadow:0 5px 20px #8959e955;
-  font-size:16px;
-}
+button{font-family:inherit;border:0;cursor:pointer;font-weight:800}
+.roll{min-height:85px;width:100%;border-radius:15px;color:#15112a;background:linear-gradient(135deg,#c09aff,#54eafa);box-shadow:0 5px 20px #8959e955;font-size:16px}
 .roll:disabled{opacity:.35;cursor:not-allowed}
-.message{
-  margin-top:11px;padding:11px;
-  border-radius:12px;text-align:center;
-  font-size:11px;min-height:42px;
-  background:#10152b;border:1px solid #39345c;
-  color:#e4e0ff;line-height:1.8;
-}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
-.secondary,.primary{
-  padding:11px;border-radius:11px;font-size:11px;
-}
+.message{margin-top:11px;padding:11px;border-radius:12px;text-align:center;font-size:11px;min-height:42px;background:#10152b;border:1px solid #39345c;color:#e4e0ff;line-height:1.8}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:9px}
+.secondary,.primary{padding:11px;border-radius:11px;font-size:11px}
 .secondary{background:#29264a;color:#eae5ff;border:1px solid #4a4374}
 .primary{background:linear-gradient(135deg,#8c5be9,#5740a8);color:white}
-.rules{
-  margin-top:12px;text-align:center;
-  color:#aaa4c9;font-size:10px;line-height:2;
-}
-.overlay{
-  position:fixed;inset:0;background:#050414ef;
-  display:none;align-items:center;justify-content:center;
-  padding:20px;z-index:20;
-}
-.dialog{
-  width:100%;max-width:350px;padding:20px;
-  border-radius:21px;text-align:center;
-  background:linear-gradient(145deg,#29204a,#151a35);
-  border:1px solid #7253a8;
-  box-shadow:0 0 35px #865aff44;
-}
+button:disabled{opacity:.35;cursor:not-allowed}
+.rules{margin-top:12px;text-align:center;color:#aaa4c9;font-size:10px;line-height:2}
+.overlay{position:fixed;inset:0;background:#050414ef;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.dialog{width:100%;max-width:350px;padding:20px;border-radius:21px;text-align:center;background:linear-gradient(145deg,#29204a,#151a35);border:1px solid #7253a8;box-shadow:0 0 35px #865aff44}
 .dialog h2{font-size:20px;margin:5px}
 .dialog p{font-size:12px;color:#c4c0dd;line-height:2}
-select{
-  width:100%;padding:12px;border-radius:10px;
-  background:#10152b;color:white;
-  border:1px solid #514879;font-family:inherit;
-  margin:8px 0 12px;
-}
+select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0 12px}
 .dialog button{width:100%;margin-top:7px}
 </style>
 </head>
-
 <body>
 <div class="app">
 <header>
@@ -233,657 +83,239 @@ select{
   <h1>🐍 مار و پله</h1>
   <div class="subtitle">مسابقه نئونی تا خانه ۱۰۰</div>
 </header>
-
 <section class="panel">
   <div class="status">
-    <div>
-      <div class="status-label">وضعیت مسابقه</div>
-      <div class="status-value" id="gameStatus">آماده شروع</div>
-    </div>
+    <div><div class="status-label">وضعیت مسابقه</div><div class="status-value" id="gameStatus">آماده شروع</div></div>
     <div class="turn-pill" id="turnLabel">منتظر شروع</div>
   </div>
-
   <div class="board-wrap">
     <div class="board" id="board">
-      <svg class="board-art" id="boardArt"
-        viewBox="0 0 1000 1000" preserveAspectRatio="none">
+      <svg class="board-art" id="boardArt" viewBox="0 0 1000 1000" preserveAspectRatio="none">
         <defs>
-          <linearGradient id="snakeGreen" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#b7ff65"/>
-            <stop offset="45%" stop-color="#35df85"/>
-            <stop offset="100%" stop-color="#08794e"/>
-          </linearGradient>
-          <linearGradient id="snakePurple" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#f1a5ff"/>
-            <stop offset="50%" stop-color="#b35cff"/>
-            <stop offset="100%" stop-color="#6024bb"/>
-          </linearGradient>
-          <linearGradient id="snakeOrange" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#fff18b"/>
-            <stop offset="50%" stop-color="#ff9d32"/>
-            <stop offset="100%" stop-color="#d83c37"/>
-          </linearGradient>
-          <linearGradient id="ladderGold" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#fff6a6"/>
-            <stop offset="45%" stop-color="#ffc34e"/>
-            <stop offset="100%" stop-color="#b76a19"/>
-          </linearGradient>
-          <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
-            <feGaussianBlur stdDeviation="7" result="blur"/>
-            <feMerge>
-              <feMergeNode in="blur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="5"/>
-          </filter>
+          <linearGradient id="snakeGreen" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#b7ff65"/><stop offset="45%" stop-color="#35df85"/><stop offset="100%" stop-color="#08794e"/></linearGradient>
+          <linearGradient id="snakePurple" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f1a5ff"/><stop offset="50%" stop-color="#b35cff"/><stop offset="100%" stop-color="#6024bb"/></linearGradient>
+          <linearGradient id="snakeOrange" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff18b"/><stop offset="50%" stop-color="#ff9d32"/><stop offset="100%" stop-color="#d83c37"/></linearGradient>
+          <linearGradient id="ladderGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff6a6"/><stop offset="45%" stop-color="#ffc34e"/><stop offset="100%" stop-color="#b76a19"/></linearGradient>
+          <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
         </defs>
       </svg>
       <div class="tokens-layer" id="tokensLayer"></div>
     </div>
   </div>
-
   <div class="legend">
     <span><i style="background:#55ed9b"></i> مار سبز</span>
     <span><i style="background:#c078ff"></i> مار بنفش</span>
     <span><i style="background:#ffc34e"></i> نردبان طلایی</span>
   </div>
-
   <div class="players" id="players"></div>
-
   <div class="controls">
-    <div class="dice-box">
-      <div class="dice" id="dice">🎲</div>
-      <div class="dice-caption" id="diceCaption">منتظر پرتاب تاس</div>
-    </div>
-    <button class="roll" id="rollBtn" onclick="rollDice()">
-      🎲 انداختن تاس
-    </button>
+    <div class="dice-box"><div class="dice" id="dice">🎲</div><div class="dice-caption" id="diceCaption">منتظر پرتاب تاس</div></div>
+    <button class="roll" id="rollBtn" onclick="rollDice()">🎲 انداختن تاس</button>
   </div>
-
-  <div class="message" id="message">
-    تعداد بازیکنان را انتخاب کن و مسابقه را شروع کن.
-  </div>
-
+  <div class="message" id="message">اتاق بساز یا با کد دعوت وارد بازی شو.</div>
   <div class="actions">
-    <button class="secondary" onclick="showSetup()">⚙️ تنظیم بازی</button>
-    <button class="primary" onclick="newGame()">↻ بازی جدید</button>
+    <button class="secondary" onclick="showSetup()">⚙️ اتاق‌ها</button>
+    <button class="primary" id="startOnlineBtn" onclick="startGame()" disabled>▶ شروع بازی</button>
+    <button class="secondary" onclick="newGame()">↻ اتاق جدید</button>
   </div>
 </section>
-
-<div class="rules">
-  🏁 برای برد باید دقیقاً به خانه ۱۰۰ برسی.<br>
-  🎲 با آوردن عدد ۶ یک نوبت اضافه می‌گیری.<br>
-  🐍 مار تو را پایین می‌برد و 🪜 نردبان تو را بالا می‌برد.
-</div>
+<div class="rules">🏁 برای برد باید دقیقاً به خانه ۱۰۰ برسی.<br>🎲 با آوردن عدد ۶ یک نوبت اضافه می‌گیری.<br>🐍 مار تو را پایین می‌برد و 🪜 نردبان تو را بالا می‌برد.</div>
 </div>
 
 <div class="overlay" id="setupOverlay">
   <div class="dialog">
-    <h2>🎮 تنظیم مسابقه</h2>
-    <p>تعداد بازیکنان را انتخاب کن.</p>
-    <select id="playerCount">
-      <option value="2">۲ بازیکن</option>
-      <option value="3">۳ بازیکن</option>
-      <option value="4" selected>۴ بازیکن</option>
-    </select>
-    <button class="primary" onclick="startGame()">شروع مسابقه</button>
-    <button class="secondary" onclick="closeSetup()">بازگشت</button>
+    <h2>🌐 بازی آنلاین SINX</h2>
+    <p>اتاق بساز یا با کد دعوت وارد بازی دوستت شو.</p>
+    <input id="playerNameInput" maxlength="20" placeholder="نام بازیکن" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0">
+    <select id="playerCount"><option value="2">۲ بازیکن</option><option value="3">۳ بازیکن</option><option value="4" selected>۴ بازیکن</option></select>
+    <button class="primary" id="createRoomBtn" onclick="createOnlineRoom()">＋ ساخت اتاق جدید</button>
+    <input id="roomCodeInput" maxlength="6" placeholder="کد اتاق" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0;text-transform:uppercase">
+    <button class="secondary" id="joinRoomBtn" onclick="joinOnlineRoom()">ورود به اتاق</button>
+    <button class="secondary" onclick="closeSetup()">بازگشت به بازی</button>
+    <p id="lobbyFeedback" style="min-height:20px;margin-bottom:0"></p>
   </div>
 </div>
 
 <div class="overlay" id="winOverlay">
-  <div class="dialog">
-    <div style="font-size:55px">🏆</div>
-    <h2 id="winnerTitle">برنده مسابقه!</h2>
-    <p id="winnerText"></p>
-    <button class="primary" onclick="newGame()">بازی مجدد</button>
-  </div>
+  <div class="dialog"><div style="font-size:55px">🏆</div><h2 id="winnerTitle">برنده مسابقه!</h2><p id="winnerText"></p><button class="primary" onclick="newGame()">بازی مجدد</button></div>
 </div>
 
 <script>
 const tg=window.Telegram?.WebApp;
-if(tg){
-  tg.ready();
-  tg.expand();
-  tg.setHeaderColor("#090817");
-  tg.setBackgroundColor("#090817");
-}
+if(tg){tg.ready();tg.expand();tg.setHeaderColor("#090817");tg.setBackgroundColor("#090817");}
 
-const SNAKES={
-  16:6,47:26,49:11,56:53,62:19,
-  64:60,87:24,93:73,95:75,98:78
-};
-
-const LADDERS={
-  2:38,7:14,8:31,15:26,21:42,
-  28:84,36:44,51:67,71:91
-};
-
+const API_URL="https://tefzctytomzmipobfvep.supabase.co/functions/v1/game-room";
+const PUBLIC_KEY="sb_publishable_5StO0MaWc5G75d-b8I_zSg_xIyZ-ZI2";
+const SNAKES={16:6,47:26,49:11,56:53,62:19,64:60,87:24,93:73,95:75,98:78};
+const LADDERS={2:38,7:14,8:31,15:26,21:42,28:84,36:44,51:67,71:91};
 const COLORS=["red","blue","green","yellow"];
 const ICONS=["🔴","🔵","🟢","🟡"];
-const NAMES=["بازیکن قرمز","بازیکن آبی","بازیکن سبز","بازیکن زرد"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
+let players=[],turn=0,playing=false,locked=false;
+let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false;
 
-let players=[];
-let turn=0;
-let playing=false;
-let locked=false;
-
-function sleep(ms){
-  return new Promise(resolve=>setTimeout(resolve,ms));
+function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+function feedback(s){const e=document.getElementById("lobbyFeedback");if(e)e.textContent=s;}
+function keyFor(code){return "sinx_room_"+code;}
+function storeSession(name){localStorage.setItem(keyFor(roomCode),JSON.stringify({playerToken,playerName:name}));}
+function readSession(code){try{const x=JSON.parse(localStorage.getItem(keyFor(code))||"null");return x&&x.playerToken?x:null;}catch{return null;}}
+async function api(action,extra={}){
+ const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":PUBLIC_KEY,"Authorization":"Bearer "+PUBLIC_KEY},body:JSON.stringify({action,roomCode,playerToken,...extra})});
+ let data;try{data=await res.json();}catch{throw new Error("پاسخ سرور قابل خواندن نیست");}
+ if(!res.ok||!data.success)throw new Error(data.error||"ارتباط با سرور ناموفق بود");
+ return data;
 }
+function applyState(data){
+ if(data.room){roomStatus=data.room.status;turn=Number(data.room.current_turn||0);}
+ if(Array.isArray(data.players))players=data.players.map(p=>({id:p.id,seat:Number(p.seat),name:p.player_name,pos:Number(p.position||0),isHost:!!p.is_host}));
+ if(Number.isInteger(data.mySeat))mySeat=data.mySeat;
+ host=players.some(p=>p.seat===mySeat&&p.isHost);
+ playing=roomStatus==="playing";
+ render();
+ document.getElementById("gameStatus").textContent=roomStatus==="waiting"?"در انتظار بازیکنان":roomStatus==="playing"?"در حال مسابقه":roomStatus==="finished"?"بازی تمام شد":"آماده شروع";
+ const sb=document.getElementById("startOnlineBtn");
+ if(sb)sb.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
+ if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent="کد اتاق: "+roomCode+" | "+players.length+" بازیکن از "+(data.room?.max_players||"?");
+ if(roomStatus==="finished"){const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}
+}
+async function syncState(){const d=await api("state");applyState(d);return d;}
+function startPolling(){if(pollHandle)clearInterval(pollHandle);pollHandle=setInterval(async()=>{if(!roomCode||!playerToken)return;try{await syncState();}catch(e){document.getElementById("message").textContent=e.message;}},2200);}
+function setLobbyBusy(v){document.getElementById("createRoomBtn").disabled=v;document.getElementById("joinRoomBtn").disabled=v;}
+async function createOnlineRoom(){
+ const name=document.getElementById("playerNameInput").value.trim();
+ if(!name){feedback("اول نام بازیکن را وارد کن.");return;}
+ try{
+  locked=true;setLobbyBusy(true);
+  const d=await api("create",{playerName:name,maxPlayers:Number(document.getElementById("playerCount").value)});
+  roomCode=d.roomCode;playerToken=d.playerToken;mySeat=0;storeSession(name);
+  applyState({room:d.room,players:[d.player],mySeat:0});
+  document.getElementById("roomCodeInput").value=roomCode;
+  document.getElementById("message").textContent="اتاق ساخته شد. کد دعوت: "+roomCode;
+  feedback("کد اتاق "+roomCode+" را برای دوستانت بفرست. برای شروع حداقل یک نفر دیگر باید وارد شود.");
+  closeSetup();startPolling();
+ }catch(e){feedback(e.message);}
+ finally{locked=false;setLobbyBusy(false);render();}
+}
+async function joinOnlineRoom(){
+ const name=document.getElementById("playerNameInput").value.trim();
+ const code=(document.getElementById("roomCodeInput").value.trim()||new URLSearchParams(location.search).get("room")||"").toUpperCase();
+ if(!name||!code){feedback("نام بازیکن و کد اتاق را وارد کن.");return;}
+ try{
+  locked=true;setLobbyBusy(true);roomCode=code;
+  const d=await api("join",{playerName:name});
+  playerToken=d.playerToken;mySeat=d.player.seat;storeSession(name);
+  await syncState();
+  document.getElementById("message").textContent="با موفقیت وارد اتاق شدی: "+roomCode;
+  feedback("وارد اتاق شدی. منتظر شروع میزبان بمان.");
+  closeSetup();startPolling();
+ }catch(e){feedback(e.message);}
+ finally{locked=false;setLobbyBusy(false);render();}
+}
+async function startGame(){
+ if(!roomCode||!playerToken){showSetup();return;}
+ try{locked=true;render();const d=await api("start");applyState(d);document.getElementById("message").textContent="مسابقه شروع شد!";closeSetup();startPolling();}
+ catch(e){document.getElementById("message").textContent=e.message;}
+ finally{locked=false;render();}
+}
+function showSetup(){document.getElementById("setupOverlay").style.display="flex";}
+function closeSetup(){document.getElementById("setupOverlay").style.display="none";}
+function newGame(){showSetup();}
 
-/* محاسبه مختصات خانه‌ها */
+/* مختصات خانه‌ها */
 function pointOf(n){
-  const rowFromBottom=Math.floor((n-1)/10);
-  const indexInRow=(n-1)%10;
-  const col=rowFromBottom%2===0?indexInRow:9-indexInRow;
-  const visualRow=9-rowFromBottom;
-
-  return {
-    x:col*100+50,
-    y:visualRow*100+50
-  };
+ const row=Math.floor((n-1)/10),idx=(n-1)%10;
+ const col=row%2===0?idx:9-idx;
+ return{x:col*100+50,y:(9-row)*100+50};
 }
-
-/* ساخت صفحه بدون حذف SVG */
 function createBoard(){
-  const board=document.getElementById("board");
-
-  // اصلاح اصلی: SVG را پاک نمی‌کنیم
-  board.querySelectorAll(".cell,.tokens-layer").forEach(el=>{
-    el.remove();
-  });
-
-  const numbers=[];
-
-  for(let row=9;row>=0;row--){
-    let line=[];
-    for(let col=0;col<10;col++){
-      line.push(row*10+col+1);
-    }
-    if(row%2===1) line.reverse();
-    numbers.push(...line);
-  }
-
-  numbers.forEach(n=>{
-    const cell=document.createElement("div");
-    cell.className="cell";
-    cell.id="cell-"+n;
-
-    if(n===1) cell.classList.add("start");
-    if(n===100) cell.classList.add("finish");
-
-    const number=document.createElement("span");
-    number.className="cell-number";
-    number.textContent=n;
-    cell.appendChild(number);
-
-    const deco=document.createElement("span");
-    deco.className="cell-decoration";
-    if(n===1) deco.textContent="🚩";
-    if(n===100) deco.textContent="🏆";
-    cell.appendChild(deco);
-
-    board.appendChild(cell);
-  });
-
-  const layer=document.createElement("div");
-  layer.className="tokens-layer";
-  layer.id="tokensLayer";
-  board.appendChild(layer);
-
-  drawBoardArt();
+ const board=document.getElementById("board");
+ board.querySelectorAll(".cell,.tokens-layer").forEach(e=>e.remove());
+ const nums=[];
+ for(let row=9;row>=0;row--){let line=[];for(let col=0;col<10;col++)line.push(row*10+col+1);if(row%2===1)line.reverse();nums.push(...line);}
+ nums.forEach(n=>{
+  const c=document.createElement("div");c.className="cell";c.id="cell-"+n;
+  if(n===1)c.classList.add("start");if(n===100)c.classList.add("finish");
+  const no=document.createElement("span");no.className="cell-number";no.textContent=n;c.appendChild(no);
+  const deco=document.createElement("span");deco.className="cell-decoration";if(n===1)deco.textContent="🚩";if(n===100)deco.textContent="🏆";c.appendChild(deco);board.appendChild(c);
+ });
+ const layer=document.createElement("div");layer.className="tokens-layer";layer.id="tokensLayer";board.appendChild(layer);drawBoardArt();
 }
-
-/* مسیر خمیده مار */
-function snakePath(a,b,index){
-  const p1=pointOf(a);
-  const p2=pointOf(b);
-
-  const dx=p2.x-p1.x;
-  const dy=p2.y-p1.y;
-  const length=Math.sqrt(dx*dx+dy*dy)||1;
-
-  const nx=-dy/length;
-  const ny=dx/length;
-  const direction=index%2===0?1:-1;
-  const bend=Math.min(105,length*.28)*direction;
-
-  const c1={
-    x:p1.x+dx*.28+nx*bend,
-    y:p1.y+dy*.28+ny*bend
-  };
-  const c2={
-    x:p1.x+dx*.72-nx*bend,
-    y:p1.y+dy*.72-ny*bend
-  };
-
-  return {
-    d:`M ${p1.x} ${p1.y}
-       C ${c1.x} ${c1.y},
-         ${c2.x} ${c2.y},
-         ${p2.x} ${p2.y}`,
-    head:p1,
-    tail:p2
-  };
+function snakePath(a,b,i){
+ const p1=pointOf(a),p2=pointOf(b),dx=p2.x-p1.x,dy=p2.y-p1.y,len=Math.hypot(dx,dy)||1;
+ const nx=-dy/len,ny=dx/len,bend=Math.min(105,len*.28)*(i%2===0?1:-1);
+ const c1={x:p1.x+dx*.28+nx*bend,y:p1.y+dy*.28+ny*bend};
+ const c2={x:p1.x+dx*.72-nx*bend,y:p1.y+dy*.72-ny*bend};
+ return{d:`M ${p1.x} ${p1.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${p2.x} ${p2.y}`,head:p1,tail:p2};
 }
-
-  
-/* طراحی مار با ظاهر کلاسیک و پولک‌دار */
-function drawSnake(a,b,index,color){
-  const s=snakePath(a,b,index);
-  const width=29;
-
-  return `
-    <g>
-      <!-- سایه زیر بدن -->
-      <path d="${s.d}"
-        fill="none"
-        stroke="#000"
-        stroke-width="${width+17}"
-        stroke-linecap="round"
-        opacity=".65"
-        transform="translate(0 8)"
-        filter="url(#shadow)"/>
-
-      <!-- حاشیه تیره بدن -->
-      <path d="${s.d}"
-        fill="none"
-        stroke="#171020"
-        stroke-width="${width+9}"
-        stroke-linecap="round"/>
-
-      <!-- بدن اصلی -->
-      <path d="${s.d}"
-        fill="none"
-        stroke="${color}"
-        stroke-width="${width}"
-        stroke-linecap="round"
-        filter="url(#glow)"/>
-
-      <!-- بافت پولک‌ها -->
-      <path d="${s.d}"
-        fill="none"
-        stroke="#21152d"
-        stroke-width="13"
-        stroke-linecap="round"
-        stroke-dasharray="2 10"
-        opacity=".48"/>
-
-      <!-- خط نور روی بدن -->
-      <path d="${s.d}"
-        fill="none"
-        stroke="#ffffff"
-        stroke-width="3"
-        stroke-linecap="round"
-        stroke-dasharray="1 22"
-        opacity=".55"/>
-
-      <!-- سر مار -->
-      <ellipse cx="${s.head.x}" cy="${s.head.y}"
-        rx="27" ry="23"
-        fill="${color}"
-        stroke="#171020"
-        stroke-width="7"/>
-
-      <!-- پوزه -->
-      <ellipse cx="${s.head.x}" cy="${s.head.y+10}"
-        rx="17" ry="10"
-        fill="${color}"
-        stroke="#171020"
-        stroke-width="3"/>
-
-      <!-- چشم‌های باریک و جدی -->
-      <ellipse cx="${s.head.x-10}" cy="${s.head.y-5}"
-        rx="5" ry="7"
-        fill="#fff2d2"/>
-      <ellipse cx="${s.head.x+10}" cy="${s.head.y-5}"
-        rx="5" ry="7"
-        fill="#fff2d2"/>
-
-      <ellipse cx="${s.head.x-10}" cy="${s.head.y-5}"
-        rx="2" ry="5" fill="#160d1d"/>
-      <ellipse cx="${s.head.x+10}" cy="${s.head.y-5}"
-        rx="2" ry="5" fill="#160d1d"/>
-
-      <!-- سوراخ بینی -->
-      <circle cx="${s.head.x-5}" cy="${s.head.y+10}"
-        r="1.8" fill="#251323"/>
-      <circle cx="${s.head.x+5}" cy="${s.head.y+10}"
-        r="1.8" fill="#251323"/>
-
-      <!-- زبان دوشاخه -->
-      <path d="M ${s.head.x} ${s.head.y+18}
-        L ${s.head.x} ${s.head.y+29}
-        M ${s.head.x} ${s.head.y+29}
-        L ${s.head.x-5} ${s.head.y+35}
-        M ${s.head.x} ${s.head.y+29}
-        L ${s.head.x+5} ${s.head.y+35}"
-        fill="none"
-        stroke="#ff426e"
-        stroke-width="2.5"
-        stroke-linecap="round"/>
-
-      <!-- انتهای دم -->
-      <path d="M ${s.tail.x-5} ${s.tail.y}
-        Q ${s.tail.x} ${s.tail.y+8}
-        ${s.tail.x+5} ${s.tail.y}"
-        fill="none"
-        stroke="#171020"
-        stroke-width="12"
-        stroke-linecap="round"/>
-    </g>`;
+function drawSnake(a,b,i,color){
+ const s=snakePath(a,b,i),w=29;
+ return `<g>
+ <path d="${s.d}" fill="none" stroke="#000" stroke-width="${w+17}" stroke-linecap="round" opacity=".65" transform="translate(0 8)" filter="url(#shadow)"/>
+ <path d="${s.d}" fill="none" stroke="#171020" stroke-width="${w+9}" stroke-linecap="round"/>
+ <path d="${s.d}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round" filter="url(#glow)"/>
+ <path d="${s.d}" fill="none" stroke="#21152d" stroke-width="13" stroke-linecap="round" stroke-dasharray="2 10" opacity=".48"/>
+ <path d="${s.d}" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 22" opacity=".55"/>
+ <ellipse cx="${s.head.x}" cy="${s.head.y}" rx="27" ry="23" fill="${color}" stroke="#171020" stroke-width="7"/>
+ <ellipse cx="${s.head.x}" cy="${s.head.y+10}" rx="17" ry="10" fill="${color}" stroke="#171020" stroke-width="3"/>
+ <ellipse cx="${s.head.x-10}" cy="${s.head.y-5}" rx="5" ry="7" fill="#fff2d2"/><ellipse cx="${s.head.x+10}" cy="${s.head.y-5}" rx="5" ry="7" fill="#fff2d2"/>
+ <ellipse cx="${s.head.x-10}" cy="${s.head.y-5}" rx="2" ry="5" fill="#160d1d"/><ellipse cx="${s.head.x+10}" cy="${s.head.y-5}" rx="2" ry="5" fill="#160d1d"/>
+ <circle cx="${s.head.x-5}" cy="${s.head.y+10}" r="1.8" fill="#251323"/><circle cx="${s.head.x+5}" cy="${s.head.y+10}" r="1.8" fill="#251323"/>
+ <path d="M ${s.head.x} ${s.head.y+18} L ${s.head.x} ${s.head.y+29} M ${s.head.x} ${s.head.y+29} L ${s.head.x-5} ${s.head.y+35} M ${s.head.x} ${s.head.y+29} L ${s.head.x+5} ${s.head.y+35}" fill="none" stroke="#ff426e" stroke-width="2.5" stroke-linecap="round"/>
+ <path d="M ${s.tail.x-5} ${s.tail.y} Q ${s.tail.x} ${s.tail.y+8} ${s.tail.x+5} ${s.tail.y}" fill="none" stroke="#171020" stroke-width="12" stroke-linecap="round"/>
+ </g>`;
 }
-  
-
-/* طراحی نردبان */
-function drawLadder(a,b,index){
-  const p1=pointOf(a);
-  const p2=pointOf(b);
-
-  const dx=p2.x-p1.x;
-  const dy=p2.y-p1.y;
-  const length=Math.sqrt(dx*dx+dy*dy)||1;
-
-  const nx=-dy/length;
-  const ny=dx/length;
-  const offset=17;
-
-  const ax=p1.x+nx*offset;
-  const ay=p1.y+ny*offset;
-  const bx=p2.x+nx*offset;
-  const by=p2.y+ny*offset;
-
-  const cx=p1.x-nx*offset;
-  const cy=p1.y-ny*offset;
-  const dx2=p2.x-nx*offset;
-  const dy2=p2.y-ny*offset;
-
-  const count=Math.max(3,Math.floor(length/42));
-  let rungs="";
-
-  for(let i=1;i<count;i++){
-    const t=i/count;
-    const x1=ax+(bx-ax)*t;
-    const y1=ay+(by-ay)*t;
-    const x2=cx+(dx2-cx)*t;
-    const y2=cy+(dy2-cy)*t;
-
-    rungs+=`
-      <path d="M ${x1} ${y1} L ${x2} ${y2}"
-        stroke="#8b4b13" stroke-width="13"
-        stroke-linecap="round"/>
-      <path d="M ${x1} ${y1} L ${x2} ${y2}"
-        stroke="url(#ladderGold)" stroke-width="8"
-        stroke-linecap="round"/>`;
-  }
-
-  return `
-    <g>
-      <path d="M ${ax} ${ay} L ${bx} ${by}
-        M ${cx} ${cy} L ${dx2} ${dy2}"
-        stroke="#4c287d" stroke-width="20"
-        stroke-linecap="round" opacity=".8"/>
-      <path d="M ${ax} ${ay} L ${bx} ${by}
-        M ${cx} ${cy} L ${dx2} ${dy2}"
-        stroke="url(#ladderGold)" stroke-width="12"
-        stroke-linecap="round" filter="url(#glow)"/>
-      ${rungs}
-      <circle cx="${p1.x}" cy="${p1.y}" r="5" fill="#fff0a0"/>
-      <circle cx="${p2.x}" cy="${p2.y}" r="5" fill="#fff0a0"/>
-    </g>`;
+function drawLadder(a,b){
+ const p1=pointOf(a),p2=pointOf(b),dx=p2.x-p1.x,dy=p2.y-p1.y,len=Math.hypot(dx,dy)||1;
+ const nx=-dy/len,ny=dx/len,o=17;
+ const ax=p1.x+nx*o,ay=p1.y+ny*o,bx=p2.x+nx*o,by=p2.y+ny*o;
+ const cx=p1.x-nx*o,cy=p1.y-ny*o,dx2=p2.x-nx*o,dy2=p2.y-ny*o;
+ const count=Math.max(3,Math.floor(len/42));let rungs="";
+ for(let i=1;i<count;i++){const t=i/count,x1=ax+(bx-ax)*t,y1=ay+(by-ay)*t,x2=cx+(dx2-cx)*t,y2=cy+(dy2-cy)*t;rungs+=`<path d="M ${x1} ${y1} L ${x2} ${y2}" stroke="#8b4b13" stroke-width="13" stroke-linecap="round"/><path d="M ${x1} ${y1} L ${x2} ${y2}" stroke="url(#ladderGold)" stroke-width="8" stroke-linecap="round"/>`;}
+ return `<g><path d="M ${ax} ${ay} L ${bx} ${by} M ${cx} ${cy} L ${dx2} ${dy2}" stroke="#4c287d" stroke-width="20" stroke-linecap="round" opacity=".8"/><path d="M ${ax} ${ay} L ${bx} ${by} M ${cx} ${cy} L ${dx2} ${dy2}" stroke="url(#ladderGold)" stroke-width="12" stroke-linecap="round" filter="url(#glow)"/>${rungs}<circle cx="${p1.x}" cy="${p1.y}" r="5" fill="#fff0a0"/><circle cx="${p2.x}" cy="${p2.y}" r="5" fill="#fff0a0"/></g>`;
 }
-
-
-/* رسم مارها در لایه زیرین و نردبان‌ها در لایه بالایی */
 function drawBoardArt(){
-  const svg=document.getElementById("boardArt");
-  const defs=svg.querySelector("defs").outerHTML;
-
-  const snakeColors=[
-    "url(#snakeGreen)",
-    "url(#snakePurple)",
-    "url(#snakeOrange)",
-    "url(#snakeGreen)",
-    "url(#snakePurple)",
-    "url(#snakeOrange)",
-    "url(#snakeGreen)",
-    "url(#snakePurple)",
-    "url(#snakeOrange)",
-    "url(#snakeGreen)"
-  ];
-
-  let art="";
-
-  // اول مارها رسم می‌شوند
-  Object.keys(SNAKES).forEach((start,i)=>{
-    art+=drawSnake(
-      Number(start),
-      SNAKES[start],
-      i,
-      snakeColors[i]
-    );
-  });
-
-  // بعد نردبان‌ها روی مارها قرار می‌گیرند
-  Object.keys(LADDERS).forEach((start,i)=>{
-    art+=drawLadder(
-      Number(start),
-      LADDERS[start],
-      i
-    );
-  });
-
-  svg.innerHTML=defs+art;
+ const svg=document.getElementById("boardArt"),defs=svg.querySelector("defs").outerHTML;
+ const colors=["url(#snakeGreen)","url(#snakePurple)","url(#snakeOrange)","url(#snakeGreen)","url(#snakePurple)","url(#snakeOrange)","url(#snakeGreen)","url(#snakePurple)","url(#snakeOrange)","url(#snakeGreen)"];
+ let art="";
+ Object.keys(SNAKES).forEach((a,i)=>art+=drawSnake(Number(a),SNAKES[a],i,colors[i]));
+ Object.keys(LADDERS).forEach(a=>art+=drawLadder(Number(a),LADDERS[a]));
+ svg.innerHTML=defs+art;
 }
-  
-
-/* رسم مهره‌ها */
 function renderTokens(){
-  const layer=document.getElementById("tokensLayer");
-  layer.innerHTML="";
-
-  players.forEach((p,i)=>{
-    if(p.pos<1) return;
-
-    const point=pointOf(p.pos);
-    const el=document.createElement("div");
-
-    el.className="token-position";
-    el.style.left=(point.x/10)+"%";
-    el.style.top=(point.y/10)+"%";
-
-    const token=document.createElement("div");
-    token.className="token "+COLORS[i];
-    token.textContent=i+1;
-
-    el.appendChild(token);
-    layer.appendChild(el);
-  });
+ const layer=document.getElementById("tokensLayer");layer.innerHTML="";
+ players.forEach(p=>{if(p.pos<1)return;const pt=pointOf(p.pos),el=document.createElement("div");el.className="token-position";el.style.left=(pt.x/10)+"%";el.style.top=(pt.y/10)+"%";const t=document.createElement("div");t.className="token "+COLORS[p.seat];t.textContent=p.seat+1;el.appendChild(t);layer.appendChild(el);});
 }
-
-/* به‌روزرسانی صفحه */
 function render(){
-  renderTokens();
-
-  const box=document.getElementById("players");
-  box.innerHTML="";
-
-  players.forEach((p,i)=>{
-    const item=document.createElement("div");
-    item.className="player"+(playing&&i===turn?" active":"");
-
-    const icon=document.createElement("div");
-    icon.className="player-icon";
-    icon.textContent=ICONS[i];
-
-    const info=document.createElement("div");
-    info.className="player-info";
-
-    const name=document.createElement("div");
-    name.className="player-name";
-    name.textContent=p.name;
-
-    const pos=document.createElement("div");
-    pos.className="player-pos";
-    pos.textContent="خانه "+p.pos+" از ۱۰۰";
-
-    info.appendChild(name);
-    info.appendChild(pos);
-    item.appendChild(icon);
-    item.appendChild(info);
-    box.appendChild(item);
-  });
-
-  document.getElementById("turnLabel").textContent=
-    playing?"نوبت "+players[turn].name:"مسابقه متوقف";
-
-  document.getElementById("rollBtn").disabled=!playing||locked;
-
-  document.getElementById("gameStatus").textContent=
-    playing?"در حال مسابقه":"آماده شروع";
+ renderTokens();const box=document.getElementById("players");box.innerHTML="";
+ players.forEach(p=>{const item=document.createElement("div");item.className="player"+(playing&&p.seat===turn?" active":"");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[p.seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p.name;const pos=document.createElement("div");pos.className="player-pos";pos.textContent="خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"");info.append(name,pos);item.append(icon,info);box.appendChild(item);});
+ const current=players.find(p=>p.seat===turn);
+ document.getElementById("turnLabel").textContent=playing?(current?"نوبت "+current.name:"در انتظار بازیکن"):(roomStatus==="waiting"?"لابی اتاق":"مسابقه متوقف");
+ document.getElementById("rollBtn").disabled=!playing||locked||mySeat!==turn;
+ const sb=document.getElementById("startOnlineBtn");if(sb)sb.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
+ document.getElementById("gameStatus").textContent=roomStatus==="waiting"?"در انتظار شروع":roomStatus==="playing"?"در حال مسابقه":roomStatus==="finished"?"پایان مسابقه":"آماده شروع";
 }
-
-function showSetup(){
-  document.getElementById("setupOverlay").style.display="flex";
-}
-
-function closeSetup(){
-  document.getElementById("setupOverlay").style.display="none";
-}
-
-function startGame(){
-  const count=Number(document.getElementById("playerCount").value);
-
-  players=Array.from({length:count},(_,i)=>({
-    id:i+1,name:NAMES[i],pos:0
-  }));
-
-  turn=0;
-  playing=true;
-  locked=false;
-
-  document.getElementById("dice").textContent="🎲";
-  document.getElementById("diceCaption").textContent="منتظر پرتاب تاس";
-  document.getElementById("message").textContent=
-    "مسابقه شروع شد! بازیکن اول تاس بیندازد.";
-
-  document.getElementById("winOverlay").style.display="none";
-
-  closeSetup();
-  render();
-}
-
-function newGame(){
-  document.getElementById("winOverlay").style.display="none";
-  showSetup();
-}
-
-function nextTurn(extra){
-  if(!extra) turn=(turn+1)%players.length;
-  render();
-}
-
-/* پرتاب تاس */
 async function rollDice(){
-  if(!playing || locked) return;
-
-  locked=true;
-  render();
-
-  const dice=document.getElementById("dice");
-  dice.classList.add("rolling");
-
-  for(let i=0;i<12;i++){
-    dice.textContent=DICE[Math.floor(Math.random()*6)];
-    await sleep(75);
-  }
-
-  const value=Math.floor(Math.random()*6)+1;
-
-  dice.textContent=DICE[value-1];
-  dice.classList.remove("rolling");
-
-  document.getElementById("diceCaption").textContent=
-    "عدد تاس: "+value;
-
-  const p=players[turn];
-  const target=p.pos+value;
-
-  if(target>100){
-    document.getElementById("message").textContent=
-      p.name+" عدد "+value+" آورد؛ باید عدد دقیق بیاید.";
-
-    await sleep(700);
-    locked=false;
-    nextTurn(value===6);
-    return;
-  }
-
-  p.pos=target;
-  render();
-
-  document.getElementById("message").textContent=
-    p.name+" به خانه "+target+" رسید.";
-
-  await sleep(600);
-
-  if(SNAKES[p.pos]){
-    const destination=SNAKES[p.pos];
-
-    document.getElementById("message").textContent=
-      "🐍 مار! برگشت از خانه "+p.pos+" به "+destination;
-
-    await sleep(500);
-    p.pos=destination;
-    render();
-
-  }else if(LADDERS[p.pos]){
-    const destination=LADDERS[p.pos];
-
-    document.getElementById("message").textContent=
-      "🪜 نردبان! صعود از خانه "+p.pos+" به "+destination;
-
-    await sleep(500);
-    p.pos=destination;
-    render();
-  }
-
-  await sleep(400);
-
-  if(p.pos===100){
-    playing=false;
-    locked=false;
-    render();
-
-    document.getElementById("winnerTitle").textContent=
-      "🏆 "+p.name;
-
-    document.getElementById("winnerText").textContent=
-      "تبریک! برنده مسابقه شدی.";
-
-    document.getElementById("winOverlay").style.display="flex";
-    return;
-  }
-
-  if(value===6){
-    document.getElementById("message").textContent+=
-      " 🎉 یک نوبت اضافه داری!";
-  }else{
-    document.getElementById("message").textContent+=
-      " نوبت بازیکن بعدی است.";
-  }
-
-  locked=false;
-  nextTurn(value===6);
+ if(!playing||locked)return;
+ if(mySeat!==turn){document.getElementById("message").textContent="هنوز نوبت تو نیست.";return;}
+ locked=true;render();const dice=document.getElementById("dice");dice.classList.add("rolling");
+ for(let i=0;i<10;i++){dice.textContent=DICE[Math.floor(Math.random()*6)];await sleep(65);}
+ try{
+  const d=await api("roll");dice.textContent=DICE[(Number(d.dice)||1)-1];dice.classList.remove("rolling");
+  document.getElementById("diceCaption").textContent="عدد تاس: "+d.dice;applyState(d);
+  document.getElementById("message").textContent=d.message||"حرکت انجام شد.";
+  const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="تبریک! برنده مسابقه شدی.";document.getElementById("winOverlay").style.display="flex";}
+ }catch(e){dice.classList.remove("rolling");document.getElementById("message").textContent=e.message;try{await syncState();}catch{}}
+ finally{locked=false;render();}
 }
-
-createBoard();
-render();
-showSetup();
+createBoard();render();
+const invitedRoom=new URLSearchParams(location.search).get("room");
+if(invitedRoom){
+ document.getElementById("roomCodeInput").value=invitedRoom.toUpperCase();
+ const saved=readSession(invitedRoom.toUpperCase());
+ if(saved){roomCode=invitedRoom.toUpperCase();playerToken=saved.playerToken;document.getElementById("playerNameInput").value=saved.playerName||"";syncState().then(()=>{closeSetup();startPolling();}).catch(()=>showSetup());}
+ else showSetup();
+}else showSetup();
 </script>
 </body>
 </html>
