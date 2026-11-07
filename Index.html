@@ -393,10 +393,15 @@ function pointOf(n){
 }
 
 /* ساخت صفحه ۱۰ در ۱۰ */
+
 function createBoard(){
   const board=document.getElementById("board");
 
-  board.innerHTML="";
+  // فقط خانه‌ها و لایه مهره‌ها را پاک کن؛ SVG را نگه دار
+  board.querySelectorAll(".cell,.tokens-layer").forEach(el=>{
+    el.remove();
+  });
+
   const numbers=[];
 
   for(let row=9;row>=0;row--){
@@ -423,10 +428,11 @@ function createBoard(){
 
     const deco=document.createElement("span");
     deco.className="cell-decoration";
+
     if(n===1) deco.textContent="🚩";
     if(n===100) deco.textContent="🏆";
-    cell.appendChild(deco);
 
+    cell.appendChild(deco);
     board.appendChild(cell);
   });
 
@@ -437,7 +443,7 @@ function createBoard(){
 
   drawBoardArt();
 }
-
+  
 /* ساخت مسیر خمیده مار */
 function snakePath(a,b,index){
   const p1=pointOf(a);
