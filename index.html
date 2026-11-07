@@ -471,45 +471,113 @@ function snakePath(a,b,index){
   };
 }
 
-/* طراحی مار */
+  
+/* طراحی مار با ظاهر کلاسیک و پولک‌دار */
 function drawSnake(a,b,index,color){
   const s=snakePath(a,b,index);
-  const width=35;
+  const width=29;
 
   return `
     <g>
-      <path d="${s.d}" fill="none"
-        stroke="#000a" stroke-width="${width+13}"
-        stroke-linecap="round" filter="url(#shadow)"
-        transform="translate(0 7)"/>
-      <path d="${s.d}" fill="none"
-        stroke="${color}" stroke-width="${width}"
-        stroke-linecap="round" filter="url(#glow)"/>
-      <path d="${s.d}" fill="none"
-        stroke="#ffffff55" stroke-width="5"
-        stroke-linecap="round" stroke-dasharray="3 24"/>
-      <circle cx="${s.head.x}" cy="${s.head.y}"
-        r="24" fill="${color}" stroke="#fff9" stroke-width="3"/>
-      <ellipse cx="${s.head.x-8}" cy="${s.head.y-5}"
-        rx="5" ry="7" fill="white"/>
-      <ellipse cx="${s.head.x+8}" cy="${s.head.y-5}"
-        rx="5" ry="7" fill="white"/>
-      <circle cx="${s.head.x-7}" cy="${s.head.y-4}"
-        r="2.5" fill="#101126"/>
-      <circle cx="${s.head.x+9}" cy="${s.head.y-4}"
-        r="2.5" fill="#101126"/>
-      <path d="M ${s.head.x-5} ${s.head.y+10}
-        Q ${s.head.x} ${s.head.y+15}
-        ${s.head.x+6} ${s.head.y+9}"
-        fill="none" stroke="#45152c" stroke-width="2.5"
+      <!-- سایه زیر بدن -->
+      <path d="${s.d}"
+        fill="none"
+        stroke="#000"
+        stroke-width="${width+17}"
+        stroke-linecap="round"
+        opacity=".65"
+        transform="translate(0 8)"
+        filter="url(#shadow)"/>
+
+      <!-- حاشیه تیره بدن -->
+      <path d="${s.d}"
+        fill="none"
+        stroke="#171020"
+        stroke-width="${width+9}"
         stroke-linecap="round"/>
+
+      <!-- بدن اصلی -->
+      <path d="${s.d}"
+        fill="none"
+        stroke="${color}"
+        stroke-width="${width}"
+        stroke-linecap="round"
+        filter="url(#glow)"/>
+
+      <!-- بافت پولک‌ها -->
+      <path d="${s.d}"
+        fill="none"
+        stroke="#21152d"
+        stroke-width="13"
+        stroke-linecap="round"
+        stroke-dasharray="2 10"
+        opacity=".48"/>
+
+      <!-- خط نور روی بدن -->
+      <path d="${s.d}"
+        fill="none"
+        stroke="#ffffff"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-dasharray="1 22"
+        opacity=".55"/>
+
+      <!-- سر مار -->
+      <ellipse cx="${s.head.x}" cy="${s.head.y}"
+        rx="27" ry="23"
+        fill="${color}"
+        stroke="#171020"
+        stroke-width="7"/>
+
+      <!-- پوزه -->
+      <ellipse cx="${s.head.x}" cy="${s.head.y+10}"
+        rx="17" ry="10"
+        fill="${color}"
+        stroke="#171020"
+        stroke-width="3"/>
+
+      <!-- چشم‌های باریک و جدی -->
+      <ellipse cx="${s.head.x-10}" cy="${s.head.y-5}"
+        rx="5" ry="7"
+        fill="#fff2d2"/>
+      <ellipse cx="${s.head.x+10}" cy="${s.head.y-5}"
+        rx="5" ry="7"
+        fill="#fff2d2"/>
+
+      <ellipse cx="${s.head.x-10}" cy="${s.head.y-5}"
+        rx="2" ry="5" fill="#160d1d"/>
+      <ellipse cx="${s.head.x+10}" cy="${s.head.y-5}"
+        rx="2" ry="5" fill="#160d1d"/>
+
+      <!-- سوراخ بینی -->
+      <circle cx="${s.head.x-5}" cy="${s.head.y+10}"
+        r="1.8" fill="#251323"/>
+      <circle cx="${s.head.x+5}" cy="${s.head.y+10}"
+        r="1.8" fill="#251323"/>
+
+      <!-- زبان دوشاخه -->
+      <path d="M ${s.head.x} ${s.head.y+18}
+        L ${s.head.x} ${s.head.y+29}
+        M ${s.head.x} ${s.head.y+29}
+        L ${s.head.x-5} ${s.head.y+35}
+        M ${s.head.x} ${s.head.y+29}
+        L ${s.head.x+5} ${s.head.y+35}"
+        fill="none"
+        stroke="#ff426e"
+        stroke-width="2.5"
+        stroke-linecap="round"/>
+
+      <!-- انتهای دم -->
       <path d="M ${s.tail.x-5} ${s.tail.y}
         Q ${s.tail.x} ${s.tail.y+8}
         ${s.tail.x+5} ${s.tail.y}"
-        fill="none" stroke="${color}" stroke-width="8"
+        fill="none"
+        stroke="#171020"
+        stroke-width="12"
         stroke-linecap="round"/>
     </g>`;
 }
+  
 
 /* طراحی نردبان */
 function drawLadder(a,b,index){
@@ -569,7 +637,8 @@ function drawLadder(a,b,index){
     </g>`;
 }
 
-/* رسم مارها و نردبان‌ها */
+
+/* رسم مارها در لایه زیرین و نردبان‌ها در لایه بالایی */
 function drawBoardArt(){
   const svg=document.getElementById("boardArt");
   const defs=svg.querySelector("defs").outerHTML;
@@ -589,10 +658,7 @@ function drawBoardArt(){
 
   let art="";
 
-  Object.keys(LADDERS).forEach((start,i)=>{
-    art+=drawLadder(Number(start),LADDERS[start],i);
-  });
-
+  // اول مارها رسم می‌شوند
   Object.keys(SNAKES).forEach((start,i)=>{
     art+=drawSnake(
       Number(start),
@@ -602,8 +668,18 @@ function drawBoardArt(){
     );
   });
 
+  // بعد نردبان‌ها روی مارها قرار می‌گیرند
+  Object.keys(LADDERS).forEach((start,i)=>{
+    art+=drawLadder(
+      Number(start),
+      LADDERS[start],
+      i
+    );
+  });
+
   svg.innerHTML=defs+art;
 }
+  
 
 /* رسم مهره‌ها */
 function renderTokens(){
