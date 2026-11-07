@@ -713,10 +713,101 @@ function nextTurn(extra){
 
 /* پرتاب تاس */
 async function rollDice(){
-  if(!playing||locked) return;
+  if(!playing || locked) return;
 
   locked=true;
   render();
 
   const dice=document.getElementById("dice");
-  dice.clas
+  dice.classList.add("rolling");
+
+  for(let i=0;i<12;i++){
+    dice.textContent=DICE[Math.floor(Math.random()*6)];
+    await sleep(75);
+  }
+
+  const value=Math.floor(Math.random()*6)+1;
+
+  dice.textContent=DICE[value-1];
+  dice.classList.remove("rolling");
+
+  document.getElementById("diceCaption").textContent=
+    "عدد تاس: "+value;
+
+  const p=players[turn];
+  const target=p.pos+value;
+
+  if(target>100){
+    document.getElementById("message").textContent=
+      p.name+" عدد "+value+" آورد؛ باید عدد دقیق بیاید.";
+
+    await sleep(700);
+    locked=false;
+    nextTurn(value===6);
+    return;
+  }
+
+  p.pos=target;
+  render();
+
+  document.getElementById("message").textContent=
+    p.name+" به خانه "+target+" رسید.";
+
+  await sleep(600);
+
+  if(SNAKES[p.pos]){
+    const destination=SNAKES[p.pos];
+
+    document.getElementById("message").textContent=
+      "🐍 مار! برگشت از خانه "+p.pos+" به "+destination;
+
+    await sleep(500);
+    p.pos=destination;
+    render();
+
+  }else if(LADDERS[p.pos]){
+    const destination=LADDERS[p.pos];
+
+    document.getElementById("message").textContent=
+      "🪜 نردبان! صعود از خانه "+p.pos+" به "+destination;
+
+    await sleep(500);
+    p.pos=destination;
+    render();
+  }
+
+  await sleep(400);
+
+  if(p.pos===100){
+    playing=false;
+    locked=false;
+    render();
+
+    document.getElementById("winnerTitle").textContent=
+      "🏆 "+p.name;
+
+    document.getElementById("winnerText").textContent=
+      "تبریک! برنده مسابقه شدی.";
+
+    document.getElementById("winOverlay").style.display="flex";
+    return;
+  }
+
+  if(value===6){
+    document.getElementById("message").textContent+=
+      " 🎉 یک نوبت اضافه داری!";
+  }else{
+    document.getElementById("message").textContent+=
+      " نوبت بازیکن بعدی است.";
+  }
+
+  locked=false;
+  nextTurn(value===6);
+}
+
+createBoard();
+render();
+showSetup();
+</script>
+</body>
+</html>
