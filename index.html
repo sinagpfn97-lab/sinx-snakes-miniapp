@@ -7,12 +7,12 @@
 <meta name="theme-color" content="#090817">
 <title>SINX | Neon Snakes</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap');
 
 :root{
   --bg:#090817;
-  --panel:#17152e;
   --purple:#a879ff;
   --cyan:#45eaff;
   --text:#f8f5ff;
@@ -60,7 +60,8 @@ h1{font-size:26px;margin:5px 0;font-weight:900}
   box-shadow:0 0 25px #8e5aff44,0 0 55px #35dff522;
 }
 .board{
-  position:relative;display:grid;
+  position:relative;
+  display:grid;
   grid-template-columns:repeat(10,minmax(0,1fr));
   grid-template-rows:repeat(10,minmax(0,1fr));
   gap:2px;direction:ltr;
@@ -75,18 +76,10 @@ h1{font-size:26px;margin:5px 0;font-weight:900}
   box-shadow:inset 0 1px 2px #ffffff18,inset 0 -2px 4px #0005;
   overflow:hidden;
 }
-.cell:nth-child(4n+1){
-  background:linear-gradient(145deg,#164e70,#172b58);
-}
-.cell:nth-child(4n+2){
-  background:linear-gradient(145deg,#3a286e,#1d2452);
-}
-.cell:nth-child(4n+3){
-  background:linear-gradient(145deg,#234b76,#17264f);
-}
-.cell:nth-child(4n){
-  background:linear-gradient(145deg,#37306e,#20244c);
-}
+.cell:nth-child(4n+1){background:linear-gradient(145deg,#164e70,#172b58)}
+.cell:nth-child(4n+2){background:linear-gradient(145deg,#3a286e,#1d2452)}
+.cell:nth-child(4n+3){background:linear-gradient(145deg,#234b76,#17264f)}
+.cell:nth-child(4n){background:linear-gradient(145deg,#37306e,#20244c)}
 .cell.start{
   box-shadow:inset 0 0 0 2px #47f3b5,inset 0 0 12px #47f3b544;
 }
@@ -107,7 +100,8 @@ h1{font-size:26px;margin:5px 0;font-weight:900}
   font-size:clamp(7px,2vw,11px);opacity:.55;
 }
 .board-art{
-  position:absolute;inset:0;width:100%;height:100%;
+  position:absolute;inset:0;
+  width:100%;height:100%;
   z-index:4;pointer-events:none;overflow:visible;
 }
 .tokens-layer{
@@ -209,7 +203,7 @@ button{
   color:#aaa4c9;font-size:10px;line-height:2;
 }
 .overlay{
-  position:fixed;inset:0;background:#050414eF;
+  position:fixed;inset:0;background:#050414ef;
   display:none;align-items:center;justify-content:center;
   padding:20px;z-index:20;
 }
@@ -234,92 +228,95 @@ select{
 
 <body>
 <div class="app">
-  <header>
-    <div class="logo">S I N X   A R C A D E</div>
-    <h1>🐍 مار و پله</h1>
-    <div class="subtitle">مسابقه نئونی تا خانه ۱۰۰</div>
-  </header>
+<header>
+  <div class="logo">S I N X   A R C A D E</div>
+  <h1>🐍 مار و پله</h1>
+  <div class="subtitle">مسابقه نئونی تا خانه ۱۰۰</div>
+</header>
 
-  <section class="panel">
-    <div class="status">
-      <div>
-        <div class="status-label">وضعیت مسابقه</div>
-        <div class="status-value" id="gameStatus">آماده شروع</div>
-      </div>
-      <div class="turn-pill" id="turnLabel">منتظر شروع</div>
+<section class="panel">
+  <div class="status">
+    <div>
+      <div class="status-label">وضعیت مسابقه</div>
+      <div class="status-value" id="gameStatus">آماده شروع</div>
     </div>
-
-    <div class="board-wrap">
-      <div class="board" id="board">
-        <svg class="board-art" id="boardArt"
-          viewBox="0 0 1000 1000" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="snakeGreen" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#b7ff65"/>
-              <stop offset="45%" stop-color="#35df85"/>
-              <stop offset="100%" stop-color="#08794e"/>
-            </linearGradient>
-            <linearGradient id="snakePurple" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#f1a5ff"/>
-              <stop offset="50%" stop-color="#b35cff"/>
-              <stop offset="100%" stop-color="#6024bb"/>
-            </linearGradient>
-            <linearGradient id="snakeOrange" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#fff18b"/>
-              <stop offset="50%" stop-color="#ff9d32"/>
-              <stop offset="100%" stop-color="#d83c37"/>
-            </linearGradient>
-            <linearGradient id="ladderGold" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#fff6a6"/>
-              <stop offset="45%" stop-color="#ffc34e"/>
-              <stop offset="100%" stop-color="#b76a19"/>
-            </linearGradient>
-            <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
-              <feGaussianBlur stdDeviation="7" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="5"/>
-            </filter>
-          </defs>
-        </svg>
-        <div class="tokens-layer" id="tokensLayer"></div>
-      </div>
-    </div>
-
-    <div class="legend">
-      <span><i style="background:#55ed9b"></i> مار سبز</span>
-      <span><i style="background:#c078ff"></i> مار بنفش</span>
-      <span><i style="background:#ffc34e"></i> نردبان طلایی</span>
-    </div>
-
-    <div class="players" id="players"></div>
-
-    <div class="controls">
-      <div class="dice-box">
-        <div class="dice" id="dice">🎲</div>
-        <div class="dice-caption" id="diceCaption">منتظر پرتاب تاس</div>
-      </div>
-      <button class="roll" id="rollBtn" onclick="rollDice()">
-        🎲 انداختن تاس
-      </button>
-    </div>
-
-    <div class="message" id="message">
-      تعداد بازیکنان را انتخاب کن و مسابقه را شروع کن.
-    </div>
-
-    <div class="actions">
-      <button class="secondary" onclick="showSetup()">⚙️ تنظیم بازی</button>
-      <button class="primary" onclick="newGame()">↻ بازی جدید</button>
-    </div>
-  </section>
-
-  <div class="rules">
-    🏁 برای برد باید دقیقاً به خانه ۱۰۰ برسی.<br>
-    🎲 با آوردن عدد ۶ یک نوبت اضافه می‌گیری.<br>
-    🐍 مار تو را پایین می‌برد و 🪜 نردبان تو را بالا می‌برد.
+    <div class="turn-pill" id="turnLabel">منتظر شروع</div>
   </div>
+
+  <div class="board-wrap">
+    <div class="board" id="board">
+      <svg class="board-art" id="boardArt"
+        viewBox="0 0 1000 1000" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="snakeGreen" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#b7ff65"/>
+            <stop offset="45%" stop-color="#35df85"/>
+            <stop offset="100%" stop-color="#08794e"/>
+          </linearGradient>
+          <linearGradient id="snakePurple" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f1a5ff"/>
+            <stop offset="50%" stop-color="#b35cff"/>
+            <stop offset="100%" stop-color="#6024bb"/>
+          </linearGradient>
+          <linearGradient id="snakeOrange" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fff18b"/>
+            <stop offset="50%" stop-color="#ff9d32"/>
+            <stop offset="100%" stop-color="#d83c37"/>
+          </linearGradient>
+          <linearGradient id="ladderGold" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fff6a6"/>
+            <stop offset="45%" stop-color="#ffc34e"/>
+            <stop offset="100%" stop-color="#b76a19"/>
+          </linearGradient>
+          <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="7" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="5"/>
+          </filter>
+        </defs>
+      </svg>
+      <div class="tokens-layer" id="tokensLayer"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:#55ed9b"></i> مار سبز</span>
+    <span><i style="background:#c078ff"></i> مار بنفش</span>
+    <span><i style="background:#ffc34e"></i> نردبان طلایی</span>
+  </div>
+
+  <div class="players" id="players"></div>
+
+  <div class="controls">
+    <div class="dice-box">
+      <div class="dice" id="dice">🎲</div>
+      <div class="dice-caption" id="diceCaption">منتظر پرتاب تاس</div>
+    </div>
+    <button class="roll" id="rollBtn" onclick="rollDice()">
+      🎲 انداختن تاس
+    </button>
+  </div>
+
+  <div class="message" id="message">
+    تعداد بازیکنان را انتخاب کن و مسابقه را شروع کن.
+  </div>
+
+  <div class="actions">
+    <button class="secondary" onclick="showSetup()">⚙️ تنظیم بازی</button>
+    <button class="primary" onclick="newGame()">↻ بازی جدید</button>
+  </div>
+</section>
+
+<div class="rules">
+  🏁 برای برد باید دقیقاً به خانه ۱۰۰ برسی.<br>
+  🎲 با آوردن عدد ۶ یک نوبت اضافه می‌گیری.<br>
+  🐍 مار تو را پایین می‌برد و 🪜 نردبان تو را بالا می‌برد.
+</div>
 </div>
 
 <div class="overlay" id="setupOverlay">
@@ -358,6 +355,7 @@ const SNAKES={
   16:6,47:26,49:11,56:53,62:19,
   64:60,87:24,93:73,95:75,98:78
 };
+
 const LADDERS={
   2:38,7:14,8:31,15:26,21:42,
   28:84,36:44,51:67,71:91
@@ -377,13 +375,11 @@ function sleep(ms){
   return new Promise(resolve=>setTimeout(resolve,ms));
 }
 
-/* تبدیل شماره خانه به مختصات دقیق SVG */
+/* محاسبه مختصات خانه‌ها */
 function pointOf(n){
   const rowFromBottom=Math.floor((n-1)/10);
   const indexInRow=(n-1)%10;
-  const col=rowFromBottom%2===0
-    ? indexInRow
-    : 9-indexInRow;
+  const col=rowFromBottom%2===0?indexInRow:9-indexInRow;
   const visualRow=9-rowFromBottom;
 
   return {
@@ -392,12 +388,11 @@ function pointOf(n){
   };
 }
 
-/* ساخت صفحه ۱۰ در ۱۰ */
-
+/* ساخت صفحه بدون حذف SVG */
 function createBoard(){
   const board=document.getElementById("board");
 
-  // فقط خانه‌ها و لایه مهره‌ها را پاک کن؛ SVG را نگه دار
+  // اصلاح اصلی: SVG را پاک نمی‌کنیم
   board.querySelectorAll(".cell,.tokens-layer").forEach(el=>{
     el.remove();
   });
@@ -428,11 +423,10 @@ function createBoard(){
 
     const deco=document.createElement("span");
     deco.className="cell-decoration";
-
     if(n===1) deco.textContent="🚩";
     if(n===100) deco.textContent="🏆";
-
     cell.appendChild(deco);
+
     board.appendChild(cell);
   });
 
@@ -443,8 +437,8 @@ function createBoard(){
 
   drawBoardArt();
 }
-  
-/* ساخت مسیر خمیده مار */
+
+/* مسیر خمیده مار */
 function snakePath(a,b,index){
   const p1=pointOf(a);
   const p2=pointOf(b);
@@ -477,7 +471,7 @@ function snakePath(a,b,index){
   };
 }
 
-/* رسم مار سه‌بعدی‌نما با سر و چشم */
+/* طراحی مار */
 function drawSnake(a,b,index,color){
   const s=snakePath(a,b,index);
   const width=35;
@@ -517,7 +511,7 @@ function drawSnake(a,b,index,color){
     </g>`;
 }
 
-/* رسم نردبان بین دو خانه */
+/* طراحی نردبان */
 function drawLadder(a,b,index){
   const p1=pointOf(a);
   const p2=pointOf(b);
@@ -575,10 +569,9 @@ function drawLadder(a,b,index){
     </g>`;
 }
 
-/* ترسیم تمام مارها و نردبان‌ها */
+/* رسم مارها و نردبان‌ها */
 function drawBoardArt(){
   const svg=document.getElementById("boardArt");
-
   const defs=svg.querySelector("defs").outerHTML;
 
   const snakeColors=[
@@ -636,7 +629,7 @@ function renderTokens(){
   });
 }
 
-/* نمایش بازیکنان و نوبت */
+/* به‌روزرسانی صفحه */
 function render(){
   renderTokens();
 
@@ -681,6 +674,7 @@ function render(){
 function showSetup(){
   document.getElementById("setupOverlay").style.display="flex";
 }
+
 function closeSetup(){
   document.getElementById("setupOverlay").style.display="none";
 }
@@ -702,6 +696,7 @@ function startGame(){
     "مسابقه شروع شد! بازیکن اول تاس بیندازد.";
 
   document.getElementById("winOverlay").style.display="none";
+
   closeSetup();
   render();
 }
@@ -716,5 +711,12 @@ function nextTurn(extra){
   render();
 }
 
+/* پرتاب تاس */
 async function rollDice(){
-  if(!playing||locke
+  if(!playing||locked) return;
+
+  locked=true;
+  render();
+
+  const dice=document.getElementById("dice");
+  dice.clas
