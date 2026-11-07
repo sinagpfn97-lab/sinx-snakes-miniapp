@@ -1,0 +1,495 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>SINX | Snakes & Ladders</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap');
+
+:root {
+  --bg:#090b18;
+  --panel:#151a30;
+  --purple:#9b6cff;
+  --cyan:#48e3ef;
+  --text:#f6f4ff;
+  --muted:#929ab8;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse at 50% 0%,#29204d 0%,transparent 48%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Vazirmatn',sans-serif;
+  padding:18px 12px 30px;
+}
+.app {max-width:520px;margin:auto}
+header {text-align:center;margin:4px 0 18px}
+.logo {
+  font-size:12px;letter-spacing:5px;
+  color:var(--cyan);font-weight:900
+}
+h1 {font-size:25px;margin:5px 0;font-weight:900}
+.subtitle {font-size:12px;color:var(--muted)}
+.panel {
+  background:linear-gradient(145deg,#1b203a,#111529);
+  border:1px solid #343957;
+  border-radius:20px;
+  padding:13px;
+  box-shadow:0 12px 35px #0005;
+}
+.status {
+  display:flex;justify-content:space-between;
+  align-items:center;gap:8px;margin-bottom:12px;
+}
+.status-label {font-size:11px;color:var(--muted)}
+.status-value {font-size:13px;font-weight:800}
+.turn-pill {
+  background:#34265c;color:#d6c2ff;
+  padding:6px 11px;border-radius:30px;font-size:11px;
+}
+.board-wrap {
+  padding:7px;border-radius:15px;
+  background:linear-gradient(135deg,#7049be,#27b9ca);
+  box-shadow:0 0 25px #8d61ff22;
+}
+.board {
+  display:grid;grid-template-columns:repeat(10,1fr);
+  gap:2px;direction:ltr;
+  background:#10172a;padding:3px;border-radius:10px;
+}
+.cell {
+  position:relative;aspect-ratio:1;
+  border-radius:4px;
+  background:#222c49;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.cell:nth-child(4n+1){background:#293653}
+.cell:nth-child(4n+2){background:#30304f}
+.cell:nth-child(4n+3){background:#24404d}
+.cell:nth-child(4n){background:#343052}
+.cell-number {
+  position:absolute;top:1px;left:3px;
+  font-size:clamp(6px,1.8vw,9px);
+  color:#b6c4df;opacity:.8;direction:ltr;
+}
+.cell-mark {
+  position:absolute;right:2px;bottom:0;
+  font-size:clamp(9px,2.5vw,14px);
+}
+.tokens {
+  display:flex;align-items:center;justify-content:center;
+  flex-wrap:wrap;gap:0px;z-index:2;
+}
+.token {
+  font-size:clamp(10px,3vw,17px);
+  line-height:1;
+  filter:drop-shadow(0 2px 2px #000);
+}
+.cell.start {outline:2px solid #53e6a8}
+.cell.finish {outline:2px solid #ffd45c}
+.legend {
+  display:flex;justify-content:center;gap:14px;
+  flex-wrap:wrap;margin-top:10px;
+  font-size:10px;color:#c4c9dc;
+}
+.legend span {display:flex;align-items:center;gap:4px}
+.players {
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:8px;margin-top:13px;
+}
+.player {
+  background:#10162a;border:1px solid #303956;
+  padding:9px;border-radius:12px;
+  display:flex;align-items:center;gap:8px;
+  min-width:0;
+}
+.player.active {
+  border-color:var(--cyan);
+  box-shadow:0 0 12px #48e3ef22;
+}
+.player-icon {font-size:23px}
+.player-info {min-width:0;flex:1}
+.player-name {font-size:11px;font-weight:800;overflow:hidden;text-overflow:ellipsis}
+.player-pos {font-size:10px;color:var(--muted)}
+.controls {
+  margin-top:13px;display:grid;
+  grid-template-columns:1fr 1fr;gap:10px;
+}
+.dice-box {
+  background:#10162a;border:1px solid #303956;
+  border-radius:15px;padding:12px;text-align:center;
+}
+.dice {
+  font-size:43px;line-height:1.3;
+  filter:drop-shadow(0 3px 8px #9b6cff66);
+}
+.dice.rolling {animation:shake .16s infinite alternate}
+@keyframes shake {
+  from{transform:rotate(-12deg) scale(.92)}
+  to{transform:rotate(12deg) scale(1.08)}
+}
+.dice-caption {font-size:10px;color:var(--muted)}
+button {
+  font-family:inherit;border:0;cursor:pointer;
+  font-weight:800;
+}
+.roll {
+  width:100%;height:100%;min-height:90px;
+  border-radius:15px;color:#101022;
+  background:linear-gradient(135deg,#9c72ff,#48ddeb);
+  font-size:17px;
+  box-shadow:0 5px 20px #7955e955;
+}
+.roll:disabled {opacity:.4;cursor:not-allowed}
+.message {
+  margin-top:12px;background:#10162a;
+  border:1px solid #303956;border-radius:12px;
+  padding:11px;text-align:center;
+  font-size:12px;min-height:43px;color:#d9d8ef;
+}
+.actions {
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:8px;margin-top:10px;
+}
+.secondary {
+  background:#252c48;color:#e8e6ff;
+  border:1px solid #3b4569;border-radius:11px;
+  padding:11px;font-size:11px;
+}
+.primary {
+  background:#714bd0;color:white;
+  border-radius:11px;padding:11px;font-size:11px;
+}
+.rules {
+  margin-top:13px;font-size:10px;
+  color:var(--muted);line-height:2;
+  text-align:center;
+}
+.overlay {
+  position:fixed;inset:0;background:#050713dd;
+  display:none;align-items:center;justify-content:center;
+  padding:22px;z-index:10;
+}
+.dialog {
+  width:100%;max-width:350px;
+  background:#1a2038;border:1px solid #56517e;
+  border-radius:20px;padding:20px;text-align:center;
+}
+.dialog h2 {font-size:21px}
+.dialog p {font-size:12px;color:#c4c8df;line-height:2}
+.dialog button {width:100%;margin-top:8px}
+select {
+  width:100%;padding:12px;border-radius:10px;
+  background:#10162a;color:white;border:1px solid #41496b;
+  font-family:inherit;margin:8px 0;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">S I N X   A R C A D E</div>
+    <h1>🐍 مار و پله</h1>
+    <div class="subtitle">یک مسابقه هیجان‌انگیز تا خانه ۱۰۰</div>
+  </header>
+
+  <section class="panel">
+    <div class="status">
+      <div>
+        <div class="status-label">وضعیت مسابقه</div>
+        <div class="status-value" id="gameStatus">آماده شروع</div>
+      </div>
+      <div class="turn-pill" id="turnLabel">نوبت بازیکن اول</div>
+    </div>
+
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+    </div>
+
+    <div class="legend">
+      <span>🐍 مار</span>
+      <span>🪜 نردبان</span>
+      <span>🏁 خانه پایان</span>
+    </div>
+
+    <div class="players" id="players"></div>
+
+    <div class="controls">
+      <div class="dice-box">
+        <div class="dice" id="dice">🎲</div>
+        <div class="dice-caption" id="diceCaption">منتظر پرتاب تاس</div>
+      </div>
+      <button class="roll" id="rollBtn" onclick="rollDice()">
+        🎲 انداختن تاس
+      </button>
+    </div>
+
+    <div class="message" id="message">
+      تعداد بازیکنان را انتخاب کن و بازی را شروع کن.
+    </div>
+
+    <div class="actions">
+      <button class="secondary" onclick="showSetup()">⚙️ تنظیم بازی</button>
+      <button class="primary" onclick="newGame()">↻ بازی جدید</button>
+    </div>
+  </section>
+
+  <div class="rules">
+    برای برد باید دقیقاً به خانه ۱۰۰ برسی.<br>
+    با آوردن عدد ۶ یک نوبت اضافه می‌گیری.<br>
+    برخورد با نردبان تو را بالا می‌برد و مار تو را پایین می‌آورد.
+  </div>
+</div>
+
+<div class="overlay" id="setupOverlay">
+  <div class="dialog">
+    <h2>🎮 تنظیم مسابقه</h2>
+    <p>تعداد بازیکنان را انتخاب کن.</p>
+    <select id="playerCount">
+      <option value="2">۲ بازیکن</option>
+      <option value="3">۳ بازیکن</option>
+      <option value="4" selected>۴ بازیکن</option>
+    </select>
+    <button class="primary" onclick="startGame()">شروع مسابقه</button>
+    <button class="secondary" onclick="closeSetup()">بازگشت</button>
+  </div>
+</div>
+
+<div class="overlay" id="winOverlay">
+  <div class="dialog">
+    <div style="font-size:55px">🏆</div>
+    <h2 id="winnerTitle">برنده مسابقه!</h2>
+    <p id="winnerText"></p>
+    <button class="primary" onclick="newGame()">بازی مجدد</button>
+  </div>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  tg.setHeaderColor("#090b18");
+  tg.setBackgroundColor("#090b18");
+}
+
+const COLORS = ["🔴","🔵","🟢","🟡"];
+const NAMES = ["بازیکن قرمز","بازیکن آبی","بازیکن سبز","بازیکن زرد"];
+
+const SNAKES = {
+  16:6,47:26,49:11,56:53,62:19,
+  64:60,87:24,93:73,95:75,98:78
+};
+const LADDERS = {
+  2:38,7:14,8:31,15:26,21:42,
+  28:84,36:44,51:67,71:91
+};
+
+let players = [];
+let turn = 0;
+let playing = false;
+let locked = false;
+let lastDice = 0;
+
+function cellOrder() {
+  const result = [];
+  for (let row=9;row>=0;row--) {
+    const nums = [];
+    for (let col=0;col<10;col++) {
+      nums.push(row*10+col+1);
+    }
+    if (row%2===1) nums.reverse();
+    result.push(...nums);
+  }
+  return result;
+}
+
+function createBoard() {
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+  cellOrder().forEach(n=>{
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.id = "cell-"+n;
+    if(n===1) cell.classList.add("start");
+    if(n===100) cell.classList.add("finish");
+
+    const number = document.createElement("span");
+    number.className = "cell-number";
+    number.textContent = n;
+    cell.appendChild(number);
+
+    const mark = document.createElement("span");
+    mark.className = "cell-mark";
+    if(SNAKES[n]) mark.textContent = "🐍";
+    if(LADDERS[n]) mark.textContent = "🪜";
+    cell.appendChild(mark);
+
+    const tokens = document.createElement("div");
+    tokens.className = "tokens";
+    tokens.id = "tokens-"+n;
+    cell.appendChild(tokens);
+
+    board.appendChild(cell);
+  });
+}
+
+function render() {
+  document.querySelectorAll(".tokens").forEach(x=>x.innerHTML="");
+
+  players.forEach((p,i)=>{
+    const spot = document.getElementById("tokens-"+p.pos);
+    if(spot) {
+      const token = document.createElement("span");
+      token.className = "token";
+      token.textContent = COLORS[i];
+      spot.appendChild(token);
+    }
+  });
+
+  const box = document.getElementById("players");
+  box.innerHTML = "";
+  players.forEach((p,i)=>{
+    const item = document.createElement("div");
+    item.className = "player"+(playing && i===turn?" active":"");
+    item.innerHTML = `
+      <div class="player-icon">${COLORS[i]}</div>
+      <div class="player-info">
+        <div class="player-name">${p.name}</div>
+        <div class="player-pos">خانه ${p.pos} از ۱۰۰</div>
+      </div>`;
+    box.appendChild(item);
+  });
+
+  document.getElementById("turnLabel").textContent =
+    playing ? "نوبت "+players[turn].name : "مسابقه متوقف";
+
+  document.getElementById("rollBtn").disabled = !playing || locked;
+  document.getElementById("gameStatus").textContent =
+    playing ? "در حال مسابقه" : "آماده شروع";
+}
+
+function showSetup() {
+  document.getElementById("setupOverlay").style.display="flex";
+}
+function closeSetup() {
+  document.getElementById("setupOverlay").style.display="none";
+}
+
+function startGame() {
+  const count = Number(document.getElementById("playerCount").value);
+  players = Array.from({length:count},(_,i)=>({
+    id:i+1,name:NAMES[i],pos:1
+  }));
+  turn=0;
+  playing=true;
+  locked=false;
+  lastDice=0;
+  document.getElementById("dice").textContent="🎲";
+  document.getElementById("diceCaption").textContent="منتظر پرتاب تاس";
+  document.getElementById("message").textContent="بازی شروع شد! تاس بینداز.";
+  document.getElementById("winOverlay").style.display="none";
+  closeSetup();
+  render();
+}
+
+function newGame() {
+  document.getElementById("winOverlay").style.display="none";
+  showSetup();
+}
+
+function nextTurn(extra) {
+  if(!extra) turn=(turn+1)%players.length;
+  render();
+}
+
+function sleep(ms) {
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+async function rollDice() {
+  if(!playing || locked) return;
+  locked=true;
+  render();
+
+  const dice = document.getElementById("dice");
+  dice.classList.add("rolling");
+
+  for(let i=0;i<9;i++) {
+    dice.textContent=["⚀","⚁","⚂","⚃","⚄","⚅"][Math.floor(Math.random()*6)];
+    await sleep(75);
+  }
+
+  const value=Math.floor(Math.random()*6)+1;
+  lastDice=value;
+  dice.textContent=["⚀","⚁","⚂","⚃","⚄","⚅"][value-1];
+  dice.classList.remove("rolling");
+  document.getElementById("diceCaption").textContent="عدد تاس: "+value;
+
+  const p=players[turn];
+  const old=p.pos;
+  const target=old+value;
+
+  if(target>100) {
+    document.getElementById("message").textContent =
+      p.name+" عدد "+value+" آورد؛ برای رسیدن به ۱۰۰ باید عدد دقیق بیاید.";
+    await sleep(650);
+    locked=false;
+    nextTurn(value===6);
+    return;
+  }
+
+  p.pos=target;
+  render();
+  document.getElementById("message").textContent =
+    p.name+" از خانه "+old+" به خانه "+target+" رفت.";
+  await sleep(450);
+
+  if(SNAKES[p.pos]) {
+    const destination=SNAKES[p.pos];
+    document.getElementById("message").textContent =
+      "🐍 وای! "+p.name+" توسط مار به خانه "+destination+" برگشت.";
+    p.pos=destination;
+  } else if(LADDERS[p.pos]) {
+    const destination=LADDERS[p.pos];
+    document.getElementById("message").textContent =
+      "🪜 عالی! "+p.name+" از نردبان به خانه "+destination+" رفت.";
+    p.pos=destination;
+  }
+
+  render();
+  await sleep(500);
+
+  if(p.pos===100) {
+    playing=false;
+    locked=false;
+    render();
+    document.getElementById("winnerTitle").textContent="🏆 "+p.name;
+    document.getElementById("winnerText").textContent="با رسیدن به خانه ۱۰۰ برنده مسابقه شدی!";
+    document.getElementById("winOverlay").style.display="flex";
+    return;
+  }
+
+  if(value===6) {
+    document.getElementById("message").textContent += " 🎉 عدد ۶ آوردی؛ دوباره تاس بینداز!";
+  } else {
+    document.getElementById("message").textContent += " نوبت بعدی!";
+  }
+
+  locked=false;
+  nextTurn(value===6);
+}
+
+createBoard();
+render();
+showSetup();
+</script>
+</body>
+</html>
