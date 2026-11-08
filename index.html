@@ -69,7 +69,7 @@ button{font-family:inherit;border:0;cursor:pointer;font-weight:800}
 .primary{background:linear-gradient(135deg,#8c5be9,#5740a8);color:white}
 button:disabled{opacity:.35;cursor:not-allowed}
 .rules{margin-top:12px;text-align:center;color:#aaa4c9;font-size:10px;line-height:2}
-.overlay{position:fixed;inset:0;background:#050414ef;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.overlay{position:fixed;inset:0;background:#050414ef;display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
 .dialog{width:100%;max-width:350px;padding:20px;border-radius:21px;text-align:center;background:linear-gradient(145deg,#29204a,#151a35);border:1px solid #7253a8;box-shadow:0 0 35px #865aff44}
 .dialog h2{font-size:20px;margin:5px}
 .dialog p{font-size:12px;color:#c4c0dd;line-height:2}
@@ -156,7 +156,7 @@ if(tg){tg.ready();tg.expand();tg.setHeaderColor("#090817");tg.setBackgroundColor
 const API_URL="https://tefzctytomzmipobfvep.supabase.co/functions/v1/game-room";
 const PUBLIC_KEY="sb_publishable_5StO0MaWc5G75d-b8I_zSg_xIyZ-ZI2";
 const SUPABASE_URL="https://tefzctytomzmipobfvep.supabase.co";
-const sb=window.supabase.createClient(SUPABASE_URL,PUBLIC_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const sb=window.supabase?.createClient?window.supabase.createClient(SUPABASE_URL,PUBLIC_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}}):null;
 const SNAKES={16:6,47:26,49:11,56:53,62:19,64:60,87:24,93:73,95:75,98:78};
 const LADDERS={2:38,7:14,8:31,15:26,21:42,28:84,36:44,51:67,71:91};
 const COLORS=["red","blue","green","yellow"];
@@ -384,13 +384,15 @@ async function movePlayerNow(){
  finally{moving=false;locked=false;render();}
 }
 async function restoreSession(){
+ if(!sb){accountFeedback("کتابخانه اتصال آنلاین بارگذاری نشد. صفحه را یک‌بار تازه‌سازی کن.");showSetup();return;}
  const {data:{session}}=await sb.auth.getSession();
  if(session){
   const {data:{user}}=await sb.auth.getUser();
   const username=user?.user_metadata?.username||"";
   if(username)document.getElementById("playerNameInput").value=username;
-  accountFeedback(username?"وارد حساب @"+username هستی.":"حساب متصل است.");
+  accountFeedback(username?"وارد حساب @"+username+" هستی.":"حساب متصل است.");
   await continueInviteIfReady();
+  if(!new URLSearchParams(location.search).get("room"))closeSetup();
  }else{
   accountFeedback("برای بازی آنلاین ابتدا وارد حساب شو.");
   showSetup();
