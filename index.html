@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#090817">
 <title>SINX | Neon Snakes</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap');
@@ -74,6 +75,7 @@ button:disabled{opacity:.35;cursor:not-allowed}
 .dialog p{font-size:12px;color:#c4c0dd;line-height:2}
 select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0 12px}
 .dialog button{width:100%;margin-top:7px}
+.cell.destination{outline:3px solid #fff27a;outline-offset:-3px;box-shadow:inset 0 0 18px #fff27a99;cursor:pointer;animation:targetPulse .8s infinite alternate}.cell.destination:after{content:'⬅ مقصد';position:absolute;inset:auto 0 1px;text-align:center;font-size:clamp(6px,1.8vw,9px);font-weight:900;color:#fff7a0;text-shadow:0 1px 4px #000;z-index:8}@keyframes targetPulse{from{filter:brightness(1)}to{filter:brightness(1.65)}}
 </style>
 </head>
 <body>
@@ -127,7 +129,13 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
   <div class="dialog">
     <h2>🌐 بازی آنلاین SINX</h2>
     <p>اتاق بساز یا با کد دعوت وارد بازی دوستت شو.</p>
-    <input id="playerNameInput" maxlength="20" placeholder="نام بازیکن" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0">
+    <input id="playerNameInput" maxlength="20" autocomplete="username" placeholder="نام کاربری انگلیسی (۳ تا ۲۰ حرف)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0">
+    <input id="passwordInput" type="password" minlength="6" autocomplete="current-password" placeholder="رمز عبور (حداقل ۶ کاراکتر)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:0 0 8px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="primary" id="registerBtn" onclick="accountAction('register')">ساخت حساب</button>
+      <button class="secondary" id="loginBtn" onclick="accountAction('login')">ورود به حساب</button>
+    </div>
+    <p id="accountStatus" style="margin:5px 0 10px;font-size:10px;color:#65e9c0">ابتدا وارد حساب دائمی خودت شو.</p>
     <select id="playerCount"><option value="2">۲ بازیکن</option><option value="3">۳ بازیکن</option><option value="4" selected>۴ بازیکن</option></select>
     <button class="primary" id="createRoomBtn" onclick="createOnlineRoom()">＋ ساخت اتاق جدید</button>
     <input id="roomCodeInput" maxlength="6" placeholder="کد اتاق" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0;text-transform:uppercase">
@@ -147,6 +155,8 @@ if(tg){tg.ready();tg.expand();tg.setHeaderColor("#090817");tg.setBackgroundColor
 
 const API_URL="https://tefzctytomzmipobfvep.supabase.co/functions/v1/game-room";
 const PUBLIC_KEY="sb_publishable_5StO0MaWc5G75d-b8I_zSg_xIyZ-ZI2";
+const SUPABASE_URL="https://tefzctytomzmipobfvep.supabase.co";
+const sb=window.supabase.createClient(SUPABASE_URL,PUBLIC_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const SNAKES={16:6,47:26,49:11,56:53,62:19,64:60,87:24,93:73,95:75,98:78};
 const LADDERS={2:38,7:14,8:31,15:26,21:42,28:84,36:44,51:67,71:91};
 const COLORS=["red","blue","green","yellow"];
@@ -154,58 +164,97 @@ const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false;
 let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false;
+let pendingMove=null,lastRoll=null,lastSeenRollId="",moving=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 function feedback(s){const e=document.getElementById("lobbyFeedback");if(e)e.textContent=s;}
+function accountFeedback(s){const e=document.getElementById("accountStatus");if(e)e.textContent=s;}
 function keyFor(code){return "sinx_room_"+code;}
-function storeSession(name){localStorage.setItem(keyFor(roomCode),JSON.stringify({playerToken,playerName:name}));}
-function readSession(code){try{const x=JSON.parse(localStorage.getItem(keyFor(code))||"null");return x&&x.playerToken?x:null;}catch{return null;}}
 async function api(action,extra={}){
- const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":PUBLIC_KEY,"Authorization":"Bearer "+PUBLIC_KEY},body:JSON.stringify({action,roomCode,playerToken,...extra})});
+ const headers={"Content-Type":"application/json","apikey":PUBLIC_KEY};
+ if(!["register","signup","login"].includes(action)){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session?.access_token)throw new Error("ابتدا وارد حساب SINX شو.");
+  headers.Authorization="Bearer "+session.access_token;
+ }
+ const res=await fetch(API_URL,{method:"POST",headers,body:JSON.stringify({action,roomCode,...extra})});
  let data;try{data=await res.json();}catch{throw new Error("پاسخ سرور قابل خواندن نیست");}
  if(!res.ok||!data.success)throw new Error(data.error||"ارتباط با سرور ناموفق بود");
  return data;
+}
+async function accountAction(action){
+ const username=document.getElementById("playerNameInput").value.trim().toLowerCase();
+ const password=document.getElementById("passwordInput").value;
+ if(!/^[a-z0-9_]{3,20}$/.test(username)){accountFeedback("نام کاربری: ۳ تا ۲۰ حرف انگلیسی کوچک، عدد یا _");return;}
+ if(password.length<6){accountFeedback("رمز عبور باید حداقل ۶ کاراکتر باشد.");return;}
+ try{
+  document.getElementById("registerBtn").disabled=true;document.getElementById("loginBtn").disabled=true;
+  accountFeedback(action==="register"?"در حال ساخت حساب...":"در حال ورود...");
+  const d=await api(action,{username,password});
+  const {error}=await sb.auth.setSession({access_token:d.session.access_token,refresh_token:d.session.refresh_token});
+  if(error)throw error;
+  accountFeedback("ورود موفق: @"+username);
+  document.getElementById("passwordInput").value="";
+  await continueInviteIfReady();
+ }catch(e){accountFeedback(e.message||"خطا در احراز هویت");}
+ finally{document.getElementById("registerBtn").disabled=false;document.getElementById("loginBtn").disabled=false;}
+}
+async function currentUsername(){
+ const {data:{user}}=await sb.auth.getUser();
+ return user?.user_metadata?.username||document.getElementById("playerNameInput").value.trim().toLowerCase()||"";
 }
 function applyState(data){
  if(data.room){roomStatus=data.room.status;turn=Number(data.room.current_turn||0);}
  if(Array.isArray(data.players))players=data.players.map(p=>({id:p.id,seat:Number(p.seat),name:p.player_name,pos:Number(p.position||0),isHost:!!p.is_host}));
  if(Number.isInteger(data.mySeat))mySeat=data.mySeat;
+ pendingMove=data.pendingMove||data.room?.game_state?.pending_move||null;
+ lastRoll=data.lastRoll||data.room?.game_state?.last_roll||null;
  host=players.some(p=>p.seat===mySeat&&p.isHost);
  playing=roomStatus==="playing";
+ if(lastRoll?.id&&lastRoll.id!==lastSeenRollId){
+  lastSeenRollId=lastRoll.id;
+  const die=Number(lastRoll.dice);
+  if(die>=1&&die<=6){const el=document.getElementById("dice");el.classList.remove("rolling");el.textContent=DICE[die-1];document.getElementById("diceCaption").textContent="عدد تاس: "+die;}
+ }
  render();
  document.getElementById("gameStatus").textContent=roomStatus==="waiting"?"در انتظار بازیکنان":roomStatus==="playing"?"در حال مسابقه":roomStatus==="finished"?"بازی تمام شد":"آماده شروع";
- const sb=document.getElementById("startOnlineBtn");
- if(sb)sb.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
+ const sbt=document.getElementById("startOnlineBtn");
+ if(sbt)sbt.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
  if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent="کد اتاق: "+roomCode+" | "+players.length+" بازیکن از "+(data.room?.max_players||"?");
  if(roomStatus==="finished"){const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
-function startPolling(){if(pollHandle)clearInterval(pollHandle);pollHandle=setInterval(async()=>{if(!roomCode||!playerToken)return;try{await syncState();}catch(e){document.getElementById("message").textContent=e.message;}},2200);}
-function setLobbyBusy(v){document.getElementById("createRoomBtn").disabled=v;document.getElementById("joinRoomBtn").disabled=v;}
+function startPolling(){if(pollHandle)clearInterval(pollHandle);pollHandle=setInterval(async()=>{if(!roomCode||moving)return;try{await syncState();}catch(e){document.getElementById("message").textContent=e.message;}},900);}
+function setLobbyBusy(v){["createRoomBtn","joinRoomBtn","registerBtn","loginBtn"].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=v;});}
+async function continueInviteIfReady(){
+ const invited=(new URLSearchParams(location.search).get("room")||document.getElementById("roomCodeInput").value||"").trim().toUpperCase();
+ if(!invited)return;
+ roomCode=invited;
+ try{
+  const d=await api("join",{roomCode:invited});
+  applyState(d);document.getElementById("message").textContent="با لینک دعوت وارد اتاق شدی: "+invited;
+  closeSetup();startPolling();
+ }catch(e){feedback(e.message);}
+}
 async function createOnlineRoom(){
- const name=document.getElementById("playerNameInput").value.trim();
- if(!name){feedback("اول نام بازیکن را وارد کن.");return;}
  try{
   locked=true;setLobbyBusy(true);
-  const d=await api("create",{playerName:name,maxPlayers:Number(document.getElementById("playerCount").value)});
-  roomCode=d.roomCode;playerToken=d.playerToken;mySeat=0;storeSession(name);
-  applyState({room:d.room,players:[d.player],mySeat:0});
+  const d=await api("create",{maxPlayers:Number(document.getElementById("playerCount").value)});
+  roomCode=d.roomCode;playerToken=d.playerToken||"";mySeat=d.mySeat;applyState(d);
   document.getElementById("roomCodeInput").value=roomCode;
-  document.getElementById("message").textContent="اتاق ساخته شد. کد دعوت: "+roomCode;
-  feedback("کد اتاق "+roomCode+" را برای دوستانت بفرست. برای شروع حداقل یک نفر دیگر باید وارد شود.");
+  document.getElementById("message").textContent="اتاق ساخته شد.";
+  feedback("لینک دعوت را برای دوستانت بفرست: "+d.inviteLink);
   closeSetup();startPolling();
  }catch(e){feedback(e.message);}
  finally{locked=false;setLobbyBusy(false);render();}
 }
 async function joinOnlineRoom(){
- const name=document.getElementById("playerNameInput").value.trim();
  const code=(document.getElementById("roomCodeInput").value.trim()||new URLSearchParams(location.search).get("room")||"").toUpperCase();
- if(!name||!code){feedback("نام بازیکن و کد اتاق را وارد کن.");return;}
+ if(!code){feedback("کد اتاق را وارد کن.");return;}
  try{
   locked=true;setLobbyBusy(true);roomCode=code;
-  const d=await api("join",{playerName:name});
-  playerToken=d.playerToken;mySeat=d.player.seat;storeSession(name);
-  await syncState();
+  const d=await api("join",{roomCode:code});
+  playerToken=d.playerToken||"";mySeat=d.mySeat;applyState(d);
   document.getElementById("message").textContent="با موفقیت وارد اتاق شدی: "+roomCode;
   feedback("وارد اتاق شدی. منتظر شروع میزبان بمان.");
   closeSetup();startPolling();
@@ -213,7 +262,7 @@ async function joinOnlineRoom(){
  finally{locked=false;setLobbyBusy(false);render();}
 }
 async function startGame(){
- if(!roomCode||!playerToken){showSetup();return;}
+ if(!roomCode){showSetup();return;}
  try{locked=true;render();const d=await api("start");applyState(d);document.getElementById("message").textContent="مسابقه شروع شد!";closeSetup();startPolling();}
  catch(e){document.getElementById("message").textContent=e.message;}
  finally{locked=false;render();}
@@ -222,7 +271,6 @@ function showSetup(){document.getElementById("setupOverlay").style.display="flex
 function closeSetup(){document.getElementById("setupOverlay").style.display="none";}
 function newGame(){showSetup();}
 
-/* مختصات خانه‌ها */
 function pointOf(n){
  const row=Math.floor((n-1)/10),idx=(n-1)%10;
  const col=row%2===0?idx:9-idx;
@@ -237,7 +285,8 @@ function createBoard(){
   const c=document.createElement("div");c.className="cell";c.id="cell-"+n;
   if(n===1)c.classList.add("start");if(n===100)c.classList.add("finish");
   const no=document.createElement("span");no.className="cell-number";no.textContent=n;c.appendChild(no);
-  const deco=document.createElement("span");deco.className="cell-decoration";if(n===1)deco.textContent="🚩";if(n===100)deco.textContent="🏆";c.appendChild(deco);board.appendChild(c);
+  const deco=document.createElement("span");deco.className="cell-decoration";if(n===1)deco.textContent="🚩";if(n===100)deco.textContent="🏆";c.appendChild(deco);
+  c.addEventListener("click",()=>chooseDestination(n));board.appendChild(c);
  });
  const layer=document.createElement("div");layer.className="tokens-layer";layer.id="tokensLayer";board.appendChild(layer);drawBoardArt();
 }
@@ -250,20 +299,7 @@ function snakePath(a,b,i){
 }
 function drawSnake(a,b,i,color){
  const s=snakePath(a,b,i),w=29;
- return `<g>
- <path d="${s.d}" fill="none" stroke="#000" stroke-width="${w+17}" stroke-linecap="round" opacity=".65" transform="translate(0 8)" filter="url(#shadow)"/>
- <path d="${s.d}" fill="none" stroke="#171020" stroke-width="${w+9}" stroke-linecap="round"/>
- <path d="${s.d}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round" filter="url(#glow)"/>
- <path d="${s.d}" fill="none" stroke="#21152d" stroke-width="13" stroke-linecap="round" stroke-dasharray="2 10" opacity=".48"/>
- <path d="${s.d}" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 22" opacity=".55"/>
- <ellipse cx="${s.head.x}" cy="${s.head.y}" rx="27" ry="23" fill="${color}" stroke="#171020" stroke-width="7"/>
- <ellipse cx="${s.head.x}" cy="${s.head.y+10}" rx="17" ry="10" fill="${color}" stroke="#171020" stroke-width="3"/>
- <ellipse cx="${s.head.x-10}" cy="${s.head.y-5}" rx="5" ry="7" fill="#fff2d2"/><ellipse cx="${s.head.x+10}" cy="${s.head.y-5}" rx="5" ry="7" fill="#fff2d2"/>
- <ellipse cx="${s.head.x-10}" cy="${s.head.y-5}" rx="2" ry="5" fill="#160d1d"/><ellipse cx="${s.head.x+10}" cy="${s.head.y-5}" rx="2" ry="5" fill="#160d1d"/>
- <circle cx="${s.head.x-5}" cy="${s.head.y+10}" r="1.8" fill="#251323"/><circle cx="${s.head.x+5}" cy="${s.head.y+10}" r="1.8" fill="#251323"/>
- <path d="M ${s.head.x} ${s.head.y+18} L ${s.head.x} ${s.head.y+29} M ${s.head.x} ${s.head.y+29} L ${s.head.x-5} ${s.head.y+35} M ${s.head.x} ${s.head.y+29} L ${s.head.x+5} ${s.head.y+35}" fill="none" stroke="#ff426e" stroke-width="2.5" stroke-linecap="round"/>
- <path d="M ${s.tail.x-5} ${s.tail.y} Q ${s.tail.x} ${s.tail.y+8} ${s.tail.x+5} ${s.tail.y}" fill="none" stroke="#171020" stroke-width="12" stroke-linecap="round"/>
- </g>`;
+ return `<g><path d="${s.d}" fill="none" stroke="#000" stroke-width="${w+17}" stroke-linecap="round" opacity=".65" transform="translate(0 8)" filter="url(#shadow)"/><path d="${s.d}" fill="none" stroke="#171020" stroke-width="${w+9}" stroke-linecap="round"/><path d="${s.d}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round" filter="url(#glow)"/><path d="${s.d}" fill="none" stroke="#21152d" stroke-width="13" stroke-linecap="round" stroke-dasharray="2 10" opacity=".48"/><path d="${s.d}" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 22" opacity=".55"/><ellipse cx="${s.head.x}" cy="${s.head.y}" rx="27" ry="23" fill="${color}" stroke="#171020" stroke-width="7"/><ellipse cx="${s.head.x}" cy="${s.head.y+10}" rx="17" ry="10" fill="${color}" stroke="#171020" stroke-width="3"/><ellipse cx="${s.head.x-10}" cy="${s.head.y-5}" rx="5" ry="7" fill="#fff2d2"/><ellipse cx="${s.head.x+10}" cy="${s.head.y-5}" rx="5" ry="7" fill="#fff2d2"/><ellipse cx="${s.head.x-10}" cy="${s.head.y-5}" rx="2" ry="5" fill="#160d1d"/><ellipse cx="${s.head.x+10}" cy="${s.head.y-5}" rx="2" ry="5" fill="#160d1d"/><circle cx="${s.head.x-5}" cy="${s.head.y+10}" r="1.8" fill="#251323"/><circle cx="${s.head.x+5}" cy="${s.head.y+10}" r="1.8" fill="#251323"/><path d="M ${s.head.x} ${s.head.y+18} L ${s.head.x} ${s.head.y+29} M ${s.head.x} ${s.head.y+29} L ${s.head.x-5} ${s.head.y+35} M ${s.head.x} ${s.head.y+29} L ${s.head.x+5} ${s.head.y+35}" fill="none" stroke="#ff426e" stroke-width="2.5" stroke-linecap="round"/><path d="M ${s.tail.x-5} ${s.tail.y} Q ${s.tail.x} ${s.tail.y+8} ${s.tail.x+5} ${s.tail.y}" fill="none" stroke="#171020" stroke-width="12" stroke-linecap="round"/></g>`;
 }
 function drawLadder(a,b){
  const p1=pointOf(a),p2=pointOf(b),dx=p2.x-p1.x,dy=p2.y-p1.y,len=Math.hypot(dx,dy)||1;
@@ -291,31 +327,79 @@ function render(){
  players.forEach(p=>{const item=document.createElement("div");item.className="player"+(playing&&p.seat===turn?" active":"");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[p.seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p.name;const pos=document.createElement("div");pos.className="player-pos";pos.textContent="خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"");info.append(name,pos);item.append(icon,info);box.appendChild(item);});
  const current=players.find(p=>p.seat===turn);
  document.getElementById("turnLabel").textContent=playing?(current?"نوبت "+current.name:"در انتظار بازیکن"):(roomStatus==="waiting"?"لابی اتاق":"مسابقه متوقف");
- document.getElementById("rollBtn").disabled=!playing||locked||mySeat!==turn;
- const sb=document.getElementById("startOnlineBtn");if(sb)sb.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
+ const canRoll=playing&&!locked&&mySeat===turn&&!pendingMove;
+ document.getElementById("rollBtn").disabled=!canRoll;
+ const sbt=document.getElementById("startOnlineBtn");if(sbt)sbt.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
  document.getElementById("gameStatus").textContent=roomStatus==="waiting"?"در انتظار شروع":roomStatus==="playing"?"در حال مسابقه":roomStatus==="finished"?"پایان مسابقه":"آماده شروع";
+ document.querySelectorAll(".cell.destination").forEach(e=>e.classList.remove("destination"));
+ if(pendingMove&&mySeat===turn){const target=document.getElementById("cell-"+pendingMove.target_position);if(target)target.classList.add("destination");}
+}
+async function animateDice(finalValue){
+ const dice=document.getElementById("dice");dice.classList.add("rolling");
+ const duration=850,start=Date.now();
+ while(Date.now()-start<duration){dice.textContent=DICE[Math.floor(Math.random()*6)];await sleep(75);}
+ dice.textContent=DICE[finalValue-1];dice.classList.remove("rolling");
+ document.getElementById("diceCaption").textContent="عدد تاس: "+finalValue;
 }
 async function rollDice(){
- if(!playing||locked)return;
+ if(!playing||locked||pendingMove)return;
  if(mySeat!==turn){document.getElementById("message").textContent="هنوز نوبت تو نیست.";return;}
- locked=true;render();const dice=document.getElementById("dice");dice.classList.add("rolling");
- for(let i=0;i<10;i++){dice.textContent=DICE[Math.floor(Math.random()*6)];await sleep(65);}
+ locked=true;render();
  try{
-  const d=await api("roll");dice.textContent=DICE[(Number(d.dice)||1)-1];dice.classList.remove("rolling");
-  document.getElementById("diceCaption").textContent="عدد تاس: "+d.dice;applyState(d);
-  document.getElementById("message").textContent=d.message||"حرکت انجام شد.";
-  const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="تبریک! برنده مسابقه شدی.";document.getElementById("winOverlay").style.display="flex";}
- }catch(e){dice.classList.remove("rolling");document.getElementById("message").textContent=e.message;try{await syncState();}catch{}}
+  const request=api("roll");
+  const animation=animateDice(1);
+  const d=await request;
+  const finalValue=Number(d.dice);
+  await animation;
+  document.getElementById("dice").textContent=DICE[finalValue-1];
+  document.getElementById("diceCaption").textContent="عدد تاس: "+finalValue;
+  lastSeenRollId=d.rollId||d.lastRoll?.id||lastSeenRollId;
+  applyState(d);
+  document.getElementById("message").textContent="عدد "+finalValue+" آمد؛ روی خانه مقصد مشخص‌شده کلیک کن.";
+ }catch(e){document.getElementById("dice").classList.remove("rolling");document.getElementById("message").textContent=e.message;try{await syncState();}catch{}}
  finally{locked=false;render();}
+}
+async function chooseDestination(n){
+ if(!pendingMove||mySeat!==turn||locked||moving)return;
+ if(n!==Number(pendingMove.target_position))return;
+ await movePlayerNow();
+}
+async function movePlayerNow(){
+ if(!pendingMove||mySeat!==turn||locked||moving)return;
+ locked=true;moving=true;render();
+ try{
+  const d=await api("move");
+  const me=players.find(p=>p.seat===mySeat);
+  if(me){
+   const path=Array.isArray(d.path)?d.path:[];
+   for(const step of path){me.pos=Number(step);renderTokens();await sleep(190);}
+   if(d.event==="snake"||d.event==="ladder"){
+    document.getElementById("message").textContent=d.event==="snake"?"🐍 مار! مهره پایین می‌رود...":"🪜 نردبان! مهره بالا می‌رود...";
+    await sleep(350);me.pos=Number(d.finalPosition);renderTokens();await sleep(450);
+   }
+  }
+  pendingMove=null;applyState(d);
+  document.getElementById("message").textContent=d.event==="snake"?"مار تو را به خانه پایین‌تر برد.":d.event==="ladder"?"نردبان تو را بالاتر برد.":Number(d.dice)===6?"عدد ۶ آمد؛ دوباره نوبت توست.":"حرکت ثبت شد.";
+ }catch(e){document.getElementById("message").textContent=e.message;try{await syncState();}catch{}}
+ finally{moving=false;locked=false;render();}
+}
+async function restoreSession(){
+ const {data:{session}}=await sb.auth.getSession();
+ if(session){
+  const {data:{user}}=await sb.auth.getUser();
+  const username=user?.user_metadata?.username||"";
+  if(username)document.getElementById("playerNameInput").value=username;
+  accountFeedback(username?"وارد حساب @"+username هستی.":"حساب متصل است.");
+  await continueInviteIfReady();
+ }else{
+  accountFeedback("برای بازی آنلاین ابتدا وارد حساب شو.");
+  showSetup();
+ }
 }
 createBoard();render();
 const invitedRoom=new URLSearchParams(location.search).get("room");
-if(invitedRoom){
- document.getElementById("roomCodeInput").value=invitedRoom.toUpperCase();
- const saved=readSession(invitedRoom.toUpperCase());
- if(saved){roomCode=invitedRoom.toUpperCase();playerToken=saved.playerToken;document.getElementById("playerNameInput").value=saved.playerName||"";syncState().then(()=>{closeSetup();startPolling();}).catch(()=>showSetup());}
- else showSetup();
-}else showSetup();
+if(invitedRoom)document.getElementById("roomCodeInput").value=invitedRoom.toUpperCase();
+restoreSession().catch(e=>{accountFeedback(e.message);showSetup();});
 </script>
 </body>
 </html>
