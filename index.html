@@ -107,7 +107,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .hub-join button{padding:0 16px;border-radius:10px;background:#332754;color:#eee5ff;border:1px solid #65508d;font-family:inherit;font-size:11px;font-weight:800}
 .hub-footer{text-align:center;color:#777391;font-size:9px;margin-top:25px}
 @media(max-width:420px){.hub{padding:16px 11px 30px}.hub-hero{padding:21px 17px}.hub-game{gap:10px}.hub-game-icon{width:54px;height:54px;flex-basis:54px;font-size:29px}.hub-play{padding:9px}.hub-actions{gap:8px}}
-.game-lobby.room-created{display:block;margin-bottom:12px}.game-lobby.room-created label,.game-lobby.room-created #playerCount,.game-lobby.room-created #createRoomBtn,.game-lobby.room-created #roomCodeInput,.game-lobby.room-created #joinRoomBtn,.game-lobby.room-created .game-back,.game-lobby.room-created #lobbyFeedback{display:none!important}.game-lobby.room-created #copyRoomLinkBtn{display:block!important}
+.game-lobby.room-created{display:block;margin-bottom:12px}.game-lobby.room-created label,.game-lobby.room-created #playerCount,.game-lobby.room-created #createRoomBtn,.game-lobby.room-created #roomCodeInput,.game-lobby.room-created #joinRoomBtn,.game-lobby.room-created .game-back,.game-lobby.room-created #lobbyFeedback{display:none!important}.game-lobby.room-created #copyRoomLinkBtn{display:block!important}.game-lobby.room-created #startOnlineBtn{width:100%;margin-top:9px}
 </style>
 </head>
 <body>
@@ -147,6 +147,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
     <select id="playerCount"><option value="2">۲ بازیکن</option><option value="3">۳ بازیکن</option><option value="4" selected>۴ بازیکن</option></select>
     <button class="primary" id="createRoomBtn" onclick="createOnlineRoom()">＋ ساخت اتاق مار و پله</button>
     <button class="secondary" id="copyRoomLinkBtn" style="display:none;width:100%;margin-top:8px" onclick="copyRoomLink()">🔗 کپی کردن لینک اتاق</button>
+    <button class="primary" id="startOnlineBtn" onclick="startGame()" style="display:none" disabled>▶ شروع بازی</button>
     <label for="roomCodeInput">کد اتاق برای ورود</label>
     <input id="roomCodeInput" maxlength="8" placeholder="کد اتاق">
     <button class="secondary" id="joinRoomBtn" onclick="joinOnlineRoom()">ورود به اتاق</button>
@@ -185,7 +186,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
   </div>
   <div class="message" id="message">اتاق بساز یا با کد دعوت وارد بازی شو.</div>
   <div class="actions">
-    <button class="primary" id="startOnlineBtn" onclick="startGame()" style="display:none" disabled>▶ شروع بازی</button>
+    
     <button class="secondary" id="leaveRoomBtn" onclick="leaveRoom()" style="display:none">🚪 خروج از بازی</button>
     <button class="secondary" onclick="newGame()">↻ بازگشت به منو</button>
   </div>
@@ -420,7 +421,7 @@ function render(){
  document.getElementById("turnLabel").textContent=playing?(current?"نوبت "+current.name:"در انتظار بازیکن"):(roomStatus==="waiting"?"لابی اتاق":"مسابقه متوقف");
  const canRoll=playing&&!locked&&!remoteAnimating&&mySeat===turn&&!pendingMove;
  document.getElementById("rollBtn").disabled=!canRoll;
- const sbt=document.getElementById("startOnlineBtn");if(sbt)sbt.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
+ const sbt=document.getElementById("startOnlineBtn");if(sbt){const canStart=host&&roomStatus==="waiting"&&players.length>=2;sbt.style.display=canStart?"block":"none";sbt.disabled=!canStart||locked;}
 
  document.getElementById("gameStatus").textContent=roomStatus==="waiting"?"در انتظار شروع":roomStatus==="playing"?"در حال مسابقه":roomStatus==="finished"?"پایان مسابقه":"آماده شروع";
  document.querySelectorAll(".cell.destination").forEach(e=>e.classList.remove("destination"));
