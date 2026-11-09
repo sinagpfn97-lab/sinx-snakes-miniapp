@@ -76,9 +76,65 @@ button:disabled{opacity:.35;cursor:not-allowed}
 select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0 12px}
 .dialog button{width:100%;margin-top:7px}
 .cell.destination{outline:3px solid #fff27a;outline-offset:-3px;box-shadow:inset 0 0 18px #fff27a99;cursor:pointer;animation:targetPulse .8s infinite alternate}.cell.destination:after{content:'⬅ مقصد';position:absolute;inset:auto 0 1px;text-align:center;font-size:clamp(6px,1.8vw,9px);font-weight:900;color:#fff7a0;text-shadow:0 1px 4px #000;z-index:8}@keyframes targetPulse{from{filter:brightness(1)}to{filter:brightness(1.65)}}
+
+/* SINX Game Hub */
+.hub{max-width:760px;margin:0 auto;padding:22px 14px 40px;min-height:100vh}
+.hub-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.hub-brand{font-size:22px;font-weight:900;letter-spacing:5px;color:#54eafa;text-shadow:0 0 22px #45eaff66}
+.hub-chip{font-size:10px;padding:7px 11px;border:1px solid #4b4773;border-radius:30px;color:#c9c1e8;background:#17152c}
+.hub-hero{position:relative;overflow:hidden;padding:25px 22px;border-radius:25px;border:1px solid #6a4a9a;background:radial-gradient(circle at 85% 15%,#6841a766,transparent 38%),linear-gradient(135deg,#29204a,#11182e 72%);box-shadow:0 20px 60px #0008,0 0 35px #8d5aff20}
+.hub-kicker{font-size:10px;letter-spacing:3px;color:#58eaff;font-weight:900}
+.hub-title{font-size:clamp(28px,7vw,43px);line-height:1.25;font-weight:900;margin:12px 0 8px}
+.hub-copy{font-size:12px;line-height:2;color:#bcb5d9;max-width:430px}
+.hub-hero-art{position:absolute;left:12px;bottom:-18px;font-size:105px;opacity:.14;transform:rotate(-17deg);pointer-events:none}
+.hub-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:17px;max-width:430px}
+.hub-btn{border-radius:13px;padding:13px 12px;font-size:12px;font-family:inherit;font-weight:900}
+.hub-btn.primary{background:linear-gradient(120deg,#c19aff,#53eafa);color:#151128;box-shadow:0 7px 24px #8b61ed44}
+.hub-btn.ghost{background:#282344;color:#eee9ff;border:1px solid #514879}
+.hub-section-head{display:flex;align-items:end;justify-content:space-between;margin:25px 2px 12px}
+.hub-section-head strong{font-size:15px}
+.hub-section-head span{font-size:10px;color:#a9a2c8}
+.hub-game{display:flex;align-items:center;gap:14px;padding:14px;border-radius:19px;border:1px solid #504477;background:linear-gradient(120deg,#211c3c,#121a30);box-shadow:0 12px 30px #0005}
+.hub-game-icon{width:66px;height:66px;flex:0 0 66px;display:grid;place-items:center;border-radius:17px;font-size:34px;background:linear-gradient(145deg,#503783,#173e5c);box-shadow:inset 0 0 20px #b58bff33}
+.hub-game-info{flex:1;min-width:0}
+.hub-game-info strong{font-size:14px}
+.hub-game-info p{margin:5px 0 0;color:#aaa4c9;font-size:10px;line-height:1.8}
+.hub-play{padding:10px 13px;border-radius:11px;background:#3b2b62;color:#e9ddff;border:1px solid #7655a9;font:800 11px inherit;white-space:nowrap}
+.hub-join{margin-top:13px;padding:15px;border:1px solid #38345e;border-radius:17px;background:#11162c}
+.hub-join label{display:block;font-size:11px;font-weight:800;margin-bottom:9px}
+.hub-join-row{display:flex;gap:8px}
+.hub-join input{min-width:0;flex:1;padding:12px;border-radius:10px;background:#090f22;color:white;border:1px solid #45416b;font:12px inherit;text-transform:uppercase}
+.hub-join button{padding:0 16px;border-radius:10px;background:#332754;color:#eee5ff;border:1px solid #65508d;font:800 11px inherit}
+.hub-footer{text-align:center;color:#777391;font-size:9px;margin-top:25px}
+@media(max-width:420px){.hub{padding:16px 11px 30px}.hub-hero{padding:21px 17px}.hub-game{gap:10px}.hub-game-icon{width:54px;height:54px;flex-basis:54px;font-size:29px}.hub-play{padding:9px}.hub-actions{gap:8px}}
 </style>
 </head>
 <body>
+<main class="hub" id="hubView">
+  <div class="hub-top"><div class="hub-brand">S I N X</div><div class="hub-chip">GAME HUB · BETA</div></div>
+  <section class="hub-hero">
+    <div class="hub-kicker">WELCOME TO SINX ARCADE</div>
+    <div class="hub-title">بازی، رقابت،<br>دورهمی آنلاین.</div>
+    <div class="hub-copy">بازی مورد علاقه‌ات رو انتخاب کن، اتاق بساز و دوستانت رو با لینک یا کد دعوت کن.</div>
+    <div class="hub-hero-art">🎮</div>
+    <div class="hub-actions">
+      <button class="hub-btn primary" onclick="openRoomSetup()">＋ ساخت اتاق بازی</button>
+      <button class="hub-btn ghost" onclick="focusHubJoin()">ورود به اتاق ↗</button>
+    </div>
+  </section>
+  <div class="hub-section-head"><strong>کتابخانه بازی‌ها</strong><span>بازی‌های قابل اجرا</span></div>
+  <section class="hub-game">
+    <div class="hub-game-icon">🐍</div>
+    <div class="hub-game-info"><strong>مار و پله نئونی</strong><p>بازی آنلاین چندنفره · ۲ تا ۴ بازیکن</p></div>
+    <button class="hub-play" onclick="launchSnakes()">ورود به بازی</button>
+  </section>
+  <section class="hub-join" id="hubJoin">
+    <label for="hubRoomCode">کد دعوت اتاق رو داری؟</label>
+    <div class="hub-join-row"><input id="hubRoomCode" maxlength="8" placeholder="مثلاً A1B2C3"><button onclick="joinFromHub()">جوین شو</button></div>
+  </section>
+  <div class="hub-footer">SINX ARCADE · یک خانه برای تمام بازی‌ها</div>
+</main>
+<div id="gameView" style="display:none">
 <div class="app">
 <header>
   <div class="logo">S I N X   A R C A D E</div>
@@ -124,6 +180,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </section>
 <div class="rules">🏁 برای برد باید دقیقاً به خانه ۱۰۰ برسی.<br>🎲 با آوردن عدد ۶ یک نوبت اضافه می‌گیری.<br>🐍 مار تو را پایین می‌برد و 🪜 نردبان تو را بالا می‌برد.</div>
 </div>
+</div><!-- gameView -->
 
 <div class="overlay" id="setupOverlay">
   <div class="dialog">
@@ -267,6 +324,12 @@ async function startGame(){
  catch(e){document.getElementById("message").textContent=e.message;}
  finally{locked=false;render();}
 }
+function showHub(){document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
+function showGame(){document.getElementById("hubView").style.display="none";document.getElementById("gameView").style.display="block";}
+function launchSnakes(){showGame();if(!roomCode){showSetup();}else closeSetup();}
+function openRoomSetup(){showGame();showSetup();}
+function focusHubJoin(){document.getElementById("hubRoomCode").focus();document.getElementById("hubJoin").scrollIntoView({behavior:"smooth",block:"center"});}
+function joinFromHub(){const code=document.getElementById("hubRoomCode").value.trim().toUpperCase();if(!code){focusHubJoin();return;}document.getElementById("roomCodeInput").value=code;showGame();showSetup();}
 function showSetup(){document.getElementById("setupOverlay").style.display="flex";}
 function closeSetup(){document.getElementById("setupOverlay").style.display="none";}
 function newGame(){showSetup();}
@@ -384,18 +447,19 @@ async function movePlayerNow(){
  finally{moving=false;locked=false;render();}
 }
 async function restoreSession(){
- if(!sb){accountFeedback("کتابخانه اتصال آنلاین بارگذاری نشد. صفحه را یک‌بار تازه‌سازی کن.");showSetup();return;}
+ const invited=(new URLSearchParams(location.search).get("room")||"").trim().toUpperCase();
+ if(invited){roomCode=invited;document.getElementById("roomCodeInput").value=invited;showGame();showSetup();}
+ else showHub();
+ if(!sb){accountFeedback("اتصال آنلاین بارگذاری نشد؛ بازی‌های آنلاین در دسترس نیستند.");return;}
  const {data:{session}}=await sb.auth.getSession();
  if(session){
   const {data:{user}}=await sb.auth.getUser();
   const username=user?.user_metadata?.username||"";
   if(username)document.getElementById("playerNameInput").value=username;
   accountFeedback(username?"وارد حساب @"+username+" هستی.":"حساب متصل است.");
-  await continueInviteIfReady();
-  if(!new URLSearchParams(location.search).get("room"))closeSetup();
+  if(invited)await continueInviteIfReady();
  }else{
-  accountFeedback("برای بازی آنلاین ابتدا وارد حساب شو.");
-  showSetup();
+  accountFeedback("برای ساخت یا ورود به اتاق، ابتدا وارد حساب شو.");
  }
 }
 createBoard();render();
