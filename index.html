@@ -99,12 +99,12 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .hub-game-info{flex:1;min-width:0}
 .hub-game-info strong{font-size:14px}
 .hub-game-info p{margin:5px 0 0;color:#aaa4c9;font-size:10px;line-height:1.8}
-.hub-play{padding:10px 13px;border-radius:11px;background:#3b2b62;color:#e9ddff;border:1px solid #7655a9;font:800 11px inherit;white-space:nowrap}
+.hub-play{padding:10px 13px;border-radius:11px;background:#3b2b62;color:#e9ddff;border:1px solid #7655a9;font-family:inherit;font-size:11px;font-weight:800;white-space:nowrap}
 .hub-join{margin-top:13px;padding:15px;border:1px solid #38345e;border-radius:17px;background:#11162c}
 .hub-join label{display:block;font-size:11px;font-weight:800;margin-bottom:9px}
 .hub-join-row{display:flex;gap:8px}
-.hub-join input{min-width:0;flex:1;padding:12px;border-radius:10px;background:#090f22;color:white;border:1px solid #45416b;font:12px inherit;text-transform:uppercase}
-.hub-join button{padding:0 16px;border-radius:10px;background:#332754;color:#eee5ff;border:1px solid #65508d;font:800 11px inherit}
+.hub-join input{min-width:0;flex:1;padding:12px;border-radius:10px;background:#090f22;color:white;border:1px solid #45416b;font-family:inherit;font-size:12px;text-transform:uppercase}
+.hub-join button{padding:0 16px;border-radius:10px;background:#332754;color:#eee5ff;border:1px solid #65508d;font-family:inherit;font-size:11px;font-weight:800}
 .hub-footer{text-align:center;color:#777391;font-size:9px;margin-top:25px}
 @media(max-width:420px){.hub{padding:16px 11px 30px}.hub-hero{padding:21px 17px}.hub-game{gap:10px}.hub-game-icon{width:54px;height:54px;flex-basis:54px;font-size:29px}.hub-play{padding:9px}.hub-actions{gap:8px}}
 </style>
@@ -329,7 +329,7 @@ function showGame(){document.getElementById("hubView").style.display="none";docu
 function launchSnakes(){showGame();if(!roomCode){showSetup();}else closeSetup();}
 function openRoomSetup(){showGame();showSetup();}
 function focusHubJoin(){document.getElementById("hubRoomCode").focus();document.getElementById("hubJoin").scrollIntoView({behavior:"smooth",block:"center"});}
-function joinFromHub(){const code=document.getElementById("hubRoomCode").value.trim().toUpperCase();if(!code){focusHubJoin();return;}document.getElementById("roomCodeInput").value=code;showGame();showSetup();}
+function joinFromHub(){const code=document.getElementById("hubRoomCode").value.trim().toUpperCase();if(!code){focusHubJoin();return;}document.getElementById("roomCodeInput").value=code;showGame();showSetup();if(sb)sb.auth.getSession().then(({data:{session}})=>{if(session)joinOnlineRoom();});}
 function showSetup(){document.getElementById("setupOverlay").style.display="flex";}
 function closeSetup(){document.getElementById("setupOverlay").style.display="none";}
 function newGame(){showSetup();}
