@@ -215,7 +215,7 @@ const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false;
 let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false;
-let pendingMove=null,lastRoll=null,lastSeenRollId="",moving=false,pollInFlight=false;
+let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,pollInFlight=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 function feedback(s){const e=document.getElementById("lobbyFeedback");if(e)e.textContent=s;}
@@ -261,6 +261,20 @@ function applyState(data){
  if(Number.isInteger(data.mySeat))mySeat=data.mySeat;
  pendingMove=data.pendingMove||data.room?.game_state?.pending_move||null;
  lastRoll=data.lastRoll||data.room?.game_state?.last_roll||null;
+ const incomingMove=data.lastMove||data.room?.game_state?.last_move||null;
+ const firstSnapshot=!stateEventsReady;stateEventsReady=true;
+ if(lastRoll?.id&&lastRoll.id!==lastSeenRollId){
+  const isNew=!!lastSeenRollId||!firstSnapshot;lastSeenRollId=lastRoll.id;
+  const die=Number(lastRoll.dice);
+  if(die>=1&&die<=6){
+   if(isNew&&Number(lastRoll.seat)!==mySeat)animateDice(die,700);
+   else if(!isNew){const el=document.getElementById("dice");el.classList.remove("rolling");el.textContent=DICE[die-1];document.getElementById("diceCaption").textContent="عدد تاس: "+die;}
+  }
+ }
+ if(incomingMove?.id&&incomingMove.id!==lastSeenMoveId){
+  const isNew=!!lastSeenMoveId||!firstSnapshot;lastSeenMoveId=incomingMove.id;
+  if(isNew&&Number(incomingMove.seat)!==mySeat)animateRemoteMove(incomingMove);
+ }
  host=players.some(p=>p.seat===mySeat&&p.isHost);
  playing=roomStatus==="playing";
  if(playing||roomStatus==="finished")document.getElementById("gameView").classList.remove("lobby-mode");
@@ -395,7 +409,7 @@ function render(){
  players.forEach(p=>{const item=document.createElement("div");item.className="player"+(playing&&p.seat===turn?" active":"");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[p.seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p.name;const pos=document.createElement("div");pos.className="player-pos";pos.textContent="خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"");info.append(name,pos);item.append(icon,info);box.appendChild(item);});
  const current=players.find(p=>p.seat===turn);
  document.getElementById("turnLabel").textContent=playing?(current?"نوبت "+current.name:"در انتظار بازیکن"):(roomStatus==="waiting"?"لابی اتاق":"مسابقه متوقف");
- const canRoll=playing&&!locked&&mySeat===turn&&!pendingMove;
+ const canRoll=playing&&!locked&&!remoteAnimating&&mySeat===turn&&!pendingMove;
  document.getElementById("rollBtn").disabled=!canRoll;
  const sbt=document.getElementById("startOnlineBtn");if(sbt)sbt.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
  const lobbyStart=document.getElementById("lobbyStartBtn");if(lobbyStart)lobbyStart.style.display=host&&roomStatus==="waiting"?"block":"none";
@@ -403,12 +417,26 @@ function render(){
  document.querySelectorAll(".cell.destination").forEach(e=>e.classList.remove("destination"));
  if(pendingMove&&mySeat===turn){const target=document.getElementById("cell-"+pendingMove.target_position);if(target)target.classList.add("destination");}
 }
-async function animateDice(finalValue){
+async function animateDice(finalValue,duration=700){
  const dice=document.getElementById("dice");dice.classList.add("rolling");
- const duration=850,start=Date.now();
- while(Date.now()-start<duration){dice.textContent=DICE[Math.floor(Math.random()*6)];await sleep(75);}
+ const start=Date.now();
+ while(Date.now()-start<duration){dice.textContent=DICE[Math.floor(Math.random()*6)];await sleep(65);}
  dice.textContent=DICE[finalValue-1];dice.classList.remove("rolling");
  document.getElementById("diceCaption").textContent="عدد تاس: "+finalValue;
+}
+async function animateRemoteMove(move){
+ if(remoteAnimating)return;
+ const player=players.find(p=>p.seat===Number(move.seat));if(!player)return;
+ remoteAnimating=true;
+ try{
+  const from=Number(move.from_position),target=Number(move.target_position),final=Number(move.final_position);
+  player.pos=from;renderTokens();
+  if(target>from){for(let step=from+1;step<=target;step++){player.pos=step;renderTokens();await sleep(145);}}
+  if(move.event==="snake"||move.event==="ladder"){
+   document.getElementById("message").textContent=move.event==="snake"?"🐍 مار! مهره حریف پایین می‌رود...":"🪜 نردبان! مهره حریف بالا می‌رود...";
+   await sleep(280);player.pos=final;renderTokens();await sleep(250);
+  }else{player.pos=final;renderTokens();}
+ }finally{remoteAnimating=false;render();}
 }
 async function rollDice(){
  if(!playing||locked||pendingMove)return;
@@ -440,6 +468,7 @@ async function movePlayerNow(){
   const d=await api("move");
   const me=players.find(p=>p.seat===mySeat);
   if(me){
+   lastSeenMoveId=d.rollId||d.room?.game_state?.last_move?.id||lastSeenMoveId;
    const path=Array.isArray(d.path)?d.path:[];
    for(const step of path){me.pos=Number(step);renderTokens();await sleep(190);}
    if(d.event==="snake"||d.event==="ladder"){
