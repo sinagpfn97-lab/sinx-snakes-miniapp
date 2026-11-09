@@ -215,13 +215,14 @@ const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false;
 let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false;
-let pendingMove=null,lastRoll=null,lastSeenRollId="",moving=false;
+let pendingMove=null,lastRoll=null,lastSeenRollId="",moving=false,pollInFlight=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 function feedback(s){const e=document.getElementById("lobbyFeedback");if(e)e.textContent=s;}
 function accountFeedback(s){const e=document.getElementById("accountStatus");if(e)e.textContent=s;}
 function keyFor(code){return "sinx_room_"+code;}
 async function api(action,extra={}){
+ if(!sb)throw new Error("اتصال Supabase برقرار نیست؛ سرویس آنلاین در دسترس نیست.");
  const headers={"Content-Type":"application/json","apikey":PUBLIC_KEY};
  if(!["register","signup","login"].includes(action)){
   const {data:{session}}=await sb.auth.getSession();
@@ -277,7 +278,8 @@ function applyState(data){
  if(roomStatus==="finished"){const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
-function startPolling(){if(pollHandle)clearInterval(pollHandle);pollHandle=setInterval(async()=>{if(!roomCode||moving)return;try{await syncState();}catch(e){document.getElementById("message").textContent=e.message;}},900);}
+function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
+function startPolling(){stopPolling();pollHandle=setInterval(async()=>{if(!roomCode||moving||pollInFlight||document.getElementById("gameView").style.display==="none")return;pollInFlight=true;try{await syncState();}catch(e){document.getElementById("message").textContent=e.message;}finally{pollInFlight=false;}},1200);}
 function setLobbyBusy(v){["createRoomBtn","joinRoomBtn","registerBtn","loginBtn"].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=v;});}
 async function continueInviteIfReady(){
  const invited=(new URLSearchParams(location.search).get("room")||document.getElementById("roomCodeInput").value||"").trim().toUpperCase();
@@ -290,6 +292,7 @@ async function continueInviteIfReady(){
  }catch(e){feedback(e.message);}
 }
 async function createOnlineRoom(){
+ if(!sb){feedback("اتصال Supabase برقرار نیست؛ ساخت اتاق ممکن نیست.");return;}
  const {data:{session}}=await sb.auth.getSession();if(!session){showProfile();feedback("برای ساخت اتاق ابتدا وارد حساب شو.");return;}
  try{
   locked=true;setLobbyBusy(true);
@@ -303,6 +306,7 @@ async function createOnlineRoom(){
  finally{locked=false;setLobbyBusy(false);render();}
 }
 async function joinOnlineRoom(){
+ if(!sb){feedback("اتصال Supabase برقرار نیست؛ ورود به اتاق ممکن نیست.");return;}
  const {data:{session}}=await sb.auth.getSession();if(!session){showProfile();feedback("برای ورود به اتاق ابتدا وارد حساب شو.");return;}
  const code=(document.getElementById("roomCodeInput").value.trim()||new URLSearchParams(location.search).get("room")||"").toUpperCase();
  if(!code){feedback("کد اتاق را وارد کن.");return;}
@@ -322,7 +326,7 @@ async function startGame(){
  catch(e){document.getElementById("message").textContent=e.message;}
  finally{locked=false;render();}
 }
-function showHub(){document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
+function showHub(){stopPolling();document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
 function showGame(){document.getElementById("hubView").style.display="none";document.getElementById("gameView").style.display="block";document.getElementById("gameView").classList.add("lobby-mode");}
 function launchSnakes(){showGame();closeSetup();}
 function openGamePicker(){document.getElementById("gamePickerOverlay").style.display="flex";}
@@ -333,7 +337,7 @@ function closeProfile(){document.getElementById("profileOverlay").style.display=
 function showSetup(){showProfile();}
 function closeSetup(){document.getElementById("setupOverlay").style.display="none";}
 function newGame(){showHub();}
-function joinFromHub(){const code=document.getElementById("hubRoomCode").value.trim().toUpperCase();if(!code){document.getElementById("hubRoomCode").focus();return;}document.getElementById("roomCodeInput").value=code;showGame();if(sb)sb.auth.getSession().then(({data:{session}})=>{if(session)joinOnlineRoom();else showProfile();});}
+async function joinFromHub(){const code=document.getElementById("hubRoomCode").value.trim().toUpperCase();if(!code){document.getElementById("hubRoomCode").focus();return;}document.getElementById("roomCodeInput").value=code;showGame();if(!sb){feedback("اتصال Supabase برقرار نیست؛ ورود آنلاین ممکن نیست.");return;}try{const {data:{session}}=await sb.auth.getSession();if(session)await joinOnlineRoom();else showProfile();}catch(e){feedback(e.message||"خطا در بررسی نشست کاربر");}}
 
 function pointOf(n){
  const row=Math.floor((n-1)/10),idx=(n-1)%10;
