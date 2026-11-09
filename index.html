@@ -63,7 +63,7 @@ button{font-family:inherit;border:0;cursor:pointer;font-weight:800}
 .roll{min-height:85px;width:100%;border-radius:15px;color:#15112a;background:linear-gradient(135deg,#c09aff,#54eafa);box-shadow:0 5px 20px #8959e955;font-size:16px}
 .roll:disabled{opacity:.35;cursor:not-allowed}
 .message{margin-top:11px;padding:11px;border-radius:12px;text-align:center;font-size:11px;min-height:42px;background:#10152b;border:1px solid #39345c;color:#e4e0ff;line-height:1.8}
-.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:9px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
 .secondary,.primary{padding:11px;border-radius:11px;font-size:11px}
 .secondary{background:#29264a;color:#eae5ff;border:1px solid #4a4374}
 .primary{background:linear-gradient(135deg,#8c5be9,#5740a8);color:white}
@@ -148,7 +148,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
     <label for="roomCodeInput">کد اتاق برای ورود</label>
     <input id="roomCodeInput" maxlength="8" placeholder="کد اتاق">
     <button class="secondary" id="joinRoomBtn" onclick="joinOnlineRoom()">ورود به اتاق</button>
-    <button class="primary" id="lobbyStartBtn" style="display:none" onclick="startGame()">▶ شروع بازی</button>
+    
     <button class="game-back" onclick="showHub()">← بازگشت به منوی اصلی</button>
     <p id="lobbyFeedback" style="min-height:20px;margin-bottom:0;text-align:center;font-size:10px;color:#c4c0dd"></p>
   </div>
@@ -183,9 +183,10 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
   </div>
   <div class="message" id="message">اتاق بساز یا با کد دعوت وارد بازی شو.</div>
   <div class="actions">
-    <button class="secondary" onclick="showSetup()">⚙️ اتاق‌ها</button>
-    <button class="primary" id="startOnlineBtn" onclick="startGame()" disabled>▶ شروع بازی</button>
-    <button class="secondary" onclick="newGame()">↻ اتاق جدید</button>
+    <button class="secondary" id="copyRoomLinkBtn" onclick="copyRoomLink()" style="display:none">🔗 کپی کردن لینک اتاق</button>
+    <button class="primary" id="startOnlineBtn" onclick="startGame()" style="display:none" disabled>▶ شروع بازی</button>
+    <button class="secondary" id="leaveRoomBtn" onclick="leaveRoom()" style="display:none">🚪 خروج از بازی</button>
+    <button class="secondary" onclick="newGame()">↻ بازگشت به منو</button>
   </div>
 </section>
 <div class="rules">🏁 برای برد باید دقیقاً به خانه ۱۰۰ برسی.<br>🎲 با آوردن عدد ۶ یک نوبت اضافه می‌گیری.<br>🐍 مار تو را پایین می‌برد و 🪜 نردبان تو را بالا می‌برد.</div>
@@ -215,7 +216,7 @@ const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false;
 let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false;
-let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,remoteAnimationQueue=Promise.resolve(),pollInFlight=false;
+let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,remoteAnimationQueue=Promise.resolve(),pollInFlight=false,autoCallInFlight=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 function feedback(s){const e=document.getElementById("lobbyFeedback");if(e)e.textContent=s;}
@@ -286,14 +287,16 @@ function applyState(data){
  render();
  document.getElementById("gameStatus").textContent=roomStatus==="waiting"?"در انتظار بازیکنان":roomStatus==="playing"?"در حال مسابقه":roomStatus==="finished"?"بازی تمام شد":"آماده شروع";
  const sbt=document.getElementById("startOnlineBtn");
- if(sbt)sbt.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
- const lobbyStart=document.getElementById("lobbyStartBtn");if(lobbyStart)lobbyStart.style.display=host&&roomStatus==="waiting"?"block":"none";
+ if(sbt){const canStart=host&&roomStatus==="waiting"&&players.length>=2;sbt.style.display=canStart?"block":"none";sbt.disabled=!canStart||locked;}
+ const copyBtn=document.getElementById("copyRoomLinkBtn");if(copyBtn)copyBtn.style.display=roomCode?"block":"none";
+ const leaveBtn=document.getElementById("leaveRoomBtn");if(leaveBtn)leaveBtn.style.display=roomCode?"block":"none";
+
  if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent="کد اتاق: "+roomCode+" | "+players.length+" بازیکن از "+(data.room?.max_players||"?");
  if(roomStatus==="finished"){const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
 function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
-function startPolling(){stopPolling();pollHandle=setInterval(async()=>{if(!roomCode||moving||remoteAnimating||pollInFlight||document.getElementById("gameView").style.display==="none")return;pollInFlight=true;try{await syncState();}catch(e){document.getElementById("message").textContent=e.message;}finally{pollInFlight=false;}},1200);}
+function startPolling(){stopPolling();pollHandle=setInterval(async()=>{if(!roomCode||moving||remoteAnimating||pollInFlight||document.getElementById("gameView").style.display==="none")return;pollInFlight=true;try{await syncState();if(playing&&!autoCallInFlight){autoCallInFlight=true;try{const bot=await api("auto");if(bot.bot){document.getElementById("message").textContent="⏱️ زمان نوبت تمام شد؛ ربات حرکت را انجام داد.";await syncState();}}finally{autoCallInFlight=false;}}}catch(e){document.getElementById("message").textContent=e.message;}finally{pollInFlight=false;}},1200);}
 function setLobbyBusy(v){["createRoomBtn","joinRoomBtn","registerBtn","loginBtn"].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=v;});}
 async function continueInviteIfReady(){
  const invited=(new URLSearchParams(location.search).get("room")||document.getElementById("roomCodeInput").value||"").trim().toUpperCase();
@@ -301,7 +304,7 @@ async function continueInviteIfReady(){
  roomCode=invited;
  try{
   const d=await api("join",{roomCode:invited});
-  applyState(d);document.getElementById("message").textContent="با لینک دعوت وارد اتاق شدی: "+invited;
+  applyState(d);showGame();document.getElementById("gameView").classList.remove("lobby-mode");document.getElementById("message").textContent="با لینک دعوت وارد اتاق شدی: "+invited;
   closeSetup();startPolling();
  }catch(e){feedback(e.message);}
 }
@@ -313,8 +316,9 @@ async function createOnlineRoom(){
   const d=await api("create",{maxPlayers:Number(document.getElementById("playerCount").value)});
   roomCode=d.roomCode;playerToken=d.playerToken||"";mySeat=d.mySeat;applyState(d);
   document.getElementById("roomCodeInput").value=roomCode;
-  document.getElementById("message").textContent="اتاق ساخته شد.";
-  feedback("لینک دعوت را برای دوستانت بفرست: "+d.inviteLink);
+  document.getElementById("message").textContent="اتاق ساخته شد؛ لینک دعوت را کپی کن و برای دوستانت بفرست.";
+  feedback("اتاق "+roomCode+" ساخته شد. دکمه کپی لینک در پایین صفحه قرار دارد.");
+  showGame();document.getElementById("gameView").classList.remove("lobby-mode");
   closeSetup();startPolling();
  }catch(e){feedback(e.message);}
  finally{locked=false;setLobbyBusy(false);render();}
@@ -328,8 +332,9 @@ async function joinOnlineRoom(){
   locked=true;setLobbyBusy(true);roomCode=code;
   const d=await api("join",{roomCode:code});
   playerToken=d.playerToken||"";mySeat=d.mySeat;applyState(d);
-  document.getElementById("message").textContent="با موفقیت وارد اتاق شدی: "+roomCode;
+  document.getElementById("message").textContent="وارد اتاق شدی. بازیکنان را در صفحه بازی می‌بینی.";
   feedback("وارد اتاق شدی. منتظر شروع میزبان بمان.");
+  showGame();document.getElementById("gameView").classList.remove("lobby-mode");
   closeSetup();startPolling();
  }catch(e){feedback(e.message);}
  finally{locked=false;setLobbyBusy(false);render();}
@@ -350,7 +355,9 @@ function showProfile(){document.getElementById("profileOverlay").style.display="
 function closeProfile(){document.getElementById("profileOverlay").style.display="none";}
 function showSetup(){showProfile();}
 function closeSetup(){document.getElementById("setupOverlay").style.display="none";}
-function newGame(){showHub();}
+async function copyRoomLink(){if(!roomCode)return;const link=location.origin+location.pathname+"?room="+encodeURIComponent(roomCode);try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(link);else{const t=document.createElement("textarea");t.value=link;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();}document.getElementById("message").textContent="لینک دعوت کپی شد؛ برای دوستانت بفرست.";}catch(e){document.getElementById("message").textContent="کپی خودکار ممکن نشد؛ کد اتاق: "+roomCode;}}
+async function leaveRoom(){if(!roomCode)return;if(!confirm("از این اتاق خارج می‌شوی؟"))return;try{locked=true;render();await api("leave");stopPolling();roomCode="";playerToken="";mySeat=-1;players=[];pendingMove=null;lastRoll=null;roomStatus="waiting";playing=false;host=false;stateEventsReady=false;lastSeenRollId="";lastSeenMoveId="";document.getElementById("roomCodeInput").value="";document.getElementById("hubRoomCode").value="";showHub();}catch(e){document.getElementById("message").textContent=e.message;}finally{locked=false;render();}}
+function newGame(){if(roomCode){showHub();return;}showHub();}
 async function joinFromHub(){const code=document.getElementById("hubRoomCode").value.trim().toUpperCase();if(!code){document.getElementById("hubRoomCode").focus();return;}document.getElementById("roomCodeInput").value=code;showGame();if(!sb){feedback("اتصال Supabase برقرار نیست؛ ورود آنلاین ممکن نیست.");return;}try{const {data:{session}}=await sb.auth.getSession();if(session)await joinOnlineRoom();else showProfile();}catch(e){feedback(e.message||"خطا در بررسی نشست کاربر");}}
 
 function pointOf(n){
@@ -412,7 +419,7 @@ function render(){
  const canRoll=playing&&!locked&&!remoteAnimating&&mySeat===turn&&!pendingMove;
  document.getElementById("rollBtn").disabled=!canRoll;
  const sbt=document.getElementById("startOnlineBtn");if(sbt)sbt.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
- const lobbyStart=document.getElementById("lobbyStartBtn");if(lobbyStart)lobbyStart.style.display=host&&roomStatus==="waiting"?"block":"none";
+
  document.getElementById("gameStatus").textContent=roomStatus==="waiting"?"در انتظار شروع":roomStatus==="playing"?"در حال مسابقه":roomStatus==="finished"?"پایان مسابقه":"آماده شروع";
  document.querySelectorAll(".cell.destination").forEach(e=>e.classList.remove("destination"));
  if(pendingMove&&mySeat===turn){const target=document.getElementById("cell-"+pendingMove.target_position);if(target)target.classList.add("destination");}
