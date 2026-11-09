@@ -278,6 +278,7 @@ function applyState(data){
   if(isNew&&Number(incomingMove.seat)!==mySeat)remoteAnimationQueue=remoteAnimationQueue.then(()=>animateRemoteMove(incomingMove)).catch(()=>{});
  }
  host=players.some(p=>p.seat===mySeat&&p.isHost);
+ if(host&&roomStatus==="waiting")document.querySelector(".game-lobby").classList.add("room-created");
  playing=roomStatus==="playing";
  if(playing||roomStatus==="finished")document.getElementById("gameView").classList.remove("lobby-mode");
  if(lastRoll?.id&&lastRoll.id!==lastSeenRollId){
