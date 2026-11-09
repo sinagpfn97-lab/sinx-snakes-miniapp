@@ -299,7 +299,7 @@ function applyState(data){
  const leaveBtn=document.getElementById("leaveRoomBtn");if(leaveBtn)leaveBtn.style.display=roomCode?"block":"none";
 
  if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent="کد اتاق: "+roomCode+" | "+players.length+" بازیکن از "+(data.room?.max_players||"?");
- if(roomStatus==="finished"){const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}
+ if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج («"+departed+"») به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}}
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
 function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
