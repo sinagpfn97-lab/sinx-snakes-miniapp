@@ -79,7 +79,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 
 /* SINX Game Hub */
 .hub{max-width:760px;margin:0 auto;padding:22px 14px 40px;min-height:100vh}
-.hub-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}.profile-btn{width:39px;height:39px;border-radius:13px;background:#292344;border:1px solid #62518c;color:#fff;font-size:20px}
+.hub-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;direction:ltr}.profile-btn{width:39px;height:39px;border-radius:13px;background:#292344;border:1px solid #62518c;color:#fff;font-size:20px}
 .hub-brand{font-size:22px;font-weight:900;letter-spacing:5px;color:#54eafa;text-shadow:0 0 22px #45eaff66}
 .hub-chip{font-size:10px;padding:7px 11px;border:1px solid #4b4773;border-radius:30px;color:#c9c1e8;background:#17152c}
 .hub-hero{position:relative;overflow:hidden;padding:25px 22px;border-radius:25px;border:1px solid #6a4a9a;background:radial-gradient(circle at 85% 15%,#6841a766,transparent 38%),linear-gradient(135deg,#29204a,#11182e 72%);box-shadow:0 20px 60px #0008,0 0 35px #8d5aff20}
@@ -148,6 +148,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
     <label for="roomCodeInput">کد اتاق برای ورود</label>
     <input id="roomCodeInput" maxlength="8" placeholder="کد اتاق">
     <button class="secondary" id="joinRoomBtn" onclick="joinOnlineRoom()">ورود به اتاق</button>
+    <button class="primary" id="lobbyStartBtn" style="display:none" onclick="startGame()">▶ شروع بازی</button>
     <button class="game-back" onclick="showHub()">← بازگشت به منوی اصلی</button>
     <p id="lobbyFeedback" style="min-height:20px;margin-bottom:0;text-align:center;font-size:10px;color:#c4c0dd"></p>
   </div>
@@ -191,7 +192,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </div>
 </div><!-- gameView -->
 
-<div class="overlay" id="setupOverlay"><div class="dialog"><h2>ورود به بازی</h2><p>برای ساخت یا پیوستن به اتاق، ابتدا وارد حساب شو.</p><button class="primary" onclick="showProfile()">👤 ورود / ثبت‌نام</button><button class="secondary" onclick="closeSetup()">بستن</button><p id="lobbyFeedback"></p></div></div>
+<div class="overlay" id="setupOverlay"><div class="dialog"><h2>ورود به بازی</h2><p>برای ساخت یا پیوستن به اتاق، ابتدا وارد حساب شو.</p><button class="primary" onclick="showProfile()">👤 ورود / ثبت‌نام</button><button class="secondary" onclick="closeSetup()">بستن</button></div></div>
 <div class="overlay" id="gamePickerOverlay"><div class="dialog"><h2>🎮 انتخاب بازی</h2><p>بازی موردنظرت را برای ساخت اتاق انتخاب کن.</p><button class="primary" onclick="chooseGame('snakes')">🐍 مار و پله نئونی</button><button class="secondary" onclick="closeGamePicker()">انصراف</button></div></div>
 <div class="overlay" id="profileOverlay"><div class="dialog"><h2>👤 حساب کاربری SINX</h2><p id="accountStatus">برای ذخیره حساب و ورود به اتاق‌ها وارد شو.</p><input id="playerNameInput" maxlength="20" autocomplete="username" placeholder="نام کاربری انگلیسی (۳ تا ۲۰ حرف)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0"><input id="passwordInput" type="password" minlength="6" autocomplete="current-password" placeholder="رمز عبور (حداقل ۶ کاراکتر)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:0 0 8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="primary" id="registerBtn" onclick="accountAction('register')">ثبت‌نام</button><button class="secondary" id="loginBtn" onclick="accountAction('login')">ورود</button></div><button class="secondary" onclick="closeProfile()">بستن</button></div></div>
 
@@ -271,6 +272,7 @@ function applyState(data){
  document.getElementById("gameStatus").textContent=roomStatus==="waiting"?"در انتظار بازیکنان":roomStatus==="playing"?"در حال مسابقه":roomStatus==="finished"?"بازی تمام شد":"آماده شروع";
  const sbt=document.getElementById("startOnlineBtn");
  if(sbt)sbt.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
+ const lobbyStart=document.getElementById("lobbyStartBtn");if(lobbyStart)lobbyStart.style.display=host&&roomStatus==="waiting"?"block":"none";
  if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent="کد اتاق: "+roomCode+" | "+players.length+" بازیکن از "+(data.room?.max_players||"?");
  if(roomStatus==="finished"){const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}
 }
@@ -288,6 +290,7 @@ async function continueInviteIfReady(){
  }catch(e){feedback(e.message);}
 }
 async function createOnlineRoom(){
+ const {data:{session}}=await sb.auth.getSession();if(!session){showProfile();feedback("برای ساخت اتاق ابتدا وارد حساب شو.");return;}
  try{
   locked=true;setLobbyBusy(true);
   const d=await api("create",{maxPlayers:Number(document.getElementById("playerCount").value)});
@@ -300,6 +303,7 @@ async function createOnlineRoom(){
  finally{locked=false;setLobbyBusy(false);render();}
 }
 async function joinOnlineRoom(){
+ const {data:{session}}=await sb.auth.getSession();if(!session){showProfile();feedback("برای ورود به اتاق ابتدا وارد حساب شو.");return;}
  const code=(document.getElementById("roomCodeInput").value.trim()||new URLSearchParams(location.search).get("room")||"").toUpperCase();
  if(!code){feedback("کد اتاق را وارد کن.");return;}
  try{
@@ -320,7 +324,7 @@ async function startGame(){
 }
 function showHub(){document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
 function showGame(){document.getElementById("hubView").style.display="none";document.getElementById("gameView").style.display="block";document.getElementById("gameView").classList.add("lobby-mode");}
-function launchSnakes(){showGame();if(!roomCode)showSetup();else closeSetup();}
+function launchSnakes(){showGame();closeSetup();}
 function openGamePicker(){document.getElementById("gamePickerOverlay").style.display="flex";}
 function closeGamePicker(){document.getElementById("gamePickerOverlay").style.display="none";}
 function chooseGame(game){closeGamePicker();if(game==="snakes")launchSnakes();}
@@ -390,6 +394,7 @@ function render(){
  const canRoll=playing&&!locked&&mySeat===turn&&!pendingMove;
  document.getElementById("rollBtn").disabled=!canRoll;
  const sbt=document.getElementById("startOnlineBtn");if(sbt)sbt.disabled=!host||roomStatus!=="waiting"||players.length<2||locked;
+ const lobbyStart=document.getElementById("lobbyStartBtn");if(lobbyStart)lobbyStart.style.display=host&&roomStatus==="waiting"?"block":"none";
  document.getElementById("gameStatus").textContent=roomStatus==="waiting"?"در انتظار شروع":roomStatus==="playing"?"در حال مسابقه":roomStatus==="finished"?"پایان مسابقه":"آماده شروع";
  document.querySelectorAll(".cell.destination").forEach(e=>e.classList.remove("destination"));
  if(pendingMove&&mySeat===turn){const target=document.getElementById("cell-"+pendingMove.target_position);if(target)target.classList.add("destination");}
