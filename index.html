@@ -215,7 +215,7 @@ const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false;
 let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false;
-let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,pollInFlight=false;
+let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,remoteAnimationQueue=Promise.resolve(),pollInFlight=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 function feedback(s){const e=document.getElementById("lobbyFeedback");if(e)e.textContent=s;}
@@ -267,13 +267,13 @@ function applyState(data){
   const isNew=!!lastSeenRollId||!firstSnapshot;lastSeenRollId=lastRoll.id;
   const die=Number(lastRoll.dice);
   if(die>=1&&die<=6){
-   if(isNew&&Number(lastRoll.seat)!==mySeat)animateDice(die,700);
+   if(isNew&&Number(lastRoll.seat)!==mySeat)remoteAnimationQueue=remoteAnimationQueue.then(()=>animateDice(die,700)).catch(()=>{});
    else if(!isNew){const el=document.getElementById("dice");el.classList.remove("rolling");el.textContent=DICE[die-1];document.getElementById("diceCaption").textContent="عدد تاس: "+die;}
   }
  }
  if(incomingMove?.id&&incomingMove.id!==lastSeenMoveId){
   const isNew=!!lastSeenMoveId||!firstSnapshot;lastSeenMoveId=incomingMove.id;
-  if(isNew&&Number(incomingMove.seat)!==mySeat)animateRemoteMove(incomingMove);
+  if(isNew&&Number(incomingMove.seat)!==mySeat)remoteAnimationQueue=remoteAnimationQueue.then(()=>animateRemoteMove(incomingMove)).catch(()=>{});
  }
  host=players.some(p=>p.seat===mySeat&&p.isHost);
  playing=roomStatus==="playing";
@@ -293,7 +293,7 @@ function applyState(data){
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
 function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
-function startPolling(){stopPolling();pollHandle=setInterval(async()=>{if(!roomCode||moving||pollInFlight||document.getElementById("gameView").style.display==="none")return;pollInFlight=true;try{await syncState();}catch(e){document.getElementById("message").textContent=e.message;}finally{pollInFlight=false;}},1200);}
+function startPolling(){stopPolling();pollHandle=setInterval(async()=>{if(!roomCode||moving||remoteAnimating||pollInFlight||document.getElementById("gameView").style.display==="none")return;pollInFlight=true;try{await syncState();}catch(e){document.getElementById("message").textContent=e.message;}finally{pollInFlight=false;}},1200);}
 function setLobbyBusy(v){["createRoomBtn","joinRoomBtn","registerBtn","loginBtn"].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=v;});}
 async function continueInviteIfReady(){
  const invited=(new URLSearchParams(location.search).get("room")||document.getElementById("roomCodeInput").value||"").trim().toUpperCase();
