@@ -68,7 +68,7 @@ button{font-family:inherit;border:0;cursor:pointer;font-weight:800}
 .secondary{background:#29264a;color:#eae5ff;border:1px solid #4a4374}
 .primary{background:linear-gradient(135deg,#8c5be9,#5740a8);color:white}
 button:disabled{opacity:.35;cursor:not-allowed}
-.rules{margin-top:12px;text-align:center;color:#aaa4c9;font-size:10px;line-height:2}
+.rules{margin-top:12px;text-align:center;color:#aaa4c9;font-size:10px;line-height:2}.game-lobby{display:none;margin-bottom:12px;padding:14px;border-radius:16px;background:#10152b;border:1px solid #514879}.lobby-mode .game-lobby{display:block}.lobby-mode .status,.lobby-mode .board-wrap,.lobby-mode .legend,.lobby-mode .players,.lobby-mode .controls,.lobby-mode .message,.lobby-mode .rules{display:none!important}.game-lobby label{display:block;text-align:right;font-size:11px;font-weight:800;margin:10px 0 7px}.game-lobby input{width:100%;padding:12px;border-radius:10px;background:#090f22;color:#fff;border:1px solid #45416b;font-family:inherit;font-size:13px;text-transform:uppercase;text-align:center}.game-lobby .primary,.game-lobby .secondary{width:100%;margin-top:8px}.game-back{width:100%;margin-top:12px;padding:11px;border-radius:11px;background:#29264a;color:#eae5ff;border:1px solid #4a4374;font-family:inherit;font-weight:800}
 .overlay{position:fixed;inset:0;background:#050414ef;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}#setupOverlay{display:flex}
 .dialog{width:100%;max-width:350px;padding:20px;border-radius:21px;text-align:center;background:linear-gradient(145deg,#29204a,#151a35);border:1px solid #7253a8;box-shadow:0 0 35px #865aff44}
 .dialog h2{font-size:20px;margin:5px}
@@ -79,14 +79,14 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 
 /* SINX Game Hub */
 .hub{max-width:760px;margin:0 auto;padding:22px 14px 40px;min-height:100vh}
-.hub-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.hub-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}.profile-btn{width:39px;height:39px;border-radius:13px;background:#292344;border:1px solid #62518c;color:#fff;font-size:20px}
 .hub-brand{font-size:22px;font-weight:900;letter-spacing:5px;color:#54eafa;text-shadow:0 0 22px #45eaff66}
 .hub-chip{font-size:10px;padding:7px 11px;border:1px solid #4b4773;border-radius:30px;color:#c9c1e8;background:#17152c}
 .hub-hero{position:relative;overflow:hidden;padding:25px 22px;border-radius:25px;border:1px solid #6a4a9a;background:radial-gradient(circle at 85% 15%,#6841a766,transparent 38%),linear-gradient(135deg,#29204a,#11182e 72%);box-shadow:0 20px 60px #0008,0 0 35px #8d5aff20}
 .hub-kicker{font-size:10px;letter-spacing:3px;color:#58eaff;font-weight:900}
 .hub-title{font-size:clamp(28px,7vw,43px);line-height:1.25;font-weight:900;margin:12px 0 8px}
 .hub-copy{font-size:12px;line-height:2;color:#bcb5d9;max-width:430px}
-.hub-hero-art{position:absolute;left:12px;bottom:-18px;font-size:105px;opacity:.14;transform:rotate(-17deg);pointer-events:none}
+.hub-hero-art{position:absolute;left:12px;bottom:-18px;font-size:105px;opacity:.14;transform:rotate(-17deg);pointer-events:none}.hub-room-entry{position:relative;margin-top:18px;max-width:480px}.hub-room-entry label{display:block;font-size:11px;font-weight:800;margin-bottom:8px}.hub-room-entry input{width:100%;padding:15px 14px;border-radius:13px;background:#090f22;color:#fff;border:1px solid #65528e;font-family:inherit;font-size:15px;letter-spacing:2px;text-align:center;text-transform:uppercase;box-shadow:inset 0 2px 8px #0005}.hub-room-buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
 .hub-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:17px;max-width:430px}
 .hub-btn{border-radius:13px;padding:13px 12px;font-size:12px;font-family:inherit;font-weight:900}
 .hub-btn.primary{background:linear-gradient(120deg,#c19aff,#53eafa);color:#151128;box-shadow:0 7px 24px #8b61ed44}
@@ -111,15 +111,16 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </head>
 <body>
 <main class="hub" id="hubView">
-  <div class="hub-top"><div class="hub-brand">S I N X</div><div class="hub-chip">GAME HUB · BETA</div></div>
+  <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
     <div class="hub-kicker">WELCOME TO SINX ARCADE</div>
     <div class="hub-title">بازی، رقابت،<br>دورهمی آنلاین.</div>
     <div class="hub-copy">بازی مورد علاقه‌ات رو انتخاب کن، اتاق بساز و دوستانت رو با لینک یا کد دعوت کن.</div>
     <div class="hub-hero-art">🎮</div>
-    <div class="hub-actions">
-      <button class="hub-btn primary" onclick="openRoomSetup()">＋ ساخت اتاق بازی</button>
-      <button class="hub-btn ghost" onclick="focusHubJoin()">ورود به اتاق ↗</button>
+    <div class="hub-room-entry">
+      <label for="hubRoomCode">کد اتاق را وارد کن</label>
+      <input id="hubRoomCode" maxlength="8" placeholder="کد دعوت اتاق" autocomplete="off">
+      <div class="hub-room-buttons"><button class="hub-btn primary" onclick="joinFromHub()">ورود به اتاق</button><button class="hub-btn ghost" onclick="openGamePicker()">＋ ساخت اتاق</button></div>
     </div>
   </section>
   <div class="hub-section-head"><strong>کتابخانه بازی‌ها</strong><span>بازی‌های قابل اجرا</span></div>
@@ -128,20 +129,28 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
     <div class="hub-game-info"><strong>مار و پله نئونی</strong><p>بازی آنلاین چندنفره · ۲ تا ۴ بازیکن</p></div>
     <button class="hub-play" onclick="launchSnakes()">ورود به بازی</button>
   </section>
-  <section class="hub-join" id="hubJoin">
-    <label for="hubRoomCode">کد دعوت اتاق رو داری؟</label>
-    <div class="hub-join-row"><input id="hubRoomCode" maxlength="8" placeholder="مثلاً A1B2C3"><button onclick="joinFromHub()">جوین شو</button></div>
-  </section>
   <div class="hub-footer">SINX ARCADE · یک خانه برای تمام بازی‌ها</div>
 </main>
-<div id="gameView" style="display:none">
+<div id="gameView" class="lobby-mode" style="display:none">
 <div class="app">
 <header>
+  <button class="secondary" style="float:right" onclick="showHub()">← بازگشت به منوی اصلی</button>
   <div class="logo">S I N X   A R C A D E</div>
   <h1>🐍 مار و پله</h1>
   <div class="subtitle">مسابقه نئونی تا خانه ۱۰۰</div>
 </header>
 <section class="panel">
+  <div class="game-lobby">
+    <div style="font-size:15px;font-weight:900;text-align:center">🐍 اتاق مار و پله</div>
+    <label for="playerCount">تعداد بازیکنان</label>
+    <select id="playerCount"><option value="2">۲ بازیکن</option><option value="3">۳ بازیکن</option><option value="4" selected>۴ بازیکن</option></select>
+    <button class="primary" id="createRoomBtn" onclick="createOnlineRoom()">＋ ساخت اتاق مار و پله</button>
+    <label for="roomCodeInput">کد اتاق برای ورود</label>
+    <input id="roomCodeInput" maxlength="8" placeholder="کد اتاق">
+    <button class="secondary" id="joinRoomBtn" onclick="joinOnlineRoom()">ورود به اتاق</button>
+    <button class="game-back" onclick="showHub()">← بازگشت به منوی اصلی</button>
+    <p id="lobbyFeedback" style="min-height:20px;margin-bottom:0;text-align:center;font-size:10px;color:#c4c0dd"></p>
+  </div>
   <div class="status">
     <div><div class="status-label">وضعیت مسابقه</div><div class="status-value" id="gameStatus">آماده شروع</div></div>
     <div class="turn-pill" id="turnLabel">منتظر شروع</div>
@@ -182,25 +191,9 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </div>
 </div><!-- gameView -->
 
-<div class="overlay" id="setupOverlay">
-  <div class="dialog">
-    <h2>🌐 بازی آنلاین SINX</h2>
-    <p>اتاق بساز یا با کد دعوت وارد بازی دوستت شو.</p>
-    <input id="playerNameInput" maxlength="20" autocomplete="username" placeholder="نام کاربری انگلیسی (۳ تا ۲۰ حرف)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0">
-    <input id="passwordInput" type="password" minlength="6" autocomplete="current-password" placeholder="رمز عبور (حداقل ۶ کاراکتر)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:0 0 8px">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <button class="primary" id="registerBtn" onclick="accountAction('register')">ساخت حساب</button>
-      <button class="secondary" id="loginBtn" onclick="accountAction('login')">ورود به حساب</button>
-    </div>
-    <p id="accountStatus" style="margin:5px 0 10px;font-size:10px;color:#65e9c0">ابتدا وارد حساب دائمی خودت شو.</p>
-    <select id="playerCount"><option value="2">۲ بازیکن</option><option value="3">۳ بازیکن</option><option value="4" selected>۴ بازیکن</option></select>
-    <button class="primary" id="createRoomBtn" onclick="createOnlineRoom()">＋ ساخت اتاق جدید</button>
-    <input id="roomCodeInput" maxlength="6" placeholder="کد اتاق" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0;text-transform:uppercase">
-    <button class="secondary" id="joinRoomBtn" onclick="joinOnlineRoom()">ورود به اتاق</button>
-    <button class="secondary" onclick="closeSetup()">بازگشت به بازی</button>
-    <p id="lobbyFeedback" style="min-height:20px;margin-bottom:0"></p>
-  </div>
-</div>
+<div class="overlay" id="setupOverlay"><div class="dialog"><h2>ورود به بازی</h2><p>برای ساخت یا پیوستن به اتاق، ابتدا وارد حساب شو.</p><button class="primary" onclick="showProfile()">👤 ورود / ثبت‌نام</button><button class="secondary" onclick="closeSetup()">بستن</button><p id="lobbyFeedback"></p></div></div>
+<div class="overlay" id="gamePickerOverlay"><div class="dialog"><h2>🎮 انتخاب بازی</h2><p>بازی موردنظرت را برای ساخت اتاق انتخاب کن.</p><button class="primary" onclick="chooseGame('snakes')">🐍 مار و پله نئونی</button><button class="secondary" onclick="closeGamePicker()">انصراف</button></div></div>
+<div class="overlay" id="profileOverlay"><div class="dialog"><h2>👤 حساب کاربری SINX</h2><p id="accountStatus">برای ذخیره حساب و ورود به اتاق‌ها وارد شو.</p><input id="playerNameInput" maxlength="20" autocomplete="username" placeholder="نام کاربری انگلیسی (۳ تا ۲۰ حرف)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0"><input id="passwordInput" type="password" minlength="6" autocomplete="current-password" placeholder="رمز عبور (حداقل ۶ کاراکتر)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:0 0 8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="primary" id="registerBtn" onclick="accountAction('register')">ثبت‌نام</button><button class="secondary" id="loginBtn" onclick="accountAction('login')">ورود</button></div><button class="secondary" onclick="closeProfile()">بستن</button></div></div>
 
 <div class="overlay" id="winOverlay">
   <div class="dialog"><div style="font-size:55px">🏆</div><h2 id="winnerTitle">برنده مسابقه!</h2><p id="winnerText"></p><button class="primary" onclick="newGame()">بازی مجدد</button></div>
@@ -268,6 +261,7 @@ function applyState(data){
  lastRoll=data.lastRoll||data.room?.game_state?.last_roll||null;
  host=players.some(p=>p.seat===mySeat&&p.isHost);
  playing=roomStatus==="playing";
+ if(playing||roomStatus==="finished")document.getElementById("gameView").classList.remove("lobby-mode");
  if(lastRoll?.id&&lastRoll.id!==lastSeenRollId){
   lastSeenRollId=lastRoll.id;
   const die=Number(lastRoll.dice);
@@ -324,15 +318,18 @@ async function startGame(){
  catch(e){document.getElementById("message").textContent=e.message;}
  finally{locked=false;render();}
 }
-function showHub(){document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
-function showGame(){document.getElementById("hubView").style.display="none";document.getElementById("gameView").style.display="block";}
-function launchSnakes(){showGame();if(!roomCode){showSetup();}else closeSetup();}
-function openRoomSetup(){showGame();showSetup();}
-function focusHubJoin(){document.getElementById("hubRoomCode").focus();document.getElementById("hubJoin").scrollIntoView({behavior:"smooth",block:"center"});}
-function joinFromHub(){const code=document.getElementById("hubRoomCode").value.trim().toUpperCase();if(!code){focusHubJoin();return;}document.getElementById("roomCodeInput").value=code;showGame();showSetup();if(sb)sb.auth.getSession().then(({data:{session}})=>{if(session)joinOnlineRoom();});}
-function showSetup(){document.getElementById("setupOverlay").style.display="flex";}
+function showHub(){document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
+function showGame(){document.getElementById("hubView").style.display="none";document.getElementById("gameView").style.display="block";document.getElementById("gameView").classList.add("lobby-mode");}
+function launchSnakes(){showGame();if(!roomCode)showSetup();else closeSetup();}
+function openGamePicker(){document.getElementById("gamePickerOverlay").style.display="flex";}
+function closeGamePicker(){document.getElementById("gamePickerOverlay").style.display="none";}
+function chooseGame(game){closeGamePicker();if(game==="snakes")launchSnakes();}
+function showProfile(){document.getElementById("profileOverlay").style.display="flex";}
+function closeProfile(){document.getElementById("profileOverlay").style.display="none";}
+function showSetup(){showProfile();}
 function closeSetup(){document.getElementById("setupOverlay").style.display="none";}
-function newGame(){showSetup();}
+function newGame(){showHub();}
+function joinFromHub(){const code=document.getElementById("hubRoomCode").value.trim().toUpperCase();if(!code){document.getElementById("hubRoomCode").focus();return;}document.getElementById("roomCodeInput").value=code;showGame();if(sb)sb.auth.getSession().then(({data:{session}})=>{if(session)joinOnlineRoom();else showProfile();});}
 
 function pointOf(n){
  const row=Math.floor((n-1)/10),idx=(n-1)%10;
@@ -448,24 +445,24 @@ async function movePlayerNow(){
 }
 async function restoreSession(){
  const invited=(new URLSearchParams(location.search).get("room")||"").trim().toUpperCase();
- if(invited){roomCode=invited;document.getElementById("roomCodeInput").value=invited;showGame();showSetup();}
+ if(invited){roomCode=invited;document.getElementById("roomCodeInput").value=invited;showGame();}
  else showHub();
- if(!sb){accountFeedback("اتصال آنلاین بارگذاری نشد؛ بازی‌های آنلاین در دسترس نیستند.");return;}
+ if(!sb){document.getElementById("accountStatus").textContent="اتصال آنلاین بارگذاری نشد؛ بازی‌های آنلاین در دسترس نیستند.";return;}
  const {data:{session}}=await sb.auth.getSession();
  if(session){
   const {data:{user}}=await sb.auth.getUser();
   const username=user?.user_metadata?.username||"";
   if(username)document.getElementById("playerNameInput").value=username;
-  accountFeedback(username?"وارد حساب @"+username+" هستی.":"حساب متصل است.");
+  document.getElementById("accountStatus").textContent=username?"وارد حساب @"+username+" هستی.":"حساب متصل است.";
   if(invited)await continueInviteIfReady();
  }else{
-  accountFeedback("برای ساخت یا ورود به اتاق، ابتدا وارد حساب شو.");
+  document.getElementById("accountStatus").textContent="برای ساخت یا ورود به اتاق، ابتدا وارد حساب شو.";
  }
 }
 createBoard();render();
 const invitedRoom=new URLSearchParams(location.search).get("room");
 if(invitedRoom)document.getElementById("roomCodeInput").value=invitedRoom.toUpperCase();
-restoreSession().catch(e=>{accountFeedback(e.message);showSetup();});
+restoreSession().catch(e=>{document.getElementById("accountStatus").textContent=e.message;showHub();});
 </script>
 </body>
 </html>
