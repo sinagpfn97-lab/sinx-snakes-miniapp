@@ -145,6 +145,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
     <label for="playerCount">تعداد بازیکنان</label>
     <select id="playerCount"><option value="2">۲ بازیکن</option><option value="3">۳ بازیکن</option><option value="4" selected>۴ بازیکن</option></select>
     <button class="primary" id="createRoomBtn" onclick="createOnlineRoom()">＋ ساخت اتاق مار و پله</button>
+    <button class="secondary" id="copyRoomLinkBtn" style="display:none;width:100%;margin-top:8px" onclick="copyRoomLink()">🔗 کپی کردن لینک اتاق</button>
     <label for="roomCodeInput">کد اتاق برای ورود</label>
     <input id="roomCodeInput" maxlength="8" placeholder="کد اتاق">
     <button class="secondary" id="joinRoomBtn" onclick="joinOnlineRoom()">ورود به اتاق</button>
@@ -183,7 +184,6 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
   </div>
   <div class="message" id="message">اتاق بساز یا با کد دعوت وارد بازی شو.</div>
   <div class="actions">
-    <button class="secondary" id="copyRoomLinkBtn" onclick="copyRoomLink()" style="display:none">🔗 کپی کردن لینک اتاق</button>
     <button class="primary" id="startOnlineBtn" onclick="startGame()" style="display:none" disabled>▶ شروع بازی</button>
     <button class="secondary" id="leaveRoomBtn" onclick="leaveRoom()" style="display:none">🚪 خروج از بازی</button>
     <button class="secondary" onclick="newGame()">↻ بازگشت به منو</button>
@@ -288,7 +288,7 @@ function applyState(data){
  document.getElementById("gameStatus").textContent=roomStatus==="waiting"?"در انتظار بازیکنان":roomStatus==="playing"?"در حال مسابقه":roomStatus==="finished"?"بازی تمام شد":"آماده شروع";
  const sbt=document.getElementById("startOnlineBtn");
  if(sbt){const canStart=host&&roomStatus==="waiting"&&players.length>=2;sbt.style.display=canStart?"block":"none";sbt.disabled=!canStart||locked;}
- const copyBtn=document.getElementById("copyRoomLinkBtn");if(copyBtn)copyBtn.style.display=roomCode?"block":"none";
+ const copyBtn=document.getElementById("copyRoomLinkBtn");if(copyBtn)copyBtn.style.display=roomCode&&host?"block":"none";
  const leaveBtn=document.getElementById("leaveRoomBtn");if(leaveBtn)leaveBtn.style.display=roomCode?"block":"none";
 
  if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent="کد اتاق: "+roomCode+" | "+players.length+" بازیکن از "+(data.room?.max_players||"?");
@@ -318,7 +318,7 @@ async function createOnlineRoom(){
   document.getElementById("roomCodeInput").value=roomCode;
   document.getElementById("message").textContent="اتاق ساخته شد؛ لینک دعوت را کپی کن و برای دوستانت بفرست.";
   feedback("اتاق "+roomCode+" ساخته شد. دکمه کپی لینک در پایین صفحه قرار دارد.");
-  showGame();document.getElementById("gameView").classList.remove("lobby-mode");
+  showGame();document.getElementById("gameView").classList.remove("lobby-mode");document.querySelector(".game-lobby").classList.add("room-created");
   closeSetup();startPolling();
  }catch(e){feedback(e.message);}
  finally{locked=false;setLobbyBusy(false);render();}
@@ -356,7 +356,7 @@ function closeProfile(){document.getElementById("profileOverlay").style.display=
 function showSetup(){showProfile();}
 function closeSetup(){document.getElementById("setupOverlay").style.display="none";}
 async function copyRoomLink(){if(!roomCode)return;const link=location.origin+location.pathname+"?room="+encodeURIComponent(roomCode);try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(link);else{const t=document.createElement("textarea");t.value=link;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();}document.getElementById("message").textContent="لینک دعوت کپی شد؛ برای دوستانت بفرست.";}catch(e){document.getElementById("message").textContent="کپی خودکار ممکن نشد؛ کد اتاق: "+roomCode;}}
-async function leaveRoom(){if(!roomCode)return;if(!confirm("از این اتاق خارج می‌شوی؟"))return;try{locked=true;render();await api("leave");stopPolling();roomCode="";playerToken="";mySeat=-1;players=[];pendingMove=null;lastRoll=null;roomStatus="waiting";playing=false;host=false;stateEventsReady=false;lastSeenRollId="";lastSeenMoveId="";document.getElementById("roomCodeInput").value="";document.getElementById("hubRoomCode").value="";showHub();}catch(e){document.getElementById("message").textContent=e.message;}finally{locked=false;render();}}
+async function leaveRoom(){if(!roomCode)return;if(!confirm("از این اتاق خارج می‌شوی؟"))return;try{locked=true;render();await api("leave");stopPolling();document.querySelector(".game-lobby").classList.remove("room-created");roomCode="";playerToken="";mySeat=-1;players=[];pendingMove=null;lastRoll=null;roomStatus="waiting";playing=false;host=false;stateEventsReady=false;lastSeenRollId="";lastSeenMoveId="";document.getElementById("roomCodeInput").value="";document.getElementById("hubRoomCode").value="";showHub();}catch(e){document.getElementById("message").textContent=e.message;}finally{locked=false;render();}}
 function newGame(){if(roomCode){showHub();return;}showHub();}
 async function joinFromHub(){const code=document.getElementById("hubRoomCode").value.trim().toUpperCase();if(!code){document.getElementById("hubRoomCode").focus();return;}document.getElementById("roomCodeInput").value=code;showGame();if(!sb){feedback("اتصال Supabase برقرار نیست؛ ورود آنلاین ممکن نیست.");return;}try{const {data:{session}}=await sb.auth.getSession();if(session)await joinOnlineRoom();else showProfile();}catch(e){feedback(e.message||"خطا در بررسی نشست کاربر");}}
 
