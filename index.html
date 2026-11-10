@@ -224,7 +224,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 /* Use the exact board artwork supplied by the project owner. */
 .board.ludo-board{
  background-color:#080b20;
- background-image:url("./ludo-board-clean.jpg?v=2");
+ background-image:url("./IMG_20261110_213051_896.png?v=1");
  background-repeat:no-repeat;
  background-position:center;
  background-size:100% 100%;
@@ -242,7 +242,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.21 · build 2026-11-10</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.22 · build 2026-11-10</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -355,7 +355,7 @@ const COLORS=["red","blue","green","yellow"];
 const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false,pollFailureCount=0;
-let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false,roomGameType="snakes",selectedGameType="snakes",ludoTokens={},selectedLudoToken=null;
+let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false,roomGameType="snakes",selectedGameType="snakes",ludoTokens={},selectedLudoToken=null,ludoRulesVersion=2;
 let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,remoteAnimationQueue=Promise.resolve(),pollInFlight=false,autoCallInFlight=false,localRollInFlight=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
@@ -397,7 +397,7 @@ async function currentUsername(){
  return user?.user_metadata?.username||document.getElementById("playerNameInput").value.trim().toLowerCase()||"";
 }
 function applyState(data){
- if(data.room){const previousGame=roomGameType;roomStatus=data.room.status;turn=Number(data.room.current_turn||0);roomGameType=data.room.game_state?.game_type||"snakes";ludoTokens=data.room.game_state?.ludo_tokens||{};if(previousGame!==roomGameType){document.querySelector("#gameView h1").textContent=roomGameType==="ludo"?"🎲 منچ چهار نفره":"🐍 مار و پله";document.querySelector("#gameView .subtitle").textContent=roomGameType==="ludo"?"چهار رنگ · شانزده مهره · مسیر کلاسیک":"مسابقه نئونی تا خانه ۱۰۰";createBoard();}}
+ if(data.room){const previousGame=roomGameType,previousLudoRulesVersion=ludoRulesVersion;roomStatus=data.room.status;turn=Number(data.room.current_turn||0);roomGameType=data.room.game_state?.game_type||"snakes";ludoRulesVersion=Number(data.room.game_state?.ludo_rules_version||1);ludoTokens=data.room.game_state?.ludo_tokens||{};if(previousGame!==roomGameType||(roomGameType==="ludo"&&previousLudoRulesVersion!==ludoRulesVersion)){document.querySelector("#gameView h1").textContent=roomGameType==="ludo"?"🎲 منچ چهار نفره":"🐍 مار و پله";document.querySelector("#gameView .subtitle").textContent=roomGameType==="ludo"?"چهار رنگ · ۱۶ مهره · مسیر ۴۸ خانه‌ای":"مسابقه نئونی تا خانه ۱۰۰";createBoard();}}
  if(Array.isArray(data.players))players=data.players.map(p=>({id:p.id,seat:Number(p.seat),name:p.player_name,pos:Number(p.position||0),isHost:!!p.is_host}));
  if(Number.isInteger(data.mySeat))mySeat=data.mySeat;
  pendingMove=data.pendingMove||data.room?.game_state?.pending_move||null;
@@ -434,7 +434,7 @@ function applyState(data){
  const leaveBtn=document.getElementById("leaveRoomBtn");if(leaveBtn)leaveBtn.style.display=roomCode?"block":"none";
 
  if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent=players.length+" بازیکن از ۴";
- if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج «"+departed+"» به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const w=roomGameType==="ludo"?players.find(p=>Array.isArray(ludoTokens[p.seat])&&ludoTokens[p.seat].every(v=>Number(v)===57)):players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}}
+ if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج «"+departed+"» به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const w=roomGameType==="ludo"?players.find(p=>Array.isArray(ludoTokens[p.seat])&&ludoTokens[p.seat].every(v=>Number(v)===ludoFinishProgress())):players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}}
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
 function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
@@ -513,7 +513,7 @@ function pointOf(n){
 function createBoard(){
  const board=document.getElementById("board");
  if(roomGameType==="ludo"){createLudoBoard();return;}
- board.classList.remove("ludo-board");document.getElementById("boardArt").style.display="block";
+ board.classList.remove("ludo-board");board.style.backgroundImage="";document.getElementById("boardArt").style.display="block";
  board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token").forEach(e=>e.remove());
  const nums=[];
  for(let row=9;row>=0;row--){let line=[];for(let col=0;col<10;col++)line.push(row*10+col+1);if(row%2===1)line.reverse();nums.push(...line);}
@@ -559,21 +559,24 @@ function renderTokens(){
  const layer=document.getElementById("tokensLayer");layer.innerHTML="";
  players.forEach(p=>{if(p.pos<1)return;const pt=pointOf(p.pos),el=document.createElement("div");el.className="token-position";el.style.left=(pt.x/10)+"%";el.style.top=(pt.y/10)+"%";const t=document.createElement("div");t.className="token "+COLORS[p.seat];t.textContent=p.seat+1;el.appendChild(t);layer.appendChild(el);});
 }
-const LUDO_TRACK=[[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
-const LUDO_START=[0,13,26,39],LUDO_COLORS=["red","blue","green","yellow"];
+const LUDO_TRACK_LEGACY=[[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
+const LUDO_START_LEGACY=[0,13,26,39],LUDO_LANES_LEGACY=[[[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],[[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],[[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]];
+const LUDO_HOME_PAWNS_LEGACY={red:[[88,85],[151,85],[88,147],[151,147]],blue:[[449,85],[512,85],[449,147],[512,147]],green:[[449,449],[512,449],[449,512],[512,512]],yellow:[[88,449],[151,449],[88,512],[151,512]]};
+const LUDO_TRACK=[[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0],[6,1],[6,2],[6,3],[6,4],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7]];
+const LUDO_START=[36,0,12,24],LUDO_COLORS=["red","blue","green","yellow"];
 const LUDO_BOARD_SIZE=600,LUDO_CELL_SIZE=40;
-// Home pawn centers aligned to the supplied 1248x1248 reference artwork.
+// Home pawn centers measured from the new 640px board artwork and scaled to the 600px canvas.
 const LUDO_HOME_PAWNS={
- red:[[88,85],[151,85],[88,147],[151,147]],
- blue:[[449,85],[512,85],[449,147],[512,147]],
- green:[[449,449],[512,449],[449,512],[512,512]],
- yellow:[[88,449],[151,449],[88,512],[151,512]]
+ red:[[86,85],[145,85],[86,142],[145,142]],
+ blue:[[455,85],[514,85],[455,142],[514,142]],
+ green:[[455,457],[514,457],[455,516],[514,516]],
+ yellow:[[86,457],[145,457],[86,516],[145,516]]
 };
 const LUDO_LANES=[
- [[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],
- [[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],
- [[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],
- [[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]
+ [[7,1],[7,2],[7,3],[7,4]],
+ [[1,7],[2,7],[3,7],[4,7]],
+ [[7,13],[7,12],[7,11],[7,10]],
+ [[13,7],[12,7],[11,7],[10,7]]
 ];
 function ludoPx(v){return (v/LUDO_BOARD_SIZE*100)+"%";}
 function ludoSquare(board,r,c,color="track",safe=false){
@@ -583,14 +586,14 @@ function ludoSquare(board,r,c,color="track",safe=false){
  cell.dataset.row=r;cell.dataset.col=c;board.appendChild(cell);return cell;
 }
 function createLudoBoard(){
- const board=document.getElementById("board");board.classList.add("ludo-board");document.getElementById("boardArt").style.display="none";
+ const board=document.getElementById("board");board.classList.add("ludo-board");board.style.backgroundImage=ludoRulesVersion===2?'url("./IMG_20261110_213051_896.png?v=1")':'url("./ludo-board-clean.jpg?v=2")';document.getElementById("boardArt").style.display="none";
  // The supplied artwork is the board itself. Keep the live tokens as the only overlay.
  board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token,.ludo-yard,.ludo-center-art,.ludo-grid-debug").forEach(e=>e.remove());
  drawLudoGridDebug(board);
  drawLudoTokens();
 }
 // The artwork's 15x15 playable grid is inset from the image edges.
-const LUDO_GRID_ORIGIN=56.7,LUDO_GRID_STEP_X=33,LUDO_GRID_STEP_Y=32;
+const LUDO_GRID_ORIGIN=34,LUDO_GRID_STEP_X=38,LUDO_GRID_STEP_Y=38;
 function ludoGridCenterX(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_X;}
 function ludoGridCenterY(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_Y;}
 function drawLudoGridDebug(board){
@@ -612,11 +615,13 @@ function drawLudoGridDebug(board){
 }
 
 function ludoCoordinate(seat,progress,token){
- if(progress<=0)return LUDO_HOME_PAWNS[LUDO_COLORS[seat]][token];
- if(progress>=52){const [r,c]=LUDO_LANES[seat][Math.min(5,progress-52)];return [ludoGridCenterX(c),ludoGridCenterY(r)];}
- const [r,c]=LUDO_TRACK[(LUDO_START[seat]+progress-1)%52];
+ if(progress<=0)return (ludoRulesVersion===2?LUDO_HOME_PAWNS:LUDO_HOME_PAWNS_LEGACY)[LUDO_COLORS[seat]][token];
+ if(ludoRulesVersion!==2){if(progress>=52){const [r,c]=LUDO_LANES_LEGACY[seat][Math.min(5,progress-52)];return [56.7+c*33,56.7+r*32];}const [r,c]=LUDO_TRACK_LEGACY[(LUDO_START_LEGACY[seat]+progress-1)%52];return [56.7+c*33,56.7+r*32];}
+ if(progress>=49){const [r,c]=LUDO_LANES[seat][Math.min(3,progress-49)];return [ludoGridCenterX(c),ludoGridCenterY(r)];}
+ const [r,c]=LUDO_TRACK[(LUDO_START[seat]+progress-1)%48];
  return [ludoGridCenterX(c),ludoGridCenterY(r)];
 }
+function ludoFinishProgress(){return ludoRulesVersion===2?52:57;}
 function drawLudoTokens(){
  const board=document.getElementById("board");board.querySelectorAll(".ludo-token").forEach(e=>e.remove());const grouped=new Map();
  for(let seat=0;seat<4;seat++){
@@ -652,7 +657,7 @@ function render(){
  renderTokens();const box=document.getElementById("players");box.innerHTML="";
  const countEl=document.getElementById("playersCount");if(countEl)countEl.innerHTML="تعداد بازیکنان: <strong>"+players.length+"</strong>";
  const roomDisplay=document.getElementById("roomCodeDisplay"),roomValue=document.getElementById("roomCodeValue");if(roomValue)roomValue.textContent=roomCode||"—";if(roomDisplay)roomDisplay.classList.toggle("visible",!!roomCode);
- for(let seat=0;seat<4;seat++){const p=players.find(x=>x.seat===seat);const item=document.createElement("div");item.className="player"+(playing&&p&&p.seat===turn?" active":"")+(p?"":" empty");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p?p.name:"صندلی خالی · "+["قرمز","آبی","سبز","زرد"][seat];const pos=document.createElement("div");pos.className="player-pos";pos.textContent=p?(roomGameType==="ludo"?(Array.isArray(ludoTokens[p.seat])?ludoTokens[p.seat].filter(v=>Number(v)===57).length:0)+" مهره به مقصد رسیده"+(p.seat===mySeat?" · شما":""):"خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"")):"منتظر ورود بازیکن";info.append(name,pos);item.append(icon,info);box.appendChild(item);}
+ for(let seat=0;seat<4;seat++){const p=players.find(x=>x.seat===seat);const item=document.createElement("div");item.className="player"+(playing&&p&&p.seat===turn?" active":"")+(p?"":" empty");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p?p.name:"صندلی خالی · "+["قرمز","آبی","سبز","زرد"][seat];const pos=document.createElement("div");pos.className="player-pos";pos.textContent=p?(roomGameType==="ludo"?(Array.isArray(ludoTokens[p.seat])?ludoTokens[p.seat].filter(v=>Number(v)===ludoFinishProgress()).length:0)+" مهره به مقصد رسیده"+(p.seat===mySeat?" · شما":""):"خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"")):"منتظر ورود بازیکن";info.append(name,pos);item.append(icon,info);box.appendChild(item);}
  const current=players.find(p=>p.seat===turn);
  document.getElementById("turnLabel").textContent=playing?(current?"نوبت "+current.name:"در انتظار بازیکن"):(roomStatus==="waiting"?"لابی اتاق":"مسابقه متوقف");
  const canRoll=playing&&!locked&&!remoteAnimating&&mySeat===turn&&!pendingMove;
@@ -686,6 +691,7 @@ async function animateRemoteMove(move){
 }
 async function rollDice(){
  if(!playing||locked||pendingMove)return;
+ if(roomGameType==="ludo"&&ludoRulesVersion!==2){document.getElementById("message").textContent="این اتاق با قوانین نسخه قبلی ساخته شده؛ برای بازی با مپ جدید یک اتاق تازه بساز.";return;}
  if(mySeat!==turn){document.getElementById("message").textContent="هنوز نوبت تو نیست.";return;}
  locked=true;localRollInFlight=true;render();
  try{
