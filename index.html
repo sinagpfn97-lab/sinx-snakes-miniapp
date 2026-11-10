@@ -652,7 +652,10 @@ function drawLudoTokens(){
   const pieceWidth=600*(group.length>1?0.038:0.047);
   const pieceHeight=600*(group.length>1?0.048:0.059);
   const centerX=x+ox,centerY=y+oy;
-  const drawX=centerX-(pieceWidth/2),drawY=centerY-(pieceHeight/2);
+  // Compensate for the sprite's visual shadow/transparent padding.
+  const visualOffsetX=2,visualOffsetY=8;
+  const drawX=centerX-(pieceWidth/2)+visualOffsetX;
+  const drawY=centerY-(pieceHeight/2)+visualOffsetY;
   token.style.transform="none";
   token.style.left=ludoPx(drawX);token.style.top=ludoPx(drawY);
    const spritePosition={red:"18% 13%",blue:"82% 13%",green:"82% 85%",yellow:"18% 85%"}[LUDO_COLORS[seat]];
