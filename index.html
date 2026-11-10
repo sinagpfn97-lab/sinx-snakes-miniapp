@@ -595,7 +595,7 @@ function ludoCoordinate(seat,progress,token){
  if(progress<=0)return LUDO_HOME_PAWNS[LUDO_COLORS[seat]][token];
  if(progress>=52){const [r,c]=LUDO_LANES[seat][Math.min(5,progress-52)];return [ludoGridCenterX(c),ludoGridCenterY(r)];}
  const [r,c]=LUDO_TRACK[(LUDO_START[seat]+progress-1)%52];
- return [ludoGridCenter(c),ludoGridCenter(r)];
+ return [ludoGridCenterX(c),ludoGridCenterY(r)];
 }
 function drawLudoTokens(){
  const board=document.getElementById("board");board.querySelectorAll(".ludo-token").forEach(e=>e.remove());const grouped=new Map();
