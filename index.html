@@ -24,6 +24,16 @@ h1{font-size:26px;margin:5px 0;font-weight:900}
 .turn-pill{padding:7px 12px;border-radius:30px;color:#d9c8ff;background:#38265e;border:1px solid #7752b8;font-size:10px}
 .board-wrap{position:relative;padding:6px;border-radius:16px;background:linear-gradient(135deg,#a46aff,#37e5fa,#7049d8);box-shadow:0 0 25px #8e5aff44,0 0 55px #35dff522}
 .board{position:relative;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:repeat(10,minmax(0,1fr));gap:2px;direction:ltr;aspect-ratio:1;overflow:hidden;border-radius:11px;background:#090d24}
+.board.ludo-board{grid-template-columns:repeat(15,minmax(0,1fr));grid-template-rows:repeat(15,minmax(0,1fr));gap:1px;background:#090d24;padding:2px}
+.ludo-cell{position:relative;min-width:0;min-height:0;background:#17213c;border:1px solid #ffffff12;display:grid;place-items:center}
+.ludo-cell.track{background:#e8e5f2;color:#17152a}.ludo-cell.safe:after{content:'✦';color:#b08cff;font-size:clamp(7px,2vw,13px)}
+.ludo-cell.home-red{background:#7d193b}.ludo-cell.home-blue{background:#14558c}.ludo-cell.home-green{background:#17643d}.ludo-cell.home-yellow{background:#856019}
+.ludo-cell.lane-red{background:#ed4775}.ludo-cell.lane-blue{background:#39a9ff}.ludo-cell.lane-green{background:#4de28a}.ludo-cell.lane-yellow{background:#ffd45b}
+.ludo-cell.center{background:conic-gradient(#ed4775 0 25%,#39a9ff 0 50%,#ffd45b 0 75%,#4de28a 0);border:0}
+.ludo-token{width:85%;height:85%;border-radius:50%;border:1px solid #fff;box-shadow:0 1px 3px #000a;display:grid;place-items:center;font-size:clamp(6px,1.8vw,10px);font-weight:900;color:#fff;cursor:pointer}
+.ludo-token.red{background:#f02e65}.ludo-token.blue{background:#168ff0}.ludo-token.green{background:#20b962}.ludo-token.yellow{background:#e9a91c}
+.player.empty{opacity:.48;border:1px dashed #665b89;background:#17142b}
+.ludo-token.selectable{outline:2px solid #fff;outline-offset:1px;animation:targetPulse .7s infinite alternate}
 .cell{position:relative;min-width:0;min-height:0;border-radius:4px;background:linear-gradient(145deg,#263b6d,#171a43);box-shadow:inset 0 1px 2px #ffffff18,inset 0 -2px 4px #0005;overflow:hidden}
 .cell:nth-child(4n+1){background:linear-gradient(145deg,#164e70,#172b58)}
 .cell:nth-child(4n+2){background:linear-gradient(145deg,#3a286e,#1d2452)}
@@ -107,7 +117,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .hub-join button{padding:0 16px;border-radius:10px;background:#332754;color:#eee5ff;border:1px solid #65508d;font-family:inherit;font-size:11px;font-weight:800}
 .hub-footer{text-align:center;color:#777391;font-size:9px;margin-top:25px}
 @media(max-width:420px){.hub{padding:16px 11px 30px}.hub-hero{padding:21px 17px}.hub-game{gap:10px}.hub-game-icon{width:54px;height:54px;flex-basis:54px;font-size:29px}.hub-play{padding:9px}.hub-actions{gap:8px}}
-.game-lobby.room-created{display:block;margin-bottom:12px}.game-lobby.room-created label,.game-lobby.room-created #playerCount,.game-lobby.room-created #createRoomBtn,.game-lobby.room-created #roomCodeInput,.game-lobby.room-created #joinRoomBtn,.game-lobby.room-created .game-back,.game-lobby.room-created #lobbyFeedback{display:none!important}.game-lobby.room-created #copyRoomLinkBtn{display:block!important}.game-lobby.room-created #startOnlineBtn{width:100%;margin-top:9px}
+.game-lobby.room-created{display:block;margin-bottom:12px}.game-lobby.room-created label,.game-lobby.room-created #createRoomBtn,.game-lobby.room-created #roomCodeInput,.game-lobby.room-created #joinRoomBtn,.game-lobby.room-created .game-back,.game-lobby.room-created #lobbyFeedback{display:none!important}.game-lobby.room-created #copyRoomLinkBtn{display:block!important}.game-lobby.room-created #startOnlineBtn{width:100%;margin-top:9px}
 </style>
 </head>
 <body>
@@ -127,8 +137,13 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
   <div class="hub-section-head"><strong>کتابخانه بازی‌ها</strong><span>بازی‌های قابل اجرا</span></div>
   <section class="hub-game">
     <div class="hub-game-icon">🐍</div>
-    <div class="hub-game-info"><strong>مار و پله نئونی</strong><p>بازی آنلاین چندنفره · ۲ تا ۴ بازیکن</p></div>
+    <div class="hub-game-info"><strong>مار و پله نئونی</strong><p>بازی آنلاین · ظرفیت ثابت ۴ نفر</p></div>
     <button class="hub-play" onclick="launchSnakes()">ورود به بازی</button>
+  </section>
+  <section class="hub-game">
+    <div class="hub-game-icon">🎲</div>
+    <div class="hub-game-info"><strong>منچ چهار نفره</strong><p>چهار رنگ · ۱۶ مهره · رقابت آنلاین</p></div>
+    <button class="hub-play" onclick="launchLudo()">ورود به بازی</button>
   </section>
   <div class="hub-footer">SINX ARCADE · یک خانه برای تمام بازی‌ها</div>
 </main>
@@ -144,9 +159,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </header>
 <section class="panel">
   <div class="game-lobby">
-    <div style="font-size:15px;font-weight:900;text-align:center">🐍 اتاق مار و پله</div>
-    <label for="playerCount">تعداد بازیکنان</label>
-    <select id="playerCount"><option value="2">۲ بازیکن</option><option value="3">۳ بازیکن</option><option value="4" selected>۴ بازیکن</option></select>
+    <div id="lobbyGameTitle" style="font-size:15px;font-weight:900;text-align:center">🎮 ساخت اتاق بازی</div>
     <button class="primary" id="createRoomBtn" onclick="createOnlineRoom()">＋ ساخت اتاق مار و پله</button>
     <button class="secondary" id="copyRoomLinkBtn" style="display:none;width:100%;margin-top:8px" onclick="copyRoomLink()">🔗 کپی کردن لینک اتاق</button>
     <button class="primary" id="startOnlineBtn" onclick="startGame()" style="display:none" disabled>▶ شروع بازی</button>
@@ -194,12 +207,12 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
     <button class="secondary" onclick="newGame()">↻ بازگشت به منو</button>
   </div>
 </section>
-<div class="rules">🏁 برای برد باید دقیقاً به خانه ۱۰۰ برسی.<br>🎲 با آوردن عدد ۶ یک نوبت اضافه می‌گیری.<br>🐍 مار تو را پایین می‌برد و 🪜 نردبان تو را بالا می‌برد.</div>
+<div class="rules">🏁 مار و پله: رسیدن دقیق به خانه ۱۰۰.<br>🎲 منچ: با ۶ مهره خارج می‌شود؛ مهره حریف را می‌توانی بزنی.<br>⏱️ هر نوبت ۱۵ ثانیه فرصت دارد.</div>
 </div>
 </div><!-- gameView -->
 
 <div class="overlay" id="setupOverlay"><div class="dialog"><h2>ورود به بازی</h2><p>برای ساخت یا پیوستن به اتاق، ابتدا وارد حساب شو.</p><button class="primary" onclick="showProfile()">👤 ورود / ثبت‌نام</button><button class="secondary" onclick="closeSetup()">بستن</button></div></div>
-<div class="overlay" id="gamePickerOverlay"><div class="dialog"><h2>🎮 انتخاب بازی</h2><p>بازی موردنظرت را برای ساخت اتاق انتخاب کن.</p><button class="primary" onclick="chooseGame('snakes')">🐍 مار و پله نئونی</button><button class="secondary" onclick="closeGamePicker()">انصراف</button></div></div>
+<div class="overlay" id="gamePickerOverlay"><div class="dialog"><h2>🎮 انتخاب بازی</h2><p>بازی موردنظرت را برای ساخت اتاق انتخاب کن.</p><button class="primary" onclick="chooseGame('snakes')">🐍 مار و پله نئونی</button><button class="secondary" onclick="chooseGame('ludo')">🎲 منچ چهار نفره</button><button class="secondary" onclick="closeGamePicker()">انصراف</button></div></div>
 <div class="overlay" id="profileOverlay"><div class="dialog"><h2>👤 حساب کاربری SINX</h2><p id="accountStatus">برای ذخیره حساب و ورود به اتاق‌ها وارد شو.</p><input id="playerNameInput" maxlength="20" autocomplete="username" placeholder="نام کاربری انگلیسی (۳ تا ۲۰ حرف)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0"><input id="passwordInput" type="password" minlength="8" autocomplete="new-password" placeholder="رمز عبور (حداقل ۸ کاراکتر)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:0 0 8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="primary" id="registerBtn" onclick="accountAction('register')">ثبت‌نام</button><button class="secondary" id="loginBtn" onclick="accountAction('login')">ورود</button></div><button class="secondary" onclick="closeProfile()">بستن</button></div></div>
 
 <div class="overlay" id="winOverlay">
@@ -220,7 +233,7 @@ const COLORS=["red","blue","green","yellow"];
 const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false,pollFailureCount=0;
-let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false;
+let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false,roomGameType="snakes",selectedGameType="snakes",ludoTokens={},selectedLudoToken=null;
 let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,remoteAnimationQueue=Promise.resolve(),pollInFlight=false,autoCallInFlight=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
@@ -262,7 +275,7 @@ async function currentUsername(){
  return user?.user_metadata?.username||document.getElementById("playerNameInput").value.trim().toLowerCase()||"";
 }
 function applyState(data){
- if(data.room){roomStatus=data.room.status;turn=Number(data.room.current_turn||0);}
+ if(data.room){const previousGame=roomGameType;roomStatus=data.room.status;turn=Number(data.room.current_turn||0);roomGameType=data.room.game_state?.game_type||"snakes";ludoTokens=data.room.game_state?.ludo_tokens||{};if(previousGame!==roomGameType){document.querySelector("#gameView h1").textContent=roomGameType==="ludo"?"🎲 منچ چهار نفره":"🐍 مار و پله";document.querySelector("#gameView .subtitle").textContent=roomGameType==="ludo"?"چهار رنگ · شانزده مهره · مسیر کلاسیک":"مسابقه نئونی تا خانه ۱۰۰";createBoard();}}
  if(Array.isArray(data.players))players=data.players.map(p=>({id:p.id,seat:Number(p.seat),name:p.player_name,pos:Number(p.position||0),isHost:!!p.is_host}));
  if(Number.isInteger(data.mySeat))mySeat=data.mySeat;
  pendingMove=data.pendingMove||data.room?.game_state?.pending_move||null;
@@ -298,8 +311,8 @@ function applyState(data){
  const copyBtn=document.getElementById("copyRoomLinkBtn");if(copyBtn)copyBtn.style.display=roomCode&&host?"block":"none";
  const leaveBtn=document.getElementById("leaveRoomBtn");if(leaveBtn)leaveBtn.style.display=roomCode?"block":"none";
 
- if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent=players.length+" بازیکن از "+(data.room?.max_players||"?");
- if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج «"+departed+"» به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}}
+ if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent=players.length+" بازیکن از ۴";
+ if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج «"+departed+"» به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const w=roomGameType==="ludo"?players.find(p=>Array.isArray(ludoTokens[p.seat])&&ludoTokens[p.seat].every(v=>Number(v)===57)):players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}}
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
 function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
@@ -321,7 +334,7 @@ async function createOnlineRoom(){
  const {data:{session}}=await sb.auth.getSession();if(!session){showProfile();feedback("برای ساخت اتاق ابتدا وارد حساب شو.");return;}
  try{
   locked=true;setLobbyBusy(true);
-  const d=await api("create",{maxPlayers:Number(document.getElementById("playerCount").value)});
+  const d=await api("create",{maxPlayers:4,gameType:selectedGameType});
   roomCode=d.roomCode;playerToken=d.playerToken||"";mySeat=d.mySeat;applyState(d);
   document.getElementById("roomCodeInput").value=roomCode;
   document.getElementById("message").textContent="اتاق ساخته شد؛ کد اتاق را برای دوستانت بفرست.";
@@ -355,10 +368,11 @@ async function startGame(){
 }
 function showHub(){stopPolling();document.getElementById("roomCodeDisplay").classList.remove("visible");document.getElementById("connectionStatus").textContent="";document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
 function showGame(){document.getElementById("hubView").style.display="none";document.getElementById("gameView").style.display="block";document.getElementById("gameView").classList.add("lobby-mode");}
-function launchSnakes(){showGame();closeSetup();}
+function launchSnakes(){selectedGameType="snakes";roomGameType="snakes";showGame();closeSetup();document.getElementById("lobbyGameTitle").textContent="🐍 اتاق مار و پله";document.getElementById("createRoomBtn").textContent="＋ ساخت اتاق مار و پله";document.querySelector("#gameView h1").textContent="🐍 مار و پله";document.querySelector("#gameView .subtitle").textContent="مسابقه نئونی تا خانه ۱۰۰";createBoard();render();}
+function launchLudo(){selectedGameType="ludo";roomGameType="ludo";showGame();closeSetup();document.getElementById("lobbyGameTitle").textContent="🎲 اتاق منچ چهار نفره";document.getElementById("createRoomBtn").textContent="＋ ساخت اتاق منچ";document.querySelector("#gameView h1").textContent="🎲 منچ چهار نفره";document.querySelector("#gameView .subtitle").textContent="چهار رنگ · شانزده مهره · مسیر کلاسیک";createBoard();render();}
 function openGamePicker(){document.getElementById("gamePickerOverlay").style.display="flex";}
 function closeGamePicker(){document.getElementById("gamePickerOverlay").style.display="none";}
-function chooseGame(game){closeGamePicker();if(game==="snakes")launchSnakes();}
+function chooseGame(game){selectedGameType=game;closeGamePicker();if(game==="snakes")launchSnakes();else launchLudo();}
 function showProfile(){document.getElementById("profileOverlay").style.display="flex";}
 function closeProfile(){document.getElementById("profileOverlay").style.display="none";}
 function showSetup(){showProfile();}
@@ -376,7 +390,9 @@ function pointOf(n){
 }
 function createBoard(){
  const board=document.getElementById("board");
- board.querySelectorAll(".cell,.tokens-layer").forEach(e=>e.remove());
+ if(roomGameType==="ludo"){createLudoBoard();return;}
+ board.classList.remove("ludo-board");document.getElementById("boardArt").style.display="block";
+ board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token").forEach(e=>e.remove());
  const nums=[];
  for(let row=9;row>=0;row--){let line=[];for(let col=0;col<10;col++)line.push(row*10+col+1);if(row%2===1)line.reverse();nums.push(...line);}
  nums.forEach(n=>{
@@ -417,14 +433,61 @@ function drawBoardArt(){
  svg.innerHTML=defs+art;
 }
 function renderTokens(){
+ if(roomGameType==="ludo"){renderLudoTokens();return;}
  const layer=document.getElementById("tokensLayer");layer.innerHTML="";
  players.forEach(p=>{if(p.pos<1)return;const pt=pointOf(p.pos),el=document.createElement("div");el.className="token-position";el.style.left=(pt.x/10)+"%";el.style.top=(pt.y/10)+"%";const t=document.createElement("div");t.className="token "+COLORS[p.seat];t.textContent=p.seat+1;el.appendChild(t);layer.appendChild(el);});
+}
+const LUDO_TRACK=[[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
+const LUDO_START=[0,13,26,39],LUDO_COLORS=["red","blue","green","yellow"];
+function createLudoBoard(){
+ const board=document.getElementById("board");board.classList.add("ludo-board");document.getElementById("boardArt").style.display="none";board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token").forEach(e=>e.remove());
+ const track=new Set(LUDO_TRACK.map(([r,c])=>r+","+c));
+ const safeCells=new Set([0,8,13,21,26,34,39,47].map(i=>LUDO_TRACK[i].join(",")));
+ for(let r=0;r<15;r++)for(let c=0;c<15;c++){
+  const cell=document.createElement("div");cell.className="ludo-cell";cell.id="ludo-"+r+"-"+c;
+  if(r<6&&c<6)cell.classList.add("home-red");
+  else if(r<6&&c>8)cell.classList.add("home-blue");
+  else if(r>8&&c<6)cell.classList.add("home-yellow");
+  else if(r>8&&c>8)cell.classList.add("home-green");
+  if(track.has(r+","+c))cell.classList.add("track");
+  if(r===7&&c>=1&&c<=6)cell.classList.add("lane-red");
+  if(c===7&&r>=1&&r<=6)cell.classList.add("lane-blue");
+  if(r===7&&c>=8&&c<=13)cell.classList.add("lane-green");
+  if(c===7&&r>=8&&r<=13)cell.classList.add("lane-yellow");
+  if(r===7&&c===7)cell.classList.add("center");
+  if(safeCells.has(r+","+c))cell.classList.add("safe");
+  board.appendChild(cell);
+ }
+ drawLudoTokens();
+}
+function ludoCoordinate(seat,progress,token){
+ if(progress<=0){const homes=[[[2,2],[2,4],[4,2],[4,4]],[[2,10],[2,12],[4,10],[4,12]],[[10,10],[10,12],[12,10],[12,12]],[[10,2],[10,4],[12,2],[12,4]]];return homes[seat][token];}
+ if(progress>=52){const lanes=[[[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],[[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],[[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]];return lanes[seat][Math.min(5,progress-52)];}
+ return LUDO_TRACK[(LUDO_START[seat]+progress-1)%52];
+}
+function drawLudoTokens(){
+ const board=document.getElementById("board");board.querySelectorAll(".ludo-token").forEach(e=>e.remove());
+ for(let seat=0;seat<4;seat++){if(!players.some(p=>p.seat===seat))continue;for(let t=0;t<4;t++){
+  const progress=Number(ludoTokens[seat]?.[t]||0),[r,c]=ludoCoordinate(seat,progress,t),cell=document.getElementById("ludo-"+r+"-"+c);
+  if(!cell)continue;const token=document.createElement("button");const valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];token.className="ludo-token "+LUDO_COLORS[seat]+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");token.textContent=String(t+1);token.title="مهره "+(t+1);
+  token.onclick=()=>chooseLudoToken(t);cell.appendChild(token);
+ }}
+}
+function renderLudoTokens(){drawLudoTokens();}
+async function chooseLudoToken(index){
+ if(!pendingMove||mySeat!==turn||locked)return;
+ const valid=pendingMove.valid_tokens||pendingMove.validTokens||[];
+ if(valid.length&&!valid.includes(index))return;
+ selectedLudoToken=index;locked=true;
+ try{const d=await api("move",{tokenIndex:index});applyState(d);document.getElementById("message").textContent="مهره "+(index+1)+" حرکت کرد.";}
+ catch(e){document.getElementById("message").textContent=e.message;}
+ finally{locked=false;render();}
 }
 function render(){
  renderTokens();const box=document.getElementById("players");box.innerHTML="";
  const countEl=document.getElementById("playersCount");if(countEl)countEl.innerHTML="تعداد بازیکنان: <strong>"+players.length+"</strong>";
  const roomDisplay=document.getElementById("roomCodeDisplay"),roomValue=document.getElementById("roomCodeValue");if(roomValue)roomValue.textContent=roomCode||"—";if(roomDisplay)roomDisplay.classList.toggle("visible",!!roomCode);
- players.forEach(p=>{const item=document.createElement("div");item.className="player"+(playing&&p.seat===turn?" active":"");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[p.seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p.name;const pos=document.createElement("div");pos.className="player-pos";pos.textContent="خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"");info.append(name,pos);item.append(icon,info);box.appendChild(item);});
+ for(let seat=0;seat<4;seat++){const p=players.find(x=>x.seat===seat);const item=document.createElement("div");item.className="player"+(playing&&p&&p.seat===turn?" active":"")+(p?"":" empty");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p?p.name:"صندلی خالی · "+["قرمز","آبی","سبز","زرد"][seat];const pos=document.createElement("div");pos.className="player-pos";pos.textContent=p?(roomGameType==="ludo"?(Array.isArray(ludoTokens[p.seat])?ludoTokens[p.seat].filter(v=>Number(v)===57).length:0)+" مهره به مقصد رسیده"+(p.seat===mySeat?" · شما":""):"خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"")):"منتظر ورود بازیکن";info.append(name,pos);item.append(icon,info);box.appendChild(item);}
  const current=players.find(p=>p.seat===turn);
  document.getElementById("turnLabel").textContent=playing?(current?"نوبت "+current.name:"در انتظار بازیکن"):(roomStatus==="waiting"?"لابی اتاق":"مسابقه متوقف");
  const canRoll=playing&&!locked&&!remoteAnimating&&mySeat===turn&&!pendingMove;
@@ -470,7 +533,7 @@ async function rollDice(){
   document.getElementById("diceCaption").textContent="عدد تاس: "+finalValue;
   lastSeenRollId=d.rollId||d.lastRoll?.id||lastSeenRollId;
   applyState(d);
-  document.getElementById("message").textContent="عدد "+finalValue+" آمد؛ روی خانه مقصد مشخص‌شده کلیک کن.";
+  document.getElementById("message").textContent=roomGameType==="ludo"?(Array.isArray(d.validTokens)&&d.validTokens.length?"عدد "+finalValue+" آمد؛ یکی از مهره‌های روشن را انتخاب کن.":"حرکت معتبری نداری؛ نوبت بعدی می‌رسد."):"عدد "+finalValue+" آمد؛ روی خانه مقصد مشخص‌شده کلیک کن.";
  }catch(e){document.getElementById("dice").classList.remove("rolling");document.getElementById("message").textContent=e.message;try{await syncState();}catch{}}
  finally{locked=false;render();}
 }
