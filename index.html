@@ -242,7 +242,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.22 · build 2026-11-10</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.23 · build 2026-11-10</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -594,8 +594,19 @@ function createLudoBoard(){
 }
 // The artwork's 15x15 playable grid is inset from the image edges.
 const LUDO_GRID_ORIGIN=34,LUDO_GRID_STEP_X=38,LUDO_GRID_STEP_Y=38;
-function ludoGridCenterX(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_X;}
-function ludoGridCenterY(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_Y;}
+// Cell bounds follow the supplied 15x15 board measurements: 36px cells, 38px pitch.
+function ludoCellBounds(row,col){
+ const xMin=16+col*38,yMin=16+row*38;
+ return [yMin,xMin,yMin+36,xMin+36];
+}
+function ludoGridCenterX(index){
+ const bounds=ludoCellBounds(0,index);
+ return (bounds[1]+bounds[3])/2;
+}
+function ludoGridCenterY(index){
+ const bounds=ludoCellBounds(index,0);
+ return (bounds[0]+bounds[2])/2;
+}
 function drawLudoGridDebug(board){
  const old=board.querySelector(".ludo-grid-debug");if(old)old.remove();
  if(new URLSearchParams(location.search).get("ludoGrid")!=="1")return;
@@ -637,7 +648,13 @@ function drawLudoTokens(){
   token.className="ludo-token "+LUDO_COLORS[seat]+(Number(ludoTokens[seat]?.[t]||0)<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
   token.type="button";token.title="مهره "+(t+1);
   const [ox,oy]=(offsets[group.length]||offsets[4])[index]||[0,0];
-  token.style.left=ludoPx(x+ox);token.style.top=ludoPx(y+oy);
+  // Place the token by its top-left corner, calculated from the cell center.
+  const pieceWidth=600*(group.length>1?0.038:0.047);
+  const pieceHeight=600*(group.length>1?0.048:0.059);
+  const centerX=x+ox,centerY=y+oy;
+  const drawX=centerX-(pieceWidth/2),drawY=centerY-(pieceHeight/2);
+  token.style.transform="none";
+  token.style.left=ludoPx(drawX);token.style.top=ludoPx(drawY);
    const spritePosition={red:"18% 13%",blue:"82% 13%",green:"82% 85%",yellow:"18% 85%"}[LUDO_COLORS[seat]];
    token.style.backgroundPosition=spritePosition;
    token.onclick=()=>chooseLudoToken(t);board.appendChild(token);
