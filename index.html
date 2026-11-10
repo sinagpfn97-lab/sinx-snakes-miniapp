@@ -606,7 +606,7 @@ function drawLudoTokens(){
  const offsets={1:[[0,0]],2:[[-8,0],[8,0]],3:[[-8,-7],[8,-7],[0,9]],4:[[-8,-8],[8,-8],[-8,8],[8,8]]};
  for(const group of grouped.values())group.forEach(({seat,t,x,y},index)=>{
   const token=document.createElement("button"),valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];
-  token.className="ludo-token "+LUDO_COLORS[seat]+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
+  token.className="ludo-token "+LUDO_COLORS[seat]+(Number(ludoTokens[seat]?.[t]||0)<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
   token.type="button";token.title="مهره "+(t+1);
   const [ox,oy]=(offsets[group.length]||offsets[4])[index]||[0,0];
   token.style.left=ludoPx(x+ox);token.style.top=ludoPx(y+oy);token.onclick=()=>chooseLudoToken(t);board.appendChild(token);
