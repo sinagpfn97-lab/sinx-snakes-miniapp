@@ -397,7 +397,7 @@ async function currentUsername(){
  return user?.user_metadata?.username||document.getElementById("playerNameInput").value.trim().toLowerCase()||"";
 }
 function applyState(data){
- if(data.room){const previousGame=roomGameType;roomStatus=data.room.status;turn=Number(data.room.current_turn||0);roomGameType=data.room.game_state?.game_type||"snakes";ludoRulesVersion=Number(data.room.game_state?.ludo_rules_version||1);ludoTokens=data.room.game_state?.ludo_tokens||{};if(previousGame!==roomGameType){document.querySelector("#gameView h1").textContent=roomGameType==="ludo"?"🎲 منچ چهار نفره":"🐍 مار و پله";document.querySelector("#gameView .subtitle").textContent=roomGameType==="ludo"?"چهار رنگ · ۱۶ مهره · مسیر ۴۸ خانه‌ای":"مسابقه نئونی تا خانه ۱۰۰";createBoard();}}
+ if(data.room){const previousGame=roomGameType,previousLudoRulesVersion=ludoRulesVersion;roomStatus=data.room.status;turn=Number(data.room.current_turn||0);roomGameType=data.room.game_state?.game_type||"snakes";ludoRulesVersion=Number(data.room.game_state?.ludo_rules_version||1);ludoTokens=data.room.game_state?.ludo_tokens||{};if(previousGame!==roomGameType||(roomGameType==="ludo"&&previousLudoRulesVersion!==ludoRulesVersion)){document.querySelector("#gameView h1").textContent=roomGameType==="ludo"?"🎲 منچ چهار نفره":"🐍 مار و پله";document.querySelector("#gameView .subtitle").textContent=roomGameType==="ludo"?"چهار رنگ · ۱۶ مهره · مسیر ۴۸ خانه‌ای":"مسابقه نئونی تا خانه ۱۰۰";createBoard();}}
  if(Array.isArray(data.players))players=data.players.map(p=>({id:p.id,seat:Number(p.seat),name:p.player_name,pos:Number(p.position||0),isHost:!!p.is_host}));
  if(Number.isInteger(data.mySeat))mySeat=data.mySeat;
  pendingMove=data.pendingMove||data.room?.game_state?.pending_move||null;
@@ -565,7 +565,7 @@ const LUDO_HOME_PAWNS_LEGACY={red:[[88,85],[151,85],[88,147],[151,147]],blue:[[4
 const LUDO_TRACK=[[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0],[6,1],[6,2],[6,3],[6,4],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7]];
 const LUDO_START=[36,0,12,24],LUDO_COLORS=["red","blue","green","yellow"];
 const LUDO_BOARD_SIZE=600,LUDO_CELL_SIZE=40;
-// Home pawn centers aligned to the supplied 1248x1248 reference artwork.
+// Home pawn centers for the original 52-cell board artwork.
 const LUDO_HOME_PAWNS={
  red:[[86,85],[145,85],[86,142],[145,142]],
  blue:[[455,85],[514,85],[455,142],[514,142]],
