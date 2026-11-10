@@ -472,7 +472,7 @@ function drawLudoTokens(){
  }}
 }
 function renderLudoTokens(){drawLudoTokens();}
-async async function chooseLudoToken(index){
+async function chooseLudoToken(index){
  if(!pendingMove||mySeat!==turn||locked)return;
  const valid=pendingMove.valid_tokens||pendingMove.validTokens||[];
  if(valid.length&&!valid.includes(index))return;
