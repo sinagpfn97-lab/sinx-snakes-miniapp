@@ -273,7 +273,7 @@ async function createRoom(
         status: "waiting",
         max_players: maxPlayers,
         current_turn: 0,
-        game_state: gameType === "ludo" ? { game_type: "ludo", ludo_tokens: { "0":[0,0,0,0], "1":[0,0,0,0], "2":[0,0,0,0], "3":[0,0,0,0] } } : { game_type: "snakes" },
+        game_state: gameType === "ludo" ? { game_type: "ludo", ludo_rules_version: 2, ludo_tokens: { "0":[0,0,0,0], "1":[0,0,0,0], "2":[0,0,0,0], "3":[0,0,0,0] } } : { game_type: "snakes" },
       })
       .select("*")
       .single();
