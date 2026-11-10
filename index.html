@@ -16,7 +16,7 @@ body{margin:0;padding:16px 11px 28px;min-height:100vh;color:var(--text);font-fam
 header{text-align:center;margin:4px 0 18px}
 .logo{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:5px;text-shadow:0 0 14px #45eaff88}
 h1{font-size:26px;margin:5px 0;font-weight:900}
-.subtitle{font-size:11px;color:var(--muted)}.room-meta{display:none;margin:8px auto 0;padding:7px 12px;width:max-content;max-width:100%;border:1px solid #514879;border-radius:10px;background:#10152b;color:#d9c8ff;font-size:11px;font-weight:800}.room-meta.visible{display:block}.room-meta small{color:#aaa4c9;font-weight:500;margin-left:5px}.players-count{margin-top:13px;text-align:center;color:#aaa4c9;font-size:10px}.players-count strong{color:#54eafa;font-size:12px}
+.subtitle{font-size:11px;color:var(--muted)}.room-meta{display:none;margin:8px auto 0;padding:7px 12px;width:max-content;max-width:100%;border:1px solid #514879;border-radius:10px;background:#10152b;color:#d9c8ff;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit}.room-meta.visible{display:block}.room-meta small{color:#aaa4c9;font-weight:500;margin-left:5px}.players-count{margin-top:13px;text-align:center;color:#aaa4c9;font-size:10px}.players-count strong{color:#54eafa;font-size:12px}
 .panel{padding:12px;border-radius:22px;background:linear-gradient(145deg,#211b40,#11152b);border:1px solid #51417a;box-shadow:0 15px 45px #0008,0 0 22px #865aff18}
 .status{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
 .status-label{font-size:10px;color:var(--muted)}
@@ -139,7 +139,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
   <div class="logo">S I N X   A R C A D E</div>
   <h1>🐍 مار و پله</h1>
   <div class="subtitle">مسابقه نئونی تا خانه ۱۰۰</div>
-  <div class="room-meta" id="roomCodeDisplay"><small>کد اتاق</small><span id="roomCodeValue">—</span></div>
+  <button class="room-meta" id="roomCodeDisplay" type="button" onclick="copyRoomCode()" title="برای کپی کد اتاق کلیک کنید"><small>کد اتاق</small><span id="roomCodeValue">—</span> ⧉</button>
   <div id="connectionStatus" style="font-size:9px;color:#aaa4c9;margin-top:5px"></div>
 </header>
 <section class="panel">
@@ -298,8 +298,8 @@ function applyState(data){
  const copyBtn=document.getElementById("copyRoomLinkBtn");if(copyBtn)copyBtn.style.display=roomCode&&host?"block":"none";
  const leaveBtn=document.getElementById("leaveRoomBtn");if(leaveBtn)leaveBtn.style.display=roomCode?"block":"none";
 
- if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent="کد اتاق: "+roomCode+" | "+players.length+" بازیکن از "+(data.room?.max_players||"?");
- if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج («"+departed+"») به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}}
+ if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent=players.length+" بازیکن از "+(data.room?.max_players||"?");
+ if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج «"+departed+"» به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}}
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
 function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
@@ -362,6 +362,7 @@ function showProfile(){document.getElementById("profileOverlay").style.display="
 function closeProfile(){document.getElementById("profileOverlay").style.display="none";}
 function showSetup(){showProfile();}
 function closeSetup(){document.getElementById("setupOverlay").style.display="none";}
+async function copyRoomCode(){if(!roomCode)return;try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(roomCode);else{const t=document.createElement("textarea");t.value=roomCode;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();}document.getElementById("message").textContent="کد اتاق کپی شد: "+roomCode;}catch(e){document.getElementById("message").textContent="کپی کد اتاق ممکن نشد: "+roomCode;}}
 async function copyRoomLink(){if(!roomCode)return;const link=location.origin+location.pathname+"?room="+encodeURIComponent(roomCode);try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(link);else{const t=document.createElement("textarea");t.value=link;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();}document.getElementById("message").textContent="لینک دعوت کپی شد؛ برای دوستانت بفرست.";}catch(e){document.getElementById("message").textContent="کپی خودکار ممکن نشد؛ کد اتاق: "+roomCode;}}
 async function leaveRoom(){if(!roomCode)return;if(!confirm("از این اتاق خارج می‌شوی؟"))return;try{locked=true;render();await api("leave");stopPolling();document.querySelector(".game-lobby").classList.remove("room-created");roomCode="";playerToken="";mySeat=-1;players=[];pendingMove=null;lastRoll=null;roomStatus="waiting";playing=false;host=false;stateEventsReady=false;lastSeenRollId="";lastSeenMoveId="";document.getElementById("roomCodeInput").value="";document.getElementById("hubRoomCode").value="";showHub();}catch(e){document.getElementById("message").textContent=e.message;}finally{locked=false;render();}}
 function newGame(){if(roomCode){showHub();return;}showHub();}
