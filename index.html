@@ -588,7 +588,7 @@ function createLudoBoard(){
  drawLudoTokens();
 }
 // The artwork's 15x15 playable grid is inset from the image edges.
-const LUDO_GRID_ORIGIN=56,LUDO_GRID_STEP=34.85;
+const LUDO_GRID_ORIGIN=56.7,LUDO_GRID_STEP=41.05;
 function ludoGridCenter(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP;}
 function ludoCoordinate(seat,progress,token){
  if(progress<=0)return LUDO_HOME_PAWNS[LUDO_COLORS[seat]][token];
