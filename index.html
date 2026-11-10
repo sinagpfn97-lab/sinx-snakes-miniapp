@@ -147,6 +147,39 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .status{margin-bottom:10px}
 @media(max-width:380px){.board-wrap{border-radius:14px}.board{border-radius:14px}.ludo-token{width:82%;height:82%}}
 
+
+/* Ludo board: classic geometry with a neon arcade finish */
+.board.ludo-board{gap:2px;padding:0;background:#090d20;border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px #8c80ff66,0 0 28px #47eaff22,0 18px 45px #0009}
+.ludo-cell{border:0;background:#10172d;overflow:visible;z-index:1}
+.ludo-cell.home-red{background:linear-gradient(145deg,#781b49,#3c1238)}
+.ludo-cell.home-blue{background:linear-gradient(145deg,#125b91,#102c5b)}
+.ludo-cell.home-green{background:linear-gradient(145deg,#146b4b,#103b38)}
+.ludo-cell.home-yellow{background:linear-gradient(145deg,#8b651e,#493018)}
+.ludo-cell.track{background:linear-gradient(145deg,#f5f4ff,#c9d0e9);border:1px solid #7e8bad;border-radius:3px;box-shadow:inset 0 1px #fff,0 1px 2px #0005}
+.ludo-cell.safe:after{content:"✦";color:#9571ed;text-shadow:0 0 8px #b58cff;font-size:clamp(8px,2vw,13px)}
+.ludo-cell.lane-red{background:linear-gradient(145deg,#ff5689,#d92c68);border:1px solid #ff9ab8}
+.ludo-cell.lane-blue{background:linear-gradient(145deg,#48c4ff,#167ee1);border:1px solid #8ee3ff}
+.ludo-cell.lane-green{background:linear-gradient(145deg,#5af2a0,#18a968);border:1px solid #9bffd0}
+.ludo-cell.lane-yellow{background:linear-gradient(145deg,#ffe477,#e8a92e);border:1px solid #fff0a2}
+.ludo-cell.center-area{background:#101a35;border:0}
+.ludo-cell.home-slot{z-index:3}
+.ludo-cell.home-slot:before{content:"";position:absolute;inset:9%;border-radius:50%;background:radial-gradient(circle at 35% 28%,#ffffff24,#0004 72%);border:2px solid #ffffffaa;box-shadow:inset 0 3px 9px #0007,0 2px 8px #0006}
+.ludo-yard{position:absolute;width:26.6667%;height:26.6667%;z-index:2;border-radius:22%;border:2px solid #ffffffb0;box-shadow:0 0 0 2px #ffffff18,inset 0 0 24px #fff2,0 0 22px currentColor;pointer-events:none}
+.ludo-yard.red{background:linear-gradient(145deg,#ec2864,#78173e);color:#ff4c86}
+.ludo-yard.blue{background:linear-gradient(145deg,#31aaff,#124b83);color:#39c4ff}
+.ludo-yard.green{background:linear-gradient(145deg,#3ce28a,#126440);color:#4effa0}
+.ludo-yard.yellow{background:linear-gradient(145deg,#ffd65b,#8b5b18);color:#ffdc63}
+.ludo-center-art{position:absolute;left:40%;top:40%;width:20%;height:20%;z-index:2;pointer-events:none;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:conic-gradient(from -45deg,#f23d78 0 25%,#39aaff 0 50%,#ffd45b 0 75%,#38d982 0);border:2px solid #fff;filter:drop-shadow(0 0 8px #a78bff)}
+.ludo-token{position:relative;z-index:4;width:76%;height:76%;border:2px solid #ffffffed;border-radius:50%;box-shadow:inset 0 2px 3px #fff9,inset 0 -5px 8px #0005,0 3px 7px #000b,0 0 10px currentColor;transform:translateZ(0)}
+.ludo-token.red{background:radial-gradient(circle at 32% 23%,#ffb1ca 0,#ff477d 30%,#dc1454 68%,#760c37 100%);color:#ff3b79}
+.ludo-token.blue{background:radial-gradient(circle at 32% 23%,#c4f7ff 0,#54d4ff 30%,#168be8 68%,#07417d 100%);color:#37caff}
+.ludo-token.green{background:radial-gradient(circle at 32% 23%,#d7ffbd 0,#75f59a 30%,#22bf69 68%,#08643a 100%);color:#43ed8b}
+.ludo-token.yellow{background:radial-gradient(circle at 32% 23%,#fff8be 0,#ffe06a 30%,#efa92b 68%,#92510b 100%);color:#ffd34d}
+.ludo-token.selectable{outline:3px solid white;outline-offset:2px;animation:targetPulse .55s infinite alternate}
+.ludo-cell:has(.ludo-token:nth-of-type(2)){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:2px;padding:12%}
+.ludo-cell:has(.ludo-token:nth-of-type(2)) .ludo-token{width:100%;height:100%;border-width:1px}
+@media(max-width:420px){.board.ludo-board{border-radius:14px;gap:1px}.ludo-yard{border-radius:18%}.ludo-cell.home-slot:before{border-width:1px}}
+
 </style>
 </head>
 <body>
@@ -483,10 +516,17 @@ function createLudoBoard(){
   if(c===7&&r>=1&&r<=6)cell.classList.add("lane-blue");
   if(r===7&&c>=8&&c<=13)cell.classList.add("lane-green");
   if(c===7&&r>=8&&r<=13)cell.classList.add("lane-yellow");
+  if(r>=6&&r<=8&&c>=6&&c<=8)cell.classList.add("center-area");
   if(r===7&&c===7)cell.classList.add("center");
+  if((r===2||r===4)&&(c===2||c===4))cell.classList.add("home-slot");
   if(safeCells.has(r+","+c))cell.classList.add("safe");
   board.appendChild(cell);
  }
+ // Four recessed home yards, kept separate from the playable track.
+ [[ "red","6.667%","6.667%" ],[ "blue","60%","6.667%" ],[ "yellow","6.667%","60%" ],[ "green","60%","60%" ]].forEach(([color,left,top])=>{
+  const yard=document.createElement("div");yard.className="ludo-yard "+color;yard.style.left=left;yard.style.top=top;board.appendChild(yard);
+ });
+ const center=document.createElement("div");center.className="ludo-center-art";board.appendChild(center);
  drawLudoTokens();
 }
 function ludoCoordinate(seat,progress,token){
