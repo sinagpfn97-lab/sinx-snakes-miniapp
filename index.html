@@ -242,7 +242,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.26 · build 2026-11-10</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.27 · build 2026-11-10</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -579,7 +579,7 @@ const LUDO_LANES=[
  [[13,7],[12,7],[11,7],[10,7]]
 ];
 const LUDO_RENDER_SIZE=640;
-function ludoPx(v){return (v/LUDO_RENDER_SIZE*100)+"%";}
+function ludoPx(v){return (v/640*100)+"%";}
 function ludoSquare(board,r,c,color="track",safe=false){
  const cell=document.createElement("div");cell.className="ludo-cell "+color+(safe?" safe":"");
  cell.style.left=ludoPx(c*LUDO_CELL_SIZE);cell.style.top=ludoPx(r*LUDO_CELL_SIZE);
@@ -646,34 +646,41 @@ function drawLudoTokens(){
    if(progress>=ludoFinishProgress())continue;
    const [x,y]=ludoCoordinate(seat,progress,t),key=x+":"+y;
    if(!grouped.has(key))grouped.set(key,[]);
-   grouped.get(key).push({seat,t,x,y});
+   // Keep progress so home tokens and track tokens use separate positioning rules.
+   grouped.get(key).push({seat,t,x,y,progress});
   }
  }
  
  const offsets={1:[[0,0]],2:[[-8,0],[8,0]],3:[[-8,-7],[8,-7],[0,9]],4:[[-8,-8],[8,-8],[-8,8],[8,8]]};
  
  for(const group of grouped.values()){
-  group.forEach(({seat,t,x,y},index)=>{
+  group.forEach(({seat,t,x,y,progress},index)=>{
    const token=document.createElement("button");
    const valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];
    
-   token.className="ludo-token "+LUDO_COLORS[seat]+(Number(ludoTokens[seat]?.[t]||0)<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
+   token.className="ludo-token "+LUDO_COLORS[seat]+(progress<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
    token.type="button";token.title="مهره "+(t+1);
    
    const [ox,oy]=(offsets[group.length]||offsets[4])[index]||[0,0];
    
-   // Pixel geometry and CSS percentage conversion both use the same 600-unit space.
-   const pieceWidth=600*(group.length>1?0.038:0.047);
-   const pieceHeight=600*(group.length>1?0.048:0.059);
-   const visualOffsetX=2;
-   const visualOffsetY=8;
+   const pieceWidth=640*(group.length>1?0.038:0.047);
+   const pieceHeight=640*(group.length>1?0.048:0.059);
    
-   const drawX=(x+ox)-(pieceWidth/2)+visualOffsetX;
-   const drawY=(y+oy)-(pieceHeight/2)+visualOffsetY;
+   let finalX, finalY;
+   if(progress<=0){
+       // Home tokens retain their original coordinates and receive no visual correction.
+       finalX=x+ox-(pieceWidth/2);
+       finalY=y+oy-(pieceHeight/2);
+   }else{
+       // Track coordinates are converted from the 600-unit grid to the 640-unit artwork.
+       const scaleFactor=640/600;
+       finalX=(x*scaleFactor)+ox-(pieceWidth/2)+2;
+       finalY=(y*scaleFactor)+oy-(pieceHeight/2)+8;
+   }
    
    token.style.transform="none";
-   token.style.left=(drawX/600*100)+"%";
-   token.style.top=(drawY/600*100)+"%";
+   token.style.left=ludoPx(finalX);
+   token.style.top=ludoPx(finalY);
    
    const spritePosition={red:"18% 13%",blue:"82% 13%",green:"82% 85%",yellow:"18% 85%"}[LUDO_COLORS[seat]];
    token.style.backgroundPosition=spritePosition;
