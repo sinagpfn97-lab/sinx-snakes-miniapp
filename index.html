@@ -242,7 +242,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.25 · build 2026-11-10</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.26 · build 2026-11-10</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -635,39 +635,53 @@ function ludoCoordinate(seat,progress,token){
 }
 function ludoFinishProgress(){return ludoRulesVersion===2?52:57;}
 function drawLudoTokens(){
- const board=document.getElementById("board");board.querySelectorAll(".ludo-token").forEach(e=>e.remove());const grouped=new Map();
+ const board=document.getElementById("board");
+ board.querySelectorAll(".ludo-token").forEach(e=>e.remove());
+ const grouped=new Map();
+ 
  for(let seat=0;seat<4;seat++){
   if(!players.some(p=>p.seat===seat))continue;
   for(let t=0;t<4;t++){
    const progress=Number(ludoTokens[seat]?.[t]||0);
-   // A token at the final home progress is finished and leaves the playable lane.
    if(progress>=ludoFinishProgress())continue;
    const [x,y]=ludoCoordinate(seat,progress,t),key=x+":"+y;
-   if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push({seat,t,x,y});
+   if(!grouped.has(key))grouped.set(key,[]);
+   grouped.get(key).push({seat,t,x,y});
   }
  }
+ 
  const offsets={1:[[0,0]],2:[[-8,0],[8,0]],3:[[-8,-7],[8,-7],[0,9]],4:[[-8,-8],[8,-8],[-8,8],[8,8]]};
- for(const group of grouped.values())group.forEach(({seat,t,x,y},index)=>{
-  const token=document.createElement("button"),valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];
-  token.className="ludo-token "+LUDO_COLORS[seat]+(Number(ludoTokens[seat]?.[t]||0)<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
-  token.type="button";token.title="مهره "+(t+1);
-  const [ox,oy]=(offsets[group.length]||offsets[4])[index]||[0,0];
-  // Convert the existing 600-unit board coordinates into the 640-unit artwork space.
-  const scaleFactor=640/600;
-  const realCenterX=(x*scaleFactor)+ox;
-  const realCenterY=(y*scaleFactor)+oy;
-  const pieceWidth=640*(group.length>1?0.038:0.047);
-  const pieceHeight=640*(group.length>1?0.048:0.059);
-  const visualOffsetX=0;
-  const visualOffsetY=0;
-  const drawX=realCenterX-(pieceWidth/2)+visualOffsetX;
-  const drawY=realCenterY-(pieceHeight/2)+visualOffsetY;
-  token.style.transform="none";
-  token.style.left=ludoPx(drawX);token.style.top=ludoPx(drawY);
+ 
+ for(const group of grouped.values()){
+  group.forEach(({seat,t,x,y},index)=>{
+   const token=document.createElement("button");
+   const valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];
+   
+   token.className="ludo-token "+LUDO_COLORS[seat]+(Number(ludoTokens[seat]?.[t]||0)<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
+   token.type="button";token.title="مهره "+(t+1);
+   
+   const [ox,oy]=(offsets[group.length]||offsets[4])[index]||[0,0];
+   
+   // Pixel geometry and CSS percentage conversion both use the same 600-unit space.
+   const pieceWidth=600*(group.length>1?0.038:0.047);
+   const pieceHeight=600*(group.length>1?0.048:0.059);
+   const visualOffsetX=2;
+   const visualOffsetY=8;
+   
+   const drawX=(x+ox)-(pieceWidth/2)+visualOffsetX;
+   const drawY=(y+oy)-(pieceHeight/2)+visualOffsetY;
+   
+   token.style.transform="none";
+   token.style.left=(drawX/600*100)+"%";
+   token.style.top=(drawY/600*100)+"%";
+   
    const spritePosition={red:"18% 13%",blue:"82% 13%",green:"82% 85%",yellow:"18% 85%"}[LUDO_COLORS[seat]];
    token.style.backgroundPosition=spritePosition;
-   token.onclick=()=>chooseLudoToken(t);board.appendChild(token);
- });
+   token.onclick=()=>chooseLudoToken(t);
+   
+   board.appendChild(token);
+  });
+ }
 }
 function renderLudoTokens(){drawLudoTokens();}
 async function chooseLudoToken(index){
