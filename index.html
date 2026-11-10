@@ -230,6 +230,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
  background-size:100% 100%;
 }
 /* Ludo pawns use the dedicated four-color pawn sprite sheet. */
+.ludo-grid-debug{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
 .board.ludo-board .ludo-token{background-image:url("./1794298872291.png?v=2")!important;background-repeat:no-repeat!important;background-color:transparent!important;background-size:570% 450%!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:transparent!important;width:4.7%!important;height:5.9%!important;padding:0!important}
 .board.ludo-board .ludo-token.stacked{width:3.8%!important;height:4.8%!important}
 .board.ludo-board .ludo-token.selectable{filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 7px #fff);outline:1px solid #fff;outline-offset:1px}
@@ -241,7 +242,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.19 · build 2026-11-10</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.20 · build 2026-11-10</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -584,13 +585,32 @@ function ludoSquare(board,r,c,color="track",safe=false){
 function createLudoBoard(){
  const board=document.getElementById("board");board.classList.add("ludo-board");document.getElementById("boardArt").style.display="none";
  // The supplied artwork is the board itself. Keep the live tokens as the only overlay.
- board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token,.ludo-yard,.ludo-center-art").forEach(e=>e.remove());
+ board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token,.ludo-yard,.ludo-center-art,.ludo-grid-debug").forEach(e=>e.remove());
+ drawLudoGridDebug(board);
  drawLudoTokens();
 }
 // The artwork's 15x15 playable grid is inset from the image edges.
 const LUDO_GRID_ORIGIN=56.7,LUDO_GRID_STEP_X=34,LUDO_GRID_STEP_Y=32;
 function ludoGridCenterX(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_X;}
 function ludoGridCenterY(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_Y;}
+function drawLudoGridDebug(board){
+ const old=board.querySelector(".ludo-grid-debug");if(old)old.remove();
+ if(new URLSearchParams(location.search).get("ludoGrid")!=="1")return;
+ const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+ svg.setAttribute("class","ludo-grid-debug");svg.setAttribute("viewBox","0 0 600 600");svg.setAttribute("preserveAspectRatio","none");
+ svg.setAttribute("aria-label","گرید تشخیصی ۱۵ در ۱۵");
+ const x0=ludoGridCenterX(0),x1=ludoGridCenterX(14),y0=ludoGridCenterY(0),y1=ludoGridCenterY(14);
+ let markup="";
+ for(let i=0;i<15;i++){
+  const x=ludoGridCenterX(i),y=ludoGridCenterY(i);
+  markup+='<line x1="'+x+'" y1="'+y0+'" x2="'+x+'" y2="'+y1+'" stroke="#00f0ff" stroke-opacity=".28" stroke-width="1"/>';
+  markup+='<line x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'" stroke="#00f0ff" stroke-opacity=".28" stroke-width="1"/>';
+  markup+='<text x="'+x+'" y="17" text-anchor="middle" fill="#fff" stroke="#081020" stroke-width="2" paint-order="stroke" font-size="11" font-weight="700">'+i+'</text>';
+  markup+='<text x="17" y="'+(y+4)+'" text-anchor="middle" fill="#fff" stroke="#081020" stroke-width="2" paint-order="stroke" font-size="11" font-weight="700">'+i+'</text>';
+ }
+ svg.innerHTML=markup;board.appendChild(svg);
+}
+
 function ludoCoordinate(seat,progress,token){
  if(progress<=0)return LUDO_HOME_PAWNS[LUDO_COLORS[seat]][token];
  if(progress>=52){const [r,c]=LUDO_LANES[seat][Math.min(5,progress-52)];return [ludoGridCenterX(c),ludoGridCenterY(r)];}
