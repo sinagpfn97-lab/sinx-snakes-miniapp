@@ -186,7 +186,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .ludo-cell{position:absolute;display:block;min-width:0;min-height:0;border:1px solid #9da7c966;border-radius:3px;background:linear-gradient(145deg,#f8f7ff,#c9d1e9);box-shadow:inset 0 1px 1px #fff,0 1px 3px #0006;z-index:1}
 .ludo-cell.safe:after{content:"✦";position:absolute;inset:0;display:grid;place-items:center;color:#a783ff;font-size:clamp(8px,2vw,14px);text-shadow:0 0 8px #bd9aff}
 .ludo-cell.lane-red{background:linear-gradient(145deg,#ff6598,#e52266);border-color:#ffb4cb}.ludo-cell.lane-blue{background:linear-gradient(145deg,#62d7ff,#1686e9);border-color:#a8edff}.ludo-cell.lane-green{background:linear-gradient(145deg,#6affae,#18b76a);border-color:#aaffd0}.ludo-cell.lane-yellow{background:linear-gradient(145deg,#ffea83,#f2b52d);border-color:#fff4ba}
-.ludo-yard{position:absolute;z-index:2;border-radius:0;pointer-events:none;box-sizing:border-box;display:block}
+.ludo-yard{position:absolute;z-index:2;border-radius:0;pointer-events:none;box-sizing:border-box;display:block;box-shadow:inset 0 0 28px #0007,inset 0 0 0 1px #ffffff35}.ludo-yard:after{content:"";position:absolute;inset:11%;border-radius:16%;border:2px solid #ffffffaa;background:linear-gradient(145deg,#ffffff18,#080d2533);box-shadow:inset 0 4px 18px #0007,0 0 18px currentColor}.ludo-yard.red{color:#ff5488}.ludo-yard.blue{color:#48c8ff}.ludo-yard.green{color:#4bffa0}.ludo-yard.yellow{color:#ffdf63}
 .ludo-yard.red{background:linear-gradient(145deg,#a81c50,#581434)}.ludo-yard.blue{background:linear-gradient(145deg,#1769a7,#10365f)}.ludo-yard.green{background:linear-gradient(145deg,#168653,#104c3b)}.ludo-yard.yellow{background:linear-gradient(145deg,#a87820,#5c4119)}
 .ludo-home-socket{position:absolute;width:27%;height:27%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 25%,#ffffff25,#0006 75%);border:2px solid #ffffffb8;box-shadow:inset 0 4px 10px #0007,0 2px 8px #0007}
 .ludo-center-art{position:absolute;left:40%;top:40%;width:20%;height:20%;z-index:3;pointer-events:none;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:conic-gradient(from -45deg,#f23d78 0 25%,#39aaff 0 50%,#ffd45b 0 75%,#38d982 0);filter:drop-shadow(0 0 9px #b28cff)}
@@ -533,7 +533,7 @@ function createLudoBoard(){
  lanes.forEach((lane,seat)=>lane.forEach(([r,c])=>{if(occupied.has(r+","+c))return;occupied.add(r+","+c);ludoSquare(board,r,c,"lane-"+LUDO_COLORS[seat]);}));
  [{color:"red",x:0,y:0},{color:"blue",x:60,y:0},{color:"green",x:60,y:60},{color:"yellow",x:0,y:60}].forEach(({color,x,y})=>{
   const yard=document.createElement("div");yard.className="ludo-yard "+color;yard.style.left=x+"%";yard.style.top=y+"%";yard.style.width="40%";yard.style.height="40%";
-  for(let n=0;n<4;n++){const socket=document.createElement("span");socket.className="ludo-home-socket";socket.style.left=([25,65,25,65][n])+"%";socket.style.top=([25,25,65,65][n])+"%";yard.appendChild(socket);}
+  for(let n=0;n<4;n++){const socket=document.createElement("span");socket.className="ludo-home-socket";socket.style.left=([41.667,75,41.667,75][n])+"%";socket.style.top=([41.667,41.667,75,75][n])+"%";yard.appendChild(socket);}
   board.appendChild(yard);
  });
  const center=document.createElement("div");center.className="ludo-center-art";board.appendChild(center);drawLudoTokens();
@@ -549,11 +549,11 @@ function drawLudoTokens(){
   const progress=Number(ludoTokens[seat]?.[t]||0),[r,c]=ludoCoordinate(seat,progress,t),key=seat+":"+r+":"+c;
   if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push({seat,t,r,c});
  }}
- const offsets=[[0,0],[-.17,-.17],[.17,-.17],[-.17,.17],[.17,.17]];
+ const offsetsByCount={1:[[0,0]],2:[[-.14,0],[.14,0]],3:[[-.14,-.13],[.14,-.13],[0,.15]],4:[[-.14,-.14],[.14,-.14],[-.14,.14],[.14,.14]]};
  for(const group of grouped.values())group.forEach(({seat,t,r,c},index)=>{
   const token=document.createElement("button"),valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];
   token.className="ludo-token "+LUDO_COLORS[seat]+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
-  token.type="button";token.title="مهره "+(t+1);const [ox,oy]=offsets[group.length===1?0:index+1]||offsets[0];
+  token.type="button";token.title="مهره "+(t+1);const [ox,oy]=(offsetsByCount[group.length]||offsetsByCount[4])[index]||[0,0];
   token.style.left=((c+.5+ox)/15*100)+"%";token.style.top=((r+.5+oy)/15*100)+"%";token.onclick=()=>chooseLudoToken(t);board.appendChild(token);
  });
 }
