@@ -575,7 +575,7 @@ function createLudoBoard(){
  ].forEach(({color,x,y,homes})=>{
   const yard=document.createElement("div");yard.className="ludo-yard "+color;
   yard.style.left=ludoPx(x);yard.style.top=ludoPx(y);yard.style.width=ludoPx(240);yard.style.height=ludoPx(240);
-  homes.forEach(([px,py])=>{const socket=document.createElement("span");socket.className="ludo-home-socket";socket.style.left=ludoPx(px-x);socket.style.top=ludoPx(py-y);yard.appendChild(socket);});
+  homes.forEach(([px,py])=>{const socket=document.createElement("span");socket.className="ludo-home-socket";socket.style.left=(((px-x)/240)*100)+"%";socket.style.top=(((py-y)/240)*100)+"%";yard.appendChild(socket);});
   board.appendChild(yard);
  });
  const center=document.createElement("div");center.className="ludo-center-art";
