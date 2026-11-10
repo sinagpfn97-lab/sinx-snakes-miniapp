@@ -242,7 +242,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.27 · build 2026-11-10</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.22 · build 2026-11-10</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -578,8 +578,7 @@ const LUDO_LANES=[
  [[7,13],[7,12],[7,11],[7,10]],
  [[13,7],[12,7],[11,7],[10,7]]
 ];
-const LUDO_RENDER_SIZE=640;
-function ludoPx(v){return (v/640*100)+"%";}
+function ludoPx(v){return (v/LUDO_BOARD_SIZE*100)+"%";}
 function ludoSquare(board,r,c,color="track",safe=false){
  const cell=document.createElement("div");cell.className="ludo-cell "+color+(safe?" safe":"");
  cell.style.left=ludoPx(c*LUDO_CELL_SIZE);cell.style.top=ludoPx(r*LUDO_CELL_SIZE);
@@ -595,19 +594,8 @@ function createLudoBoard(){
 }
 // The artwork's 15x15 playable grid is inset from the image edges.
 const LUDO_GRID_ORIGIN=34,LUDO_GRID_STEP_X=38,LUDO_GRID_STEP_Y=38;
-// Cell bounds follow the supplied 15x15 board measurements: 36px cells, 38px pitch.
-function ludoCellBounds(row,col){
- const xMin=16+col*38,yMin=16+row*38;
- return [yMin,xMin,yMin+36,xMin+36];
-}
-function ludoGridCenterX(index){
- const bounds=ludoCellBounds(0,index);
- return (bounds[1]+bounds[3])/2;
-}
-function ludoGridCenterY(index){
- const bounds=ludoCellBounds(index,0);
- return (bounds[0]+bounds[2])/2;
-}
+function ludoGridCenterX(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_X;}
+function ludoGridCenterY(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_Y;}
 function drawLudoGridDebug(board){
  const old=board.querySelector(".ludo-grid-debug");if(old)old.remove();
  if(new URLSearchParams(location.search).get("ludoGrid")!=="1")return;
@@ -635,60 +623,25 @@ function ludoCoordinate(seat,progress,token){
 }
 function ludoFinishProgress(){return ludoRulesVersion===2?52:57;}
 function drawLudoTokens(){
- const board=document.getElementById("board");
- board.querySelectorAll(".ludo-token").forEach(e=>e.remove());
- const grouped=new Map();
- 
+ const board=document.getElementById("board");board.querySelectorAll(".ludo-token").forEach(e=>e.remove());const grouped=new Map();
  for(let seat=0;seat<4;seat++){
   if(!players.some(p=>p.seat===seat))continue;
   for(let t=0;t<4;t++){
-   const progress=Number(ludoTokens[seat]?.[t]||0);
-   if(progress>=ludoFinishProgress())continue;
-   const [x,y]=ludoCoordinate(seat,progress,t),key=x+":"+y;
-   if(!grouped.has(key))grouped.set(key,[]);
-   // Keep progress so home tokens and track tokens use separate positioning rules.
-   grouped.get(key).push({seat,t,x,y,progress});
+   const progress=Number(ludoTokens[seat]?.[t]||0),[x,y]=ludoCoordinate(seat,progress,t),key=x+":"+y;
+   if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push({seat,t,x,y});
   }
  }
- 
  const offsets={1:[[0,0]],2:[[-8,0],[8,0]],3:[[-8,-7],[8,-7],[0,9]],4:[[-8,-8],[8,-8],[-8,8],[8,8]]};
- 
- for(const group of grouped.values()){
-  group.forEach(({seat,t,x,y,progress},index)=>{
-   const token=document.createElement("button");
-   const valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];
-   
-   token.className="ludo-token "+LUDO_COLORS[seat]+(progress<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
-   token.type="button";token.title="مهره "+(t+1);
-   
-   const [ox,oy]=(offsets[group.length]||offsets[4])[index]||[0,0];
-   
-   const pieceWidth=640*(group.length>1?0.038:0.047);
-   const pieceHeight=640*(group.length>1?0.048:0.059);
-   
-   let finalX, finalY;
-   if(progress<=0){
-       // Home tokens retain their original coordinates and receive no visual correction.
-       finalX=x+ox-(pieceWidth/2);
-       finalY=y+oy-(pieceHeight/2);
-   }else{
-       // Track coordinates are converted from the 600-unit grid to the 640-unit artwork.
-       const scaleFactor=640/600;
-       finalX=(x*scaleFactor)+ox-(pieceWidth/2)+2;
-       finalY=(y*scaleFactor)+oy-(pieceHeight/2)+8;
-   }
-   
-   token.style.transform="none";
-   token.style.left=ludoPx(finalX);
-   token.style.top=ludoPx(finalY);
-   
+ for(const group of grouped.values())group.forEach(({seat,t,x,y},index)=>{
+  const token=document.createElement("button"),valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];
+  token.className="ludo-token "+LUDO_COLORS[seat]+(Number(ludoTokens[seat]?.[t]||0)<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
+  token.type="button";token.title="مهره "+(t+1);
+  const [ox,oy]=(offsets[group.length]||offsets[4])[index]||[0,0];
+  token.style.left=ludoPx(x+ox);token.style.top=ludoPx(y+oy);
    const spritePosition={red:"18% 13%",blue:"82% 13%",green:"82% 85%",yellow:"18% 85%"}[LUDO_COLORS[seat]];
    token.style.backgroundPosition=spritePosition;
-   token.onclick=()=>chooseLudoToken(t);
-   
-   board.appendChild(token);
-  });
- }
+   token.onclick=()=>chooseLudoToken(t);board.appendChild(token);
+ });
 }
 function renderLudoTokens(){drawLudoTokens();}
 async function chooseLudoToken(index){
