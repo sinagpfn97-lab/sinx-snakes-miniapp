@@ -217,8 +217,8 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 
 /* JSON-anchored Ludo pawn geometry and stacked-token sizing. */
 .ludo-home-socket{left:0;top:0;width:13%;height:13%}
-.ludo-token.stacked{width:3.35%;height:3.35%;border-width:1.5px}
-.ludo-token{width:5.2%;height:5.2%;transform:translate(-50%,-50%);padding:0}
+.ludo-token.stacked{width:3%;height:3%;border-width:1.5px}
+.ludo-token{width:4.5%;height:4.5%;transform:translate(-50%,-50%);padding:0}
 .board.ludo-board{display:block;grid-template-columns:none;grid-template-rows:none;gap:0;padding:0;position:relative;aspect-ratio:1/1}
 
 /* Use the exact board artwork supplied by the project owner. */
@@ -588,11 +588,14 @@ function createLudoBoard(){
  board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token,.ludo-yard,.ludo-center-art").forEach(e=>e.remove());
  drawLudoTokens();
 }
+// The artwork's 15x15 playable grid is inset from the image edges.
+const LUDO_GRID_ORIGIN=56,LUDO_GRID_STEP=34.85;
+function ludoGridCenter(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP;}
 function ludoCoordinate(seat,progress,token){
  if(progress<=0)return LUDO_HOME_PAWNS[LUDO_COLORS[seat]][token];
- if(progress>=52){const [r,c]=LUDO_LANES[seat][Math.min(5,progress-52)];return [c*LUDO_CELL_SIZE+20,r*LUDO_CELL_SIZE+20];}
+ if(progress>=52){const [r,c]=LUDO_LANES[seat][Math.min(5,progress-52)];return [ludoGridCenter(c),ludoGridCenter(r)];}
  const [r,c]=LUDO_TRACK[(LUDO_START[seat]+progress-1)%52];
- return [c*LUDO_CELL_SIZE+20,r*LUDO_CELL_SIZE+20];
+ return [ludoGridCenter(c),ludoGridCenter(r)];
 }
 function drawLudoTokens(){
  const board=document.getElementById("board");board.querySelectorAll(".ludo-token").forEach(e=>e.remove());const grouped=new Map();
