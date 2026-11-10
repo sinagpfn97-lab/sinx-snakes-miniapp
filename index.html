@@ -118,6 +118,35 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .hub-footer{text-align:center;color:#777391;font-size:9px;margin-top:25px}
 @media(max-width:420px){.hub{padding:16px 11px 30px}.hub-hero{padding:21px 17px}.hub-game{gap:10px}.hub-game-icon{width:54px;height:54px;flex-basis:54px;font-size:29px}.hub-play{padding:9px}.hub-actions{gap:8px}}
 .game-lobby.room-created{display:block;margin-bottom:12px}.game-lobby.room-created label,.game-lobby.room-created #createRoomBtn,.game-lobby.room-created #roomCodeInput,.game-lobby.room-created #joinRoomBtn,.game-lobby.room-created .game-back,.game-lobby.room-created #lobbyFeedback{display:none!important}.game-lobby.room-created #copyRoomLinkBtn{display:block!important}.game-lobby.room-created #startOnlineBtn{width:100%;margin-top:9px}
+
+/* Modern, borderless game surface */
+.panel{padding:8px 2px;background:transparent;border:0;border-radius:0;box-shadow:none}
+.board-wrap{padding:0;background:transparent;border-radius:18px;box-shadow:0 18px 48px #0007,0 0 34px #45eaff12}
+.board{gap:1px;border-radius:18px;background:#0b1020;box-shadow:inset 0 0 0 1px #ffffff0a}
+.board.ludo-board{gap:0;padding:0;background:#0b1020}
+.ludo-cell{border:0}
+.ludo-cell.track{background:#e8e8f2}
+.ludo-cell.safe:after{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;font-size:clamp(7px,1.8vw,11px);opacity:.72}
+.ludo-cell:has(.ludo-token:nth-of-type(2)){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:1px;padding:2px}
+.ludo-token{width:88%;height:88%;min-width:0;min-height:0;border:1.5px solid #ffffffdd;box-shadow:0 1px 4px #0009,0 0 5px #0005;font-size:0;place-self:center;z-index:2}
+.ludo-cell:has(.ludo-token:nth-of-type(2)) .ludo-token{width:100%;height:100%;border-width:1px}
+.cell{border-radius:0;box-shadow:none}
+.cell:nth-child(4n+1),.cell:nth-child(4n+2),.cell:nth-child(4n+3),.cell:nth-child(4n){background:#18223b}
+.cell:nth-child(odd){background:#1b2742}
+.cell.start,.cell.finish{box-shadow:inset 0 0 0 1px #ffffff30}
+.cell-number{display:none!important}
+.cell-decoration{font-size:clamp(9px,2.4vw,14px);opacity:.72}
+.players{gap:5px;margin-top:12px}
+.player{background:#ffffff08;border:0;border-radius:12px;padding:9px 7px}
+.player.active{background:#45eaff12;box-shadow:inset 2px 0 #45eaff}
+.player.empty{border:0;background:#ffffff04}
+.dice-box{background:#ffffff08;border:0;border-radius:16px;padding:8px}
+.message{background:#ffffff08;border:0;border-radius:13px}
+.turn-pill{border:0;background:#ffffff10}
+.roll{border-radius:16px;box-shadow:0 8px 24px #8959e933}
+.status{margin-bottom:10px}
+@media(max-width:380px){.board-wrap{border-radius:14px}.board{border-radius:14px}.ludo-token{width:82%;height:82%}}
+
 </style>
 </head>
 <body>
@@ -234,7 +263,7 @@ const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false,pollFailureCount=0;
 let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false,roomGameType="snakes",selectedGameType="snakes",ludoTokens={},selectedLudoToken=null;
-let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,remoteAnimationQueue=Promise.resolve(),pollInFlight=false,autoCallInFlight=false;
+let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,remoteAnimationQueue=Promise.resolve(),pollInFlight=false,autoCallInFlight=false,localRollInFlight=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 function feedback(s){const e=document.getElementById("lobbyFeedback");if(e)e.textContent=s;}
@@ -286,7 +315,7 @@ function applyState(data){
   const isNew=!!lastSeenRollId||!firstSnapshot;lastSeenRollId=lastRoll.id;
   const die=Number(lastRoll.dice);
   if(die>=1&&die<=6){
-   if(isNew&&Number(lastRoll.seat)!==mySeat)remoteAnimationQueue=remoteAnimationQueue.then(()=>animateDice(die,700)).catch(()=>{});
+   if(isNew&&Number(lastRoll.seat)!==mySeat&&!localRollInFlight)remoteAnimationQueue=remoteAnimationQueue.then(()=>animateDice(die,360)).catch(()=>{});
    else if(!isNew){const el=document.getElementById("dice");el.classList.remove("rolling");el.textContent=DICE[die-1];document.getElementById("diceCaption").textContent="عدد تاس: "+die;}
   }
  }
@@ -398,7 +427,7 @@ function createBoard(){
  nums.forEach(n=>{
   const c=document.createElement("div");c.className="cell";c.id="cell-"+n;
   if(n===1)c.classList.add("start");if(n===100)c.classList.add("finish");
-  const no=document.createElement("span");no.className="cell-number";no.textContent=n;c.appendChild(no);
+  
   const deco=document.createElement("span");deco.className="cell-decoration";if(n===1)deco.textContent="🚩";if(n===100)deco.textContent="🏆";c.appendChild(deco);
   c.addEventListener("click",()=>chooseDestination(n));board.appendChild(c);
  });
@@ -469,7 +498,7 @@ function drawLudoTokens(){
  const board=document.getElementById("board");board.querySelectorAll(".ludo-token").forEach(e=>e.remove());
  for(let seat=0;seat<4;seat++){if(!players.some(p=>p.seat===seat))continue;for(let t=0;t<4;t++){
   const progress=Number(ludoTokens[seat]?.[t]||0),[r,c]=ludoCoordinate(seat,progress,t),cell=document.getElementById("ludo-"+r+"-"+c);
-  if(!cell)continue;const token=document.createElement("button");const valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];token.className="ludo-token "+LUDO_COLORS[seat]+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");token.textContent=String(t+1);token.title="مهره "+(t+1);
+  if(!cell)continue;const token=document.createElement("button");const valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];token.className="ludo-token "+LUDO_COLORS[seat]+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");token.textContent="";token.title="مهره "+(t+1);
   token.onclick=()=>chooseLudoToken(t);cell.appendChild(token);
  }}
 }
@@ -498,10 +527,10 @@ function render(){
  document.querySelectorAll(".cell.destination").forEach(e=>e.classList.remove("destination"));
  if(pendingMove&&mySeat===turn){const target=document.getElementById("cell-"+pendingMove.target_position);if(target)target.classList.add("destination");}
 }
-async function animateDice(finalValue,duration=700){
+async function animateDice(finalValue,duration=360){
  const dice=document.getElementById("dice");dice.classList.add("rolling");
  const start=Date.now();
- while(Date.now()-start<duration){dice.textContent=DICE[Math.floor(Math.random()*6)];await sleep(65);}
+ while(Date.now()-start<duration){dice.textContent=DICE[Math.floor(Math.random()*6)];await sleep(42);}
  dice.textContent=DICE[finalValue-1];dice.classList.remove("rolling");
  document.getElementById("diceCaption").textContent="عدد تاس: "+finalValue;
 }
@@ -522,20 +551,18 @@ async function animateRemoteMove(move){
 async function rollDice(){
  if(!playing||locked||pendingMove)return;
  if(mySeat!==turn){document.getElementById("message").textContent="هنوز نوبت تو نیست.";return;}
- locked=true;render();
+ locked=true;localRollInFlight=true;render();
  try{
-  const request=api("roll");
-  const animation=animateDice(1);
-  const d=await request;
+  const d=await api("roll");
   const finalValue=Number(d.dice);
-  await animation;
+  await animateDice(finalValue,360);
   document.getElementById("dice").textContent=DICE[finalValue-1];
   document.getElementById("diceCaption").textContent="عدد تاس: "+finalValue;
   lastSeenRollId=d.rollId||d.lastRoll?.id||lastSeenRollId;
   applyState(d);
   document.getElementById("message").textContent=roomGameType==="ludo"?(Array.isArray(d.validTokens)&&d.validTokens.length?"عدد "+finalValue+" آمد؛ یکی از مهره‌های روشن را انتخاب کن.":"حرکت معتبری نداری؛ نوبت بعدی می‌رسد."):"عدد "+finalValue+" آمد؛ روی خانه مقصد مشخص‌شده کلیک کن.";
  }catch(e){document.getElementById("dice").classList.remove("rolling");document.getElementById("message").textContent=e.message;try{await syncState();}catch{}}
- finally{locked=false;render();}
+ finally{localRollInFlight=false;locked=false;render();}
 }
 async function chooseDestination(n){
  if(!pendingMove||mySeat!==turn||locked||moving)return;
