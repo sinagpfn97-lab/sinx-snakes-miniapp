@@ -235,9 +235,13 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .board.ludo-board .ludo-token.selectable{filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 7px #fff);outline:1px solid #fff;outline-offset:1px}
 @media(max-width:420px){.board.ludo-board .ludo-token{width:4.7%!important;height:5.9%!important}}
 
+
+/* Visible build marker */
+#sinxBuildVersion{position:fixed;right:8px;bottom:7px;z-index:99999;padding:5px 9px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(8,12,30,.88);color:#fff;font:600 10px/1.2 system-ui,sans-serif;letter-spacing:.25px;direction:ltr;pointer-events:none;box-shadow:0 2px 10px #0005}
 </style>
 </head>
 <body>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.14 · build 2026-11-10</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
