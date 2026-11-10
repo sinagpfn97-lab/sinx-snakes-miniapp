@@ -130,6 +130,11 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
     <div class="hub-game-info"><strong>مار و پله نئونی</strong><p>بازی آنلاین چندنفره · ۲ تا ۴ بازیکن</p></div>
     <button class="hub-play" onclick="launchSnakes()">ورود به بازی</button>
   </section>
+  <section class="hub-game">
+    <div class="hub-game-icon">🎲</div>
+    <div class="hub-game-info"><strong>منچ چهار نفره</strong><p>چهار رنگ · ۱۶ مهره · رقابت آنلاین</p></div>
+    <button class="hub-play" onclick="launchLudo()">ورود به بازی</button>
+  </section>
   <div class="hub-footer">SINX ARCADE · یک خانه برای تمام بازی‌ها</div>
 </main>
 <div id="gameView" class="lobby-mode" style="display:none">
@@ -144,9 +149,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </header>
 <section class="panel">
   <div class="game-lobby">
-    <div style="font-size:15px;font-weight:900;text-align:center">🐍 اتاق مار و پله</div>
-    <label for="playerCount">تعداد بازیکنان</label>
-    <select id="playerCount"><option value="2">۲ بازیکن</option><option value="3">۳ بازیکن</option><option value="4" selected>۴ بازیکن</option></select>
+    <div id="lobbyGameTitle" style="font-size:15px;font-weight:900;text-align:center">🎮 ساخت اتاق بازی</div>
     <button class="primary" id="createRoomBtn" onclick="createOnlineRoom()">＋ ساخت اتاق مار و پله</button>
     <button class="secondary" id="copyRoomLinkBtn" style="display:none;width:100%;margin-top:8px" onclick="copyRoomLink()">🔗 کپی کردن لینک اتاق</button>
     <button class="primary" id="startOnlineBtn" onclick="startGame()" style="display:none" disabled>▶ شروع بازی</button>
@@ -199,7 +202,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </div><!-- gameView -->
 
 <div class="overlay" id="setupOverlay"><div class="dialog"><h2>ورود به بازی</h2><p>برای ساخت یا پیوستن به اتاق، ابتدا وارد حساب شو.</p><button class="primary" onclick="showProfile()">👤 ورود / ثبت‌نام</button><button class="secondary" onclick="closeSetup()">بستن</button></div></div>
-<div class="overlay" id="gamePickerOverlay"><div class="dialog"><h2>🎮 انتخاب بازی</h2><p>بازی موردنظرت را برای ساخت اتاق انتخاب کن.</p><button class="primary" onclick="chooseGame('snakes')">🐍 مار و پله نئونی</button><button class="secondary" onclick="closeGamePicker()">انصراف</button></div></div>
+<div class="overlay" id="gamePickerOverlay"><div class="dialog"><h2>🎮 انتخاب بازی</h2><p>بازی موردنظرت را برای ساخت اتاق انتخاب کن.</p><button class="primary" onclick="chooseGame('snakes')">🐍 مار و پله نئونی</button><button class="secondary" onclick="chooseGame('ludo')">🎲 منچ چهار نفره</button><button class="secondary" onclick="closeGamePicker()">انصراف</button></div></div>
 <div class="overlay" id="profileOverlay"><div class="dialog"><h2>👤 حساب کاربری SINX</h2><p id="accountStatus">برای ذخیره حساب و ورود به اتاق‌ها وارد شو.</p><input id="playerNameInput" maxlength="20" autocomplete="username" placeholder="نام کاربری انگلیسی (۳ تا ۲۰ حرف)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0"><input id="passwordInput" type="password" minlength="8" autocomplete="new-password" placeholder="رمز عبور (حداقل ۸ کاراکتر)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:0 0 8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="primary" id="registerBtn" onclick="accountAction('register')">ثبت‌نام</button><button class="secondary" id="loginBtn" onclick="accountAction('login')">ورود</button></div><button class="secondary" onclick="closeProfile()">بستن</button></div></div>
 
 <div class="overlay" id="winOverlay">
@@ -220,7 +223,7 @@ const COLORS=["red","blue","green","yellow"];
 const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false,pollFailureCount=0;
-let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false;
+let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false,roomGameType="snakes",selectedGameType="snakes";
 let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,remoteAnimationQueue=Promise.resolve(),pollInFlight=false,autoCallInFlight=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
@@ -262,7 +265,7 @@ async function currentUsername(){
  return user?.user_metadata?.username||document.getElementById("playerNameInput").value.trim().toLowerCase()||"";
 }
 function applyState(data){
- if(data.room){roomStatus=data.room.status;turn=Number(data.room.current_turn||0);}
+ if(data.room){roomStatus=data.room.status;turn=Number(data.room.current_turn||0);roomGameType=data.room.game_state?.game_type||"snakes";}
  if(Array.isArray(data.players))players=data.players.map(p=>({id:p.id,seat:Number(p.seat),name:p.player_name,pos:Number(p.position||0),isHost:!!p.is_host}));
  if(Number.isInteger(data.mySeat))mySeat=data.mySeat;
  pendingMove=data.pendingMove||data.room?.game_state?.pending_move||null;
@@ -321,7 +324,7 @@ async function createOnlineRoom(){
  const {data:{session}}=await sb.auth.getSession();if(!session){showProfile();feedback("برای ساخت اتاق ابتدا وارد حساب شو.");return;}
  try{
   locked=true;setLobbyBusy(true);
-  const d=await api("create",{maxPlayers:Number(document.getElementById("playerCount").value)});
+  const d=await api("create",{maxPlayers:4,gameType:selectedGameType});
   roomCode=d.roomCode;playerToken=d.playerToken||"";mySeat=d.mySeat;applyState(d);
   document.getElementById("roomCodeInput").value=roomCode;
   document.getElementById("message").textContent="اتاق ساخته شد؛ کد اتاق را برای دوستانت بفرست.";
@@ -355,10 +358,11 @@ async function startGame(){
 }
 function showHub(){stopPolling();document.getElementById("roomCodeDisplay").classList.remove("visible");document.getElementById("connectionStatus").textContent="";document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
 function showGame(){document.getElementById("hubView").style.display="none";document.getElementById("gameView").style.display="block";document.getElementById("gameView").classList.add("lobby-mode");}
-function launchSnakes(){showGame();closeSetup();}
+function launchSnakes(){selectedGameType="snakes";roomGameType="snakes";showGame();closeSetup();document.getElementById("lobbyGameTitle").textContent="🐍 اتاق مار و پله";document.querySelector("#gameView h1").textContent="🐍 مار و پله";document.querySelector("#gameView .subtitle").textContent="مسابقه نئونی تا خانه ۱۰۰";createBoard();render();}
+function launchLudo(){selectedGameType="ludo";roomGameType="ludo";showGame();closeSetup();document.getElementById("lobbyGameTitle").textContent="🎲 اتاق منچ چهار نفره";document.querySelector("#gameView h1").textContent="🎲 منچ چهار نفره";document.querySelector("#gameView .subtitle").textContent="چهار رنگ · شانزده مهره · مسیر کلاسیک";createBoard();render();}
 function openGamePicker(){document.getElementById("gamePickerOverlay").style.display="flex";}
 function closeGamePicker(){document.getElementById("gamePickerOverlay").style.display="none";}
-function chooseGame(game){closeGamePicker();if(game==="snakes")launchSnakes();}
+function chooseGame(game){selectedGameType=game;closeGamePicker();if(game==="snakes")launchSnakes();else launchLudo();}
 function showProfile(){document.getElementById("profileOverlay").style.display="flex";}
 function closeProfile(){document.getElementById("profileOverlay").style.display="none";}
 function showSetup(){showProfile();}
@@ -376,6 +380,8 @@ function pointOf(n){
 }
 function createBoard(){
  const board=document.getElementById("board");
+ if(roomGameType==="ludo"){createLudoBoard();return;}
+ board.classList.remove("ludo-board");
  board.querySelectorAll(".cell,.tokens-layer").forEach(e=>e.remove());
  const nums=[];
  for(let row=9;row>=0;row--){let line=[];for(let col=0;col<10;col++)line.push(row*10+col+1);if(row%2===1)line.reverse();nums.push(...line);}
@@ -417,6 +423,7 @@ function drawBoardArt(){
  svg.innerHTML=defs+art;
 }
 function renderTokens(){
+ if(roomGameType==="ludo"){renderLudoTokens();return;}
  const layer=document.getElementById("tokensLayer");layer.innerHTML="";
  players.forEach(p=>{if(p.pos<1)return;const pt=pointOf(p.pos),el=document.createElement("div");el.className="token-position";el.style.left=(pt.x/10)+"%";el.style.top=(pt.y/10)+"%";const t=document.createElement("div");t.className="token "+COLORS[p.seat];t.textContent=p.seat+1;el.appendChild(t);layer.appendChild(el);});
 }
