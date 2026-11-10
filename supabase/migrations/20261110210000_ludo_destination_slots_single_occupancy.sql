@@ -1,4 +1,3 @@
-
 -- Enforce one token per home-lane destination slot (progress 49..52).
 -- The roll function hides blocked tokens from valid_tokens; the move function
 -- independently rejects stale or forged moves into an occupied slot.
@@ -33,8 +32,8 @@ begin
   v_new := replace(
     v_def,
     'if v_new > 52 then raise exception ''برای رسیدن به مقصد باید عدد دقیق بیاورید''; end if;',
-    'if v_new > 52 then raise exception ''برای رسیدن به مقصد باید عدد دقیق بیاورید''; end if;' || chr(10) ||
-    chr(10) ||
+    'if v_new > 52 then raise exception ''برای رسیدن به مقصد باید عدد دقیق بیاورید''; end if;' ||
+    chr(10) || chr(10) ||
     '  if v_new between 49 and 52 and exists (' || chr(10) ||
     '    select 1 from generate_series(0, 3) as occupied(token_index)' || chr(10) ||
     '    where occupied.token_index <> p_token_index' || chr(10) ||
