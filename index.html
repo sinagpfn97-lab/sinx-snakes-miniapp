@@ -221,35 +221,38 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .ludo-token{width:4.5%;height:4.5%;transform:translate(-50%,-50%);padding:0}
 .board.ludo-board{display:block;grid-template-columns:none;grid-template-rows:none;gap:0;padding:0;position:relative;aspect-ratio:1/1}
 
-/* Use the exact board artwork supplied by the project owner. */
+/* Temporary calibration view: show the supplied dotted board and the marked pawn sprites together. */
 .board.ludo-board{
  background-color:#080b20;
- background-image:url("./IMG_20261110_213051_896.png?v=1");
+ background-image:url("./1794340298652.jpg?v=1")!important;
  background-repeat:no-repeat;
  background-position:center;
  background-size:100% 100%;
 }
-/* Ludo pawns use the dedicated four-color pawn sprite sheet. */
 .ludo-grid-debug{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
-.board.ludo-board .ludo-token{background-image:url("./1794298872291.png?v=2")!important;background-repeat:no-repeat!important;background-color:transparent!important;background-size:570% 450%!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:transparent!important;width:4.7%!important;height:5.9%!important;padding:0!important}
-.board.ludo-board .ludo-token.stacked{width:3.8%!important;height:4.8%!important}
+/* Each quadrant is one pawn. The red calibration dot is the anchor that must sit on a board dot. */
+.board.ludo-board .ludo-token{
+ background-image:url("./1794340921890.png?v=1")!important;
+ background-repeat:no-repeat!important;
+ background-color:transparent!important;
+ background-size:200% 200%!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;color:transparent!important;
+ width:4.7%!important;height:5.9%!important;padding:0!important;
+}
+.board.ludo-board .ludo-token.red{background-position:0% 0%!important;transform:translate(-47%,-55.3%)!important}
+.board.ludo-board .ludo-token.blue{background-position:100% 0%!important;transform:translate(-53.1%,-55.3%)!important}
+.board.ludo-board .ludo-token.yellow{background-position:0% 100%!important;transform:translate(-44.9%,-65.5%)!important}
+.board.ludo-board .ludo-token.green{background-position:100% 100%!important;transform:translate(-55.1%,-66.7%)!important}
+.board.ludo-board .ludo-token.stacked{width:4.7%!important;height:5.9%!important}
 .board.ludo-board .ludo-token.selectable{filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 7px #fff);outline:1px solid #fff;outline-offset:1px}
 @media(max-width:420px){.board.ludo-board .ludo-token{width:4.7%!important;height:5.9%!important}}
-
-
-
-/* Align each pawn's marked base-contact point (from the supplied calibration sprite) to the logical square center. */
-.board.ludo-board .ludo-token.red,
-.board.ludo-board .ludo-token.blue{transform:translate(-50%,-78.7%)!important}
-.board.ludo-board .ludo-token.yellow,
-.board.ludo-board .ludo-token.green{transform:translate(-50%,-74.5%)!important}
 
 /* Visible build marker */
 #sinxBuildVersion{position:fixed;right:8px;bottom:7px;z-index:99999;padding:5px 9px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(8,12,30,.88);color:#fff;font:600 10px/1.2 system-ui,sans-serif;letter-spacing:.25px;direction:ltr;pointer-events:none;box-shadow:0 2px 10px #0005}
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.24 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.25 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
