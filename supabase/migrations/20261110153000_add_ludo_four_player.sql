@@ -12,6 +12,7 @@ declare
   v_id text := gen_random_uuid()::text;
   v_pending jsonb;
   v_state jsonb;
+  v_next integer;
 begin
   select * into v_room from public.rooms where code=upper(trim(p_room_code)) for update;
   if not found or v_room.status <> 'playing' then raise exception 'بازی در حال اجرا نیست'; end if;
@@ -30,8 +31,14 @@ begin
   end loop;
   v_pending := jsonb_build_object('id',v_id,'user_id',p_user_id,'seat',v_player.seat,'dice',v_dice,'valid_tokens',v_valid);
   v_state := coalesce(v_room.game_state,'{}'::jsonb) || jsonb_build_object(
-    'last_roll',jsonb_build_object('id',v_id,'user_id',p_user_id,'seat',v_player.seat,'dice',v_dice),
-    'pending_move',v_pending);
+    'last_roll',jsonb_build_object('id',v_id,'user_id',p_user_id,'seat',v_player.seat,'dice',v_dice));
+  if jsonb_array_length(v_valid)=0 then
+    select min(seat) into v_next from public.players where room_id=v_room.id and seat>v_player.seat;
+    if v_next is null then select min(seat) into v_next from public.players where room_id=v_room.id; end if;
+    update public.rooms set game_state=v_state,current_turn=v_next,updated_at=now() where id=v_room.id;
+    return jsonb_build_object('success',true,'dice',v_dice,'rollId',v_id,'validTokens',v_valid,'skipped',true,'nextTurn',v_next);
+  end if;
+  v_state := v_state || jsonb_build_object('pending_move',v_pending);
   update public.rooms set game_state=v_state,updated_at=now() where id=v_room.id;
   return jsonb_build_object('success',true,'dice',v_dice,'rollId',v_id,'validTokens',v_valid,'pendingMove',v_pending);
 end $$;
@@ -47,6 +54,7 @@ declare
   v_valid jsonb;
   v_dice integer;
   v_old integer;
+  v_from integer;
   v_new integer;
   v_global integer;
   v_safe integer[] := array[0,8,13,21,26,34,39,47];
@@ -71,6 +79,7 @@ begin
   v_tokens:=coalesce(v_room.game_state->'ludo_tokens','{}'::jsonb);
   v_own:=coalesce(v_tokens->(v_player.seat::text),'[0,0,0,0]'::jsonb);
   v_old:=coalesce((v_own->>p_token_index)::integer,0);
+  v_from:=v_old;
   v_new:=case when v_old=0 then 1 else v_old+v_dice end;
   v_own:=jsonb_set(v_own,array[p_token_index::text],to_jsonb(v_new),true);
   v_tokens:=jsonb_set(v_tokens,array[v_player.seat::text],v_own,true);
@@ -105,7 +114,7 @@ begin
     if v_next is null then select min(seat) into v_next from public.players where room_id=v_room.id; end if;
   end if;
   v_state:=(coalesce(v_room.game_state,'{}'::jsonb)-'pending_move')||
-    jsonb_build_object('ludo_tokens',v_tokens,'last_move',jsonb_build_object('id',v_id,'user_id',p_user_id,'seat',v_player.seat,'dice',v_dice,'token_index',p_token_index,'from_progress',v_old,'to_progress',v_new,'captured',v_captured));
+    jsonb_build_object('ludo_tokens',v_tokens,'last_move',jsonb_build_object('id',v_id,'user_id',p_user_id,'seat',v_player.seat,'dice',v_dice,'token_index',p_token_index,'from_progress',v_from,'to_progress',v_new,'captured',v_captured));
   update public.rooms set game_state=v_state,current_turn=v_next,status=case when v_win then 'finished' else status end,updated_at=now() where id=v_room.id returning * into v_room;
   return jsonb_build_object('success',true,'room',to_jsonb(v_room),'players',(select coalesce(jsonb_agg(jsonb_build_object('id',p.id,'player_name',p.player_name,'seat',p.seat,'position',p.position,'is_host',p.is_host) order by p.seat),'[]'::jsonb) from public.players p where p.room_id=v_room.id),'dice',v_dice,'rollId',v_id,'tokenIndex',p_token_index,'captured',v_captured,'winner',v_win,'nextTurn',v_next);
 end $$;
@@ -132,7 +141,7 @@ begin
  if v_room.game_state ? 'pending_move' then
    v_valid:=v_room.game_state->'pending_move'->'valid_tokens';
    if jsonb_array_length(coalesce(v_valid,'[]'::jsonb))=0 then
-     update public.rooms set game_state=game_state-'pending_move',current_turn=(select min(seat) from public.players where room_id=v_room.id and seat>v_player.seat),updated_at=now() where id=v_room.id;
+     update public.rooms set game_state=game_state-'pending_move',current_turn=coalesce((select min(seat) from public.players where room_id=v_room.id and seat>v_player.seat),(select min(seat) from public.players where room_id=v_room.id)),updated_at=now() where id=v_room.id;
      return jsonb_build_object('success',true,'bot',true,'skippedMove',true);
    end if;
    v_pick:=(v_valid->>0)::integer;
