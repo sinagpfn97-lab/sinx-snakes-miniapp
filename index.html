@@ -305,8 +305,9 @@ async function syncState(){const d=await api("state");applyState(d);return d;}
 function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
 function startPolling(){stopPolling();pollFailureCount=0;pollHandle=setInterval(async()=>{if(!roomCode||moving||remoteAnimating||pollInFlight||document.getElementById("gameView").style.display==="none")return;pollInFlight=true;try{await api("heartbeat");await syncState();pollFailureCount=0;const connectionStatus=document.getElementById("connectionStatus");if(connectionStatus)connectionStatus.textContent="";if(playing&&!autoCallInFlight){autoCallInFlight=true;try{const bot=await api("auto");if(bot.bot){document.getElementById("message").textContent="⏱️ زمان نوبت تمام شد؛ ربات حرکت را انجام داد.";await syncState();}}finally{autoCallInFlight=false;}}}catch(e){pollFailureCount++;if(pollFailureCount>=3){const status=document.getElementById("connectionStatus");if(status)status.textContent="اتصال ناپایدار؛ در حال تلاش مجدد";}}finally{pollInFlight=false;}},500);}
 function setLobbyBusy(v){["createRoomBtn","joinRoomBtn","registerBtn","loginBtn"].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=v;});}
+function getInviteRoomCode(){const params=new URLSearchParams(location.search);const direct=params.get("room");const start=params.get("startapp")||params.get("tgWebAppStartParam")||window.Telegram?.WebApp?.initDataUnsafe?.start_param||"";const value=direct||(start.startsWith("room_")?start.slice(5):"");return value.trim().toUpperCase();}
 async function continueInviteIfReady(){
- const invited=(new URLSearchParams(location.search).get("room")||document.getElementById("roomCodeInput").value||"").trim().toUpperCase();
+ const invited=(getInviteRoomCode()||document.getElementById("roomCodeInput").value||"").trim().toUpperCase();
  if(!invited)return;
  roomCode=invited;
  try{
@@ -363,7 +364,7 @@ function closeProfile(){document.getElementById("profileOverlay").style.display=
 function showSetup(){showProfile();}
 function closeSetup(){document.getElementById("setupOverlay").style.display="none";}
 async function copyRoomCode(){if(!roomCode)return;try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(roomCode);else{const t=document.createElement("textarea");t.value=roomCode;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();}document.getElementById("message").textContent="کد اتاق کپی شد: "+roomCode;}catch(e){document.getElementById("message").textContent="کپی کد اتاق ممکن نشد: "+roomCode;}}
-async function copyRoomLink(){if(!roomCode)return;const link=location.origin+location.pathname+"?room="+encodeURIComponent(roomCode);try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(link);else{const t=document.createElement("textarea");t.value=link;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();}document.getElementById("message").textContent="لینک دعوت کپی شد؛ برای دوستانت بفرست.";}catch(e){document.getElementById("message").textContent="کپی خودکار ممکن نشد؛ کد اتاق: "+roomCode;}}
+async function copyRoomLink(){if(!roomCode)return;const link="https://t.me/SInsdownloaderbot?startapp="+encodeURIComponent("room_"+roomCode);try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(link);else{const t=document.createElement("textarea");t.value=link;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();}document.getElementById("message").textContent="لینک ورود به اتاق در تلگرام کپی شد؛ برای دوستانت بفرست.";}catch(e){document.getElementById("message").textContent="کپی خودکار ممکن نشد؛ کد اتاق: "+roomCode;}}
 async function leaveRoom(){if(!roomCode)return;if(!confirm("از این اتاق خارج می‌شوی؟"))return;try{locked=true;render();await api("leave");stopPolling();document.querySelector(".game-lobby").classList.remove("room-created");roomCode="";playerToken="";mySeat=-1;players=[];pendingMove=null;lastRoll=null;roomStatus="waiting";playing=false;host=false;stateEventsReady=false;lastSeenRollId="";lastSeenMoveId="";document.getElementById("roomCodeInput").value="";document.getElementById("hubRoomCode").value="";showHub();}catch(e){document.getElementById("message").textContent=e.message;}finally{locked=false;render();}}
 function newGame(){if(roomCode){showHub();return;}showHub();}
 async function joinFromHub(){const code=document.getElementById("hubRoomCode").value.trim().toUpperCase();if(!code){document.getElementById("hubRoomCode").focus();return;}document.getElementById("roomCodeInput").value=code;showGame();if(!sb){feedback("اتصال Supabase برقرار نیست؛ ورود آنلاین ممکن نیست.");return;}try{const {data:{session}}=await sb.auth.getSession();if(session)await joinOnlineRoom();else showProfile();}catch(e){feedback(e.message||"خطا در بررسی نشست کاربر");}}
@@ -499,7 +500,7 @@ async function movePlayerNow(){
  finally{moving=false;locked=false;render();}
 }
 async function restoreSession(){
- const invited=(new URLSearchParams(location.search).get("room")||"").trim().toUpperCase();
+ const invited=getInviteRoomCode();
  if(invited){roomCode=invited;document.getElementById("roomCodeInput").value=invited;showGame();}
  else showHub();
  if(!sb){document.getElementById("accountStatus").textContent="اتصال آنلاین بارگذاری نشد؛ بازی‌های آنلاین در دسترس نیستند.";return;}
@@ -515,7 +516,7 @@ async function restoreSession(){
  }
 }
 createBoard();render();
-const invitedRoom=new URLSearchParams(location.search).get("room");
+const invitedRoom=getInviteRoomCode();
 if(invitedRoom)document.getElementById("roomCodeInput").value=invitedRoom.toUpperCase();
 restoreSession().catch(e=>{document.getElementById("accountStatus").textContent=e.message;showHub();});
 </script>
