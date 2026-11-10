@@ -513,7 +513,7 @@ function pointOf(n){
 function createBoard(){
  const board=document.getElementById("board");
  if(roomGameType==="ludo"){createLudoBoard();return;}
- board.classList.remove("ludo-board");document.getElementById("boardArt").style.display="block";
+ board.classList.remove("ludo-board");board.style.backgroundImage="";document.getElementById("boardArt").style.display="block";
  board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token").forEach(e=>e.remove());
  const nums=[];
  for(let row=9;row>=0;row--){let line=[];for(let col=0;col<10;col++)line.push(row*10+col+1);if(row%2===1)line.reverse();nums.push(...line);}
