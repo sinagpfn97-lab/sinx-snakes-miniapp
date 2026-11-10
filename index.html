@@ -578,7 +578,8 @@ const LUDO_LANES=[
  [[7,13],[7,12],[7,11],[7,10]],
  [[13,7],[12,7],[11,7],[10,7]]
 ];
-function ludoPx(v){return (v/LUDO_BOARD_SIZE*100)+"%";}
+const LUDO_RENDER_SIZE=640;
+function ludoPx(v){return (v/LUDO_RENDER_SIZE*100)+"%";}
 function ludoSquare(board,r,c,color="track",safe=false){
  const cell=document.createElement("div");cell.className="ludo-cell "+color+(safe?" safe":"");
  cell.style.left=ludoPx(c*LUDO_CELL_SIZE);cell.style.top=ludoPx(r*LUDO_CELL_SIZE);
@@ -648,14 +649,16 @@ function drawLudoTokens(){
   token.className="ludo-token "+LUDO_COLORS[seat]+(Number(ludoTokens[seat]?.[t]||0)<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
   token.type="button";token.title="مهره "+(t+1);
   const [ox,oy]=(offsets[group.length]||offsets[4])[index]||[0,0];
-  // Place the token by its top-left corner, calculated from the cell center.
-  const pieceWidth=600*(group.length>1?0.038:0.047);
-  const pieceHeight=600*(group.length>1?0.048:0.059);
-  const centerX=x+ox,centerY=y+oy;
-  // Compensate for the sprite's visual shadow/transparent padding.
-  const visualOffsetX=2,visualOffsetY=8;
-  const drawX=centerX-(pieceWidth/2)+visualOffsetX;
-  const drawY=centerY-(pieceHeight/2)+visualOffsetY;
+  // Convert the existing 600-unit board coordinates into the 640-unit artwork space.
+  const scaleFactor=640/600;
+  const realCenterX=(x*scaleFactor)+ox;
+  const realCenterY=(y*scaleFactor)+oy;
+  const pieceWidth=640*(group.length>1?0.038:0.047);
+  const pieceHeight=640*(group.length>1?0.048:0.059);
+  const visualOffsetX=0;
+  const visualOffsetY=0;
+  const drawX=realCenterX-(pieceWidth/2)+visualOffsetX;
+  const drawY=realCenterY-(pieceHeight/2)+visualOffsetY;
   token.style.transform="none";
   token.style.left=ludoPx(drawX);token.style.top=ludoPx(drawY);
    const spritePosition={red:"18% 13%",blue:"82% 13%",green:"82% 85%",yellow:"18% 85%"}[LUDO_COLORS[seat]];
