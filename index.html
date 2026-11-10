@@ -224,21 +224,16 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 /* Use the exact board artwork supplied by the project owner. */
 .board.ludo-board{
  background-color:#080b20;
- background-image:url("./1794280611503.jpg");
+ background-image:url("./ludo-board-clean.jpg");
  background-repeat:no-repeat;
  background-position:center;
  background-size:100% 100%;
 }
-.board.ludo-board .ludo-token.home-token{
- background:transparent!important;
- border-color:transparent!important;
- box-shadow:none!important;
- color:transparent!important;
-}
-.board.ludo-board .ludo-token.home-token.selectable{
- border-color:#fff!important;
- box-shadow:0 0 0 3px #fff,0 0 18px #fff!important;
-}
+/* Every Ludo pawn is a cropped, independently movable sprite from Mohre.png. */
+.board.ludo-board .ludo-token{background-image:url("./Mohre.png")!important;background-repeat:no-repeat!important;background-color:transparent!important;background-size:1040% 833%!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:transparent!important;width:4.7%!important;height:5.9%!important;padding:0!important}
+.board.ludo-board .ludo-token.stacked{width:3.8%!important;height:4.8%!important}
+.board.ludo-board .ludo-token.selectable{filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 7px #fff);outline:1px solid #fff;outline-offset:1px}
+@media(max-width:420px){.board.ludo-board .ludo-token{width:4.7%!important;height:5.9%!important}}
 
 </style>
 </head>
@@ -612,7 +607,10 @@ function drawLudoTokens(){
   token.className="ludo-token "+LUDO_COLORS[seat]+(Number(ludoTokens[seat]?.[t]||0)<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
   token.type="button";token.title="مهره "+(t+1);
   const [ox,oy]=(offsets[group.length]||offsets[4])[index]||[0,0];
-  token.style.left=ludoPx(x+ox);token.style.top=ludoPx(y+oy);token.onclick=()=>chooseLudoToken(t);board.appendChild(token);
+  token.style.left=ludoPx(x+ox);token.style.top=ludoPx(y+oy);
+   const sprite={red:[[141,115],[354,115],[141,344],[354,344]],blue:[[1435,115],[1648,115],[1435,344],[1648,344]],yellow:[[141,1288],[354,1288],[141,1518],[354,1518]],green:[[1435,1288],[1648,1288],[1435,1518],[1648,1518]]}[LUDO_COLORS[seat]][t];
+   token.style.backgroundPosition=((sprite[0]/1851)*100)+"% "+((sprite[1]/1802)*100)+"%";
+   token.onclick=()=>chooseLudoToken(t);board.appendChild(token);
  });
 }
 function renderLudoTokens(){drawLudoTokens();}
