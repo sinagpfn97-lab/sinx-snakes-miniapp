@@ -1,0 +1,40 @@
+name: Validate SINX game sources
+
+on:
+  push:
+    branches:
+      - feature/ludo-four-player
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check embedded browser JavaScript syntax
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script(?:\\s[^>]*)?>(.*?)</script>", html, re.S | re.I)
+          if not scripts:
+              raise SystemExit("No inline application script found")
+          Path("/tmp/sinx-app.js").write_text("\\n".join(scripts), encoding="utf-8")
+          PY
+          node --check /tmp/sinx-app.js
+      - name: Check Ludo RPC migration contract
+        shell: bash
+        run: |
+          grep -q "create or replace function public.roll_ludo_room" supabase/migrations/20261110153000_add_ludo_four_player.sql
+          grep -q "create or replace function public.move_ludo_room" supabase/migrations/20261110153000_add_ludo_four_player.sql
+          grep -q "create or replace function public.auto_play_ludo_room" supabase/migrations/20261110153000_add_ludo_four_player.sql
+          grep -q "grant execute on function public.roll_ludo_room(text,uuid) to service_role" supabase/migrations/20261110153000_add_ludo_four_player.sql
+          grep -q "grant execute on function public.move_ludo_room(text,uuid,integer) to service_role" supabase/migrations/20261110153000_add_ludo_four_player.sql
+          grep -q "grant execute on function public.auto_play_ludo_room(text) to service_role" supabase/migrations/20261110153000_add_ludo_four_player.sql
