@@ -195,6 +195,25 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .ludo-token.selectable{outline:3px solid #fff;outline-offset:2px;animation:targetPulse .55s infinite alternate}
 @media(max-width:420px){.board.ludo-board{border-radius:13px}.ludo-token{width:5.6%;height:5.6%}.ludo-home-socket{border-width:1px}}
 
+
+/* Correct Ludo color ownership, standard safe/start squares and a full neon X center. */
+.ludo-cell.start-red,.ludo-cell.lane-red{background:linear-gradient(145deg,#a81c50,#581434);border-color:#f58aaa}
+.ludo-cell.start-blue,.ludo-cell.lane-blue{background:linear-gradient(145deg,#1769a7,#10365f);border-color:#86dfff}
+.ludo-cell.start-green,.ludo-cell.lane-green{background:linear-gradient(145deg,#168653,#104c3b);border-color:#8df0b7}
+.ludo-cell.start-yellow,.ludo-cell.lane-yellow{background:linear-gradient(145deg,#a87820,#5c4119);border-color:#ffe18a}
+.ludo-cell.safe:after{content:"✦";color:#9c83ff;text-shadow:0 0 7px #a98cff}
+.ludo-center-art{position:absolute;left:40%;top:40%;width:20%;height:20%;z-index:4;pointer-events:none;overflow:hidden;clip-path:none;filter:drop-shadow(0 0 8px #59eaff)}
+.ludo-center-triangle{position:absolute;inset:0;display:block}
+.ludo-center-triangle.top{clip-path:polygon(50% 0,0 50%,100% 50%)}
+.ludo-center-triangle.right{clip-path:polygon(100% 50%,50% 0,50% 100%)}
+.ludo-center-triangle.bottom{clip-path:polygon(50% 100%,0 50%,100% 50%)}
+.ludo-center-triangle.left{clip-path:polygon(0 50%,50% 0,50% 100%)}
+.ludo-center-triangle.red{background:linear-gradient(135deg,#ff4c8a,#9f174d)}
+.ludo-center-triangle.blue{background:linear-gradient(135deg,#55d7ff,#1769a7)}
+.ludo-center-triangle.green{background:linear-gradient(135deg,#62f5a4,#168653)}
+.ludo-center-triangle.yellow{background:linear-gradient(135deg,#ffe477,#a87820)}
+.ludo-center-x{position:absolute;left:50%;top:50%;transform:translate(-50%,-53%);font-family:Arial,sans-serif;font-size:clamp(23px,6vw,48px);font-weight:1000;line-height:1;color:#e8ffff;-webkit-text-stroke:1px #48eaff;text-shadow:0 0 3px #fff,0 0 8px #47eaff,0 0 18px #23cfff,0 0 28px #8a5cff}
+
 </style>
 </head>
 <body>
@@ -525,18 +544,26 @@ function createLudoBoard(){
  const board=document.getElementById("board");board.classList.add("ludo-board");document.getElementById("boardArt").style.display="none";
  board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token,.ludo-yard,.ludo-center-art").forEach(e=>e.remove());
  const safeIndices=new Set([0,8,13,21,26,34,39,47]),occupied=new Set();
- LUDO_TRACK.forEach(([r,c],i)=>{occupied.add(r+","+c);ludoSquare(board,r,c,"track",safeIndices.has(i));});
+ LUDO_TRACK.forEach(([r,c],i)=>{occupied.add(r+","+c);const startSeat=LUDO_START.indexOf(i);ludoSquare(board,r,c,startSeat>=0?"start-"+LUDO_COLORS[startSeat]:"track",safeIndices.has(i));});
  const lanes=[
  [[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],[[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],
  [[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]
  ];
  lanes.forEach((lane,seat)=>lane.forEach(([r,c])=>{if(occupied.has(r+","+c))return;occupied.add(r+","+c);ludoSquare(board,r,c,"lane-"+LUDO_COLORS[seat]);}));
- [{color:"red",x:0,y:0},{color:"blue",x:60,y:0},{color:"green",x:60,y:60},{color:"yellow",x:0,y:60}].forEach(({color,x,y})=>{
+ [
+  {color:"red",x:0,y:0,sx:[41.667,75,41.667,75],sy:[41.667,41.667,75,75]},
+  {color:"blue",x:60,y:0,sx:[25,58.333,25,58.333],sy:[41.667,41.667,75,75]},
+  {color:"green",x:60,y:60,sx:[25,58.333,25,58.333],sy:[25,25,58.333,58.333]},
+  {color:"yellow",x:0,y:60,sx:[41.667,75,41.667,75],sy:[25,25,58.333,58.333]}
+ ].forEach(({color,x,y,sx,sy})=>{
   const yard=document.createElement("div");yard.className="ludo-yard "+color;yard.style.left=x+"%";yard.style.top=y+"%";yard.style.width="40%";yard.style.height="40%";
-  for(let n=0;n<4;n++){const socket=document.createElement("span");socket.className="ludo-home-socket";socket.style.left=([41.667,75,41.667,75][n])+"%";socket.style.top=([41.667,41.667,75,75][n])+"%";yard.appendChild(socket);}
+  for(let n=0;n<4;n++){const socket=document.createElement("span");socket.className="ludo-home-socket";socket.style.left=sx[n]+"%";socket.style.top=sy[n]+"%";yard.appendChild(socket);}
   board.appendChild(yard);
  });
- const center=document.createElement("div");center.className="ludo-center-art";board.appendChild(center);drawLudoTokens();
+ const center=document.createElement("div");center.className="ludo-center-art";
+ [["top","blue"],["right","green"],["bottom","yellow"],["left","red"]].forEach(([side,color])=>{const tri=document.createElement("i");tri.className="ludo-center-triangle "+side+" "+color;center.appendChild(tri);});
+ const mark=document.createElement("b");mark.className="ludo-center-x";mark.textContent="X";center.appendChild(mark);
+ board.appendChild(center);drawLudoTokens();
 }
 function ludoCoordinate(seat,progress,token){
  if(progress<=0){const homes=[[[2,2],[2,4],[4,2],[4,4]],[[2,10],[2,12],[4,10],[4,12]],[[10,10],[10,12],[12,10],[12,12]],[[10,2],[10,4],[12,2],[12,4]]];return homes[seat][token];}
