@@ -467,7 +467,6 @@ function drawLudoTokens(){
   token.onclick=()=>chooseLudoToken(t);cell.appendChild(token);
  }}
 }
-function createLudoBoard(){const board=document.getElementById("board");board.classList.add("ludo-board");board.innerHTML="";for(let r=0;r<15;r++)for(let c=0;c<15;c++){const cell=document.createElement("div");cell.className="ludo-cell";cell.id="ludo-"+r+"-"+c;if(r<6&&c<6)cell.classList.add("home-red");else if(r<6&&c>8)cell.classList.add("home-blue");else if(r>8&&c<6)cell.classList.add("home-yellow");else if(r>8&&c>8)cell.classList.add("home-green");if(LUDO_TRACK.some(p=>p[0]===r&&p[1]===c))cell.classList.add("track");if(r===7&&c===7)cell.classList.add("center");board.appendChild(cell);}drawLudoTokens();}
 function renderLudoTokens(){drawLudoTokens();}
 async async function chooseLudoToken(index){
  if(!pendingMove||mySeat!==turn||locked)return;
