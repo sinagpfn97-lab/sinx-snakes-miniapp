@@ -24,6 +24,15 @@ h1{font-size:26px;margin:5px 0;font-weight:900}
 .turn-pill{padding:7px 12px;border-radius:30px;color:#d9c8ff;background:#38265e;border:1px solid #7752b8;font-size:10px}
 .board-wrap{position:relative;padding:6px;border-radius:16px;background:linear-gradient(135deg,#a46aff,#37e5fa,#7049d8);box-shadow:0 0 25px #8e5aff44,0 0 55px #35dff522}
 .board{position:relative;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-template-rows:repeat(10,minmax(0,1fr));gap:2px;direction:ltr;aspect-ratio:1;overflow:hidden;border-radius:11px;background:#090d24}
+.board.ludo-board{grid-template-columns:repeat(15,minmax(0,1fr));grid-template-rows:repeat(15,minmax(0,1fr));gap:1px;background:#090d24;padding:2px}
+.ludo-cell{position:relative;min-width:0;min-height:0;background:#17213c;border:1px solid #ffffff12;display:grid;place-items:center}
+.ludo-cell.track{background:#e8e5f2;color:#17152a}.ludo-cell.safe:after{content:'✦';color:#b08cff;font-size:clamp(7px,2vw,13px)}
+.ludo-cell.home-red{background:#7d193b}.ludo-cell.home-blue{background:#14558c}.ludo-cell.home-green{background:#17643d}.ludo-cell.home-yellow{background:#856019}
+.ludo-cell.lane-red{background:#ed4775}.ludo-cell.lane-blue{background:#39a9ff}.ludo-cell.lane-green{background:#4de28a}.ludo-cell.lane-yellow{background:#ffd45b}
+.ludo-cell.center{background:conic-gradient(#ed4775 0 25%,#39a9ff 0 50%,#ffd45b 0 75%,#4de28a 0);border:0}
+.ludo-token{width:85%;height:85%;border-radius:50%;border:1px solid #fff;box-shadow:0 1px 3px #000a;display:grid;place-items:center;font-size:clamp(6px,1.8vw,10px);font-weight:900;color:#fff;cursor:pointer}
+.ludo-token.red{background:#f02e65}.ludo-token.blue{background:#168ff0}.ludo-token.green{background:#20b962}.ludo-token.yellow{background:#e9a91c}
+.ludo-token.selectable{outline:2px solid #fff;outline-offset:1px;animation:targetPulse .7s infinite alternate}
 .cell{position:relative;min-width:0;min-height:0;border-radius:4px;background:linear-gradient(145deg,#263b6d,#171a43);box-shadow:inset 0 1px 2px #ffffff18,inset 0 -2px 4px #0005;overflow:hidden}
 .cell:nth-child(4n+1){background:linear-gradient(145deg,#164e70,#172b58)}
 .cell:nth-child(4n+2){background:linear-gradient(145deg,#3a286e,#1d2452)}
@@ -223,7 +232,7 @@ const COLORS=["red","blue","green","yellow"];
 const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false,pollFailureCount=0;
-let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false,roomGameType="snakes",selectedGameType="snakes";
+let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false,roomGameType="snakes",selectedGameType="snakes",ludoTokens={},selectedLudoToken=null;
 let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,remoteAnimationQueue=Promise.resolve(),pollInFlight=false,autoCallInFlight=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
@@ -265,7 +274,7 @@ async function currentUsername(){
  return user?.user_metadata?.username||document.getElementById("playerNameInput").value.trim().toLowerCase()||"";
 }
 function applyState(data){
- if(data.room){roomStatus=data.room.status;turn=Number(data.room.current_turn||0);roomGameType=data.room.game_state?.game_type||"snakes";}
+ if(data.room){roomStatus=data.room.status;turn=Number(data.room.current_turn||0);roomGameType=data.room.game_state?.game_type||"snakes";ludoTokens=data.room.game_state?.ludo_tokens||{};}
  if(Array.isArray(data.players))players=data.players.map(p=>({id:p.id,seat:Number(p.seat),name:p.player_name,pos:Number(p.position||0),isHost:!!p.is_host}));
  if(Number.isInteger(data.mySeat))mySeat=data.mySeat;
  pendingMove=data.pendingMove||data.room?.game_state?.pending_move||null;
@@ -301,7 +310,7 @@ function applyState(data){
  const copyBtn=document.getElementById("copyRoomLinkBtn");if(copyBtn)copyBtn.style.display=roomCode&&host?"block":"none";
  const leaveBtn=document.getElementById("leaveRoomBtn");if(leaveBtn)leaveBtn.style.display=roomCode?"block":"none";
 
- if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent=players.length+" بازیکن از "+(data.room?.max_players||"?");
+ if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent=players.length+" بازیکن از ۴";
  if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج «"+departed+"» به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const w=players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}}
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
@@ -426,6 +435,48 @@ function renderTokens(){
  if(roomGameType==="ludo"){renderLudoTokens();return;}
  const layer=document.getElementById("tokensLayer");layer.innerHTML="";
  players.forEach(p=>{if(p.pos<1)return;const pt=pointOf(p.pos),el=document.createElement("div");el.className="token-position";el.style.left=(pt.x/10)+"%";el.style.top=(pt.y/10)+"%";const t=document.createElement("div");t.className="token "+COLORS[p.seat];t.textContent=p.seat+1;el.appendChild(t);layer.appendChild(el);});
+}
+const LUDO_TRACK=[[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
+const LUDO_START=[0,13,26,39],LUDO_COLORS=["red","blue","green","yellow"];
+function createLudoBoard(){
+ const board=document.getElementById("board");board.classList.add("ludo-board");board.innerHTML="";
+ const track=new Set(LUDO_TRACK.map(([r,c])=>r+","+c));
+ for(let r=0;r<15;r++)for(let c=0;c<15;c++){
+  const cell=document.createElement("div");cell.className="ludo-cell";cell.id="ludo-"+r+"-"+c;
+  if(r<6&&c<6)cell.classList.add("home-red");
+  else if(r<6&&c>8)cell.classList.add("home-blue");
+  else if(r>8&&c<6)cell.classList.add("home-yellow");
+  else if(r>8&&c>8)cell.classList.add("home-green");
+  if(track.has(r+","+c))cell.classList.add("track");
+  if(r===7&&c===7)cell.classList.add("center");
+  if((r===6&&[1,8,13].includes(c))||(c===6&&[1,8,13].includes(r))||(r===8&&[1,8,13].includes(c))||(c===8&&[1,8,13].includes(r)))cell.classList.add("safe");
+  board.appendChild(cell);
+ }
+ drawLudoTokens();
+}
+function ludoCoordinate(seat,progress,token){
+ if(progress<=0){const homes=[[[2,2],[2,4],[4,2],[4,4]],[[2,10],[2,12],[4,10],[4,12]],[[10,10],[10,12],[12,10],[12,12]],[[10,2],[10,4],[12,2],[12,4]]];return homes[seat][token];}
+ if(progress>=52){const lanes=[[[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],[[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],[[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]];return lanes[seat][Math.min(5,progress-52)];}
+ return LUDO_TRACK[(LUDO_START[seat]+progress-1)%52];
+}
+function drawLudoTokens(){
+ const board=document.getElementById("board");board.querySelectorAll(".ludo-token").forEach(e=>e.remove());
+ for(let seat=0;seat<4;seat++)for(let t=0;t<4;t++){
+  const progress=Number(ludoTokens[seat]?.[t]||0),[r,c]=ludoCoordinate(seat,progress,t),cell=document.getElementById("ludo-"+r+"-"+c);
+  if(!cell)continue;const token=document.createElement("button");token.className="ludo-token "+LUDO_COLORS[seat]+(pendingMove&&seat===mySeat&&mySeat===turn?" selectable":"");token.textContent=String(t+1);token.title="مهره "+(t+1);
+  token.onclick=()=>chooseLudoToken(t);cell.appendChild(token);
+ }
+}
+function createLudoBoard(){const board=document.getElementById("board");board.classList.add("ludo-board");board.innerHTML="";for(let r=0;r<15;r++)for(let c=0;c<15;c++){const cell=document.createElement("div");cell.className="ludo-cell";cell.id="ludo-"+r+"-"+c;if(r<6&&c<6)cell.classList.add("home-red");else if(r<6&&c>8)cell.classList.add("home-blue");else if(r>8&&c<6)cell.classList.add("home-yellow");else if(r>8&&c>8)cell.classList.add("home-green");if(LUDO_TRACK.some(p=>p[0]===r&&p[1]===c))cell.classList.add("track");if(r===7&&c===7)cell.classList.add("center");board.appendChild(cell);}drawLudoTokens();}
+function renderLudoTokens(){drawLudoTokens();}
+async function chooseLudoToken(index){
+ if(!pendingMove||mySeat!==turn||locked)return;
+ const valid=pendingMove.valid_tokens||pendingMove.validTokens||[];
+ if(valid.length&&!valid.includes(index))return;
+ selectedLudoToken=index;locked=true;
+ try{const d=await api("move",{tokenIndex:index});applyState(d);document.getElementById("message").textContent="مهره "+(index+1)+" حرکت کرد.";}
+ catch(e){document.getElementById("message").textContent=e.message;}
+ finally{locked=false;render();}
 }
 function render(){
  renderTokens();const box=document.getElementById("players");box.innerHTML="";
