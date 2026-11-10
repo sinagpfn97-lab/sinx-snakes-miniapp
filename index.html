@@ -32,6 +32,7 @@ h1{font-size:26px;margin:5px 0;font-weight:900}
 .ludo-cell.center{background:conic-gradient(#ed4775 0 25%,#39a9ff 0 50%,#ffd45b 0 75%,#4de28a 0);border:0}
 .ludo-token{width:85%;height:85%;border-radius:50%;border:1px solid #fff;box-shadow:0 1px 3px #000a;display:grid;place-items:center;font-size:clamp(6px,1.8vw,10px);font-weight:900;color:#fff;cursor:pointer}
 .ludo-token.red{background:#f02e65}.ludo-token.blue{background:#168ff0}.ludo-token.green{background:#20b962}.ludo-token.yellow{background:#e9a91c}
+.player.empty{opacity:.48;border:1px dashed #665b89;background:#17142b}
 .ludo-token.selectable{outline:2px solid #fff;outline-offset:1px;animation:targetPulse .7s infinite alternate}
 .cell{position:relative;min-width:0;min-height:0;border-radius:4px;background:linear-gradient(145deg,#263b6d,#171a43);box-shadow:inset 0 1px 2px #ffffff18,inset 0 -2px 4px #0005;overflow:hidden}
 .cell:nth-child(4n+1){background:linear-gradient(145deg,#164e70,#172b58)}
@@ -390,7 +391,7 @@ function pointOf(n){
 function createBoard(){
  const board=document.getElementById("board");
  if(roomGameType==="ludo"){createLudoBoard();return;}
- board.classList.remove("ludo-board");
+ board.classList.remove("ludo-board");document.getElementById("boardArt").style.display="block";
  board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token").forEach(e=>e.remove());
  const nums=[];
  for(let row=9;row>=0;row--){let line=[];for(let col=0;col<10;col++)line.push(row*10+col+1);if(row%2===1)line.reverse();nums.push(...line);}
@@ -439,8 +440,9 @@ function renderTokens(){
 const LUDO_TRACK=[[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
 const LUDO_START=[0,13,26,39],LUDO_COLORS=["red","blue","green","yellow"];
 function createLudoBoard(){
- const board=document.getElementById("board");board.classList.add("ludo-board");board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token").forEach(e=>e.remove());
+ const board=document.getElementById("board");board.classList.add("ludo-board");document.getElementById("boardArt").style.display="none";board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token").forEach(e=>e.remove());
  const track=new Set(LUDO_TRACK.map(([r,c])=>r+","+c));
+ const safeCells=new Set([0,8,13,21,26,34,39,47].map(i=>LUDO_TRACK[i].join(",")));
  for(let r=0;r<15;r++)for(let c=0;c<15;c++){
   const cell=document.createElement("div");cell.className="ludo-cell";cell.id="ludo-"+r+"-"+c;
   if(r<6&&c<6)cell.classList.add("home-red");
@@ -453,7 +455,7 @@ function createLudoBoard(){
   if(r===7&&c>=8&&c<=13)cell.classList.add("lane-green");
   if(c===7&&r>=8&&r<=13)cell.classList.add("lane-yellow");
   if(r===7&&c===7)cell.classList.add("center");
-  if((r===6&&[1,8,13].includes(c))||(c===6&&[1,8,13].includes(r))||(r===8&&[1,8,13].includes(c))||(c===8&&[1,8,13].includes(r)))cell.classList.add("safe");
+  if(safeCells.has(r+","+c))cell.classList.add("safe");
   board.appendChild(cell);
  }
  drawLudoTokens();
@@ -485,7 +487,7 @@ function render(){
  renderTokens();const box=document.getElementById("players");box.innerHTML="";
  const countEl=document.getElementById("playersCount");if(countEl)countEl.innerHTML="تعداد بازیکنان: <strong>"+players.length+"</strong>";
  const roomDisplay=document.getElementById("roomCodeDisplay"),roomValue=document.getElementById("roomCodeValue");if(roomValue)roomValue.textContent=roomCode||"—";if(roomDisplay)roomDisplay.classList.toggle("visible",!!roomCode);
- players.forEach(p=>{const item=document.createElement("div");item.className="player"+(playing&&p.seat===turn?" active":"");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[p.seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p.name;const pos=document.createElement("div");pos.className="player-pos";pos.textContent=roomGameType==="ludo"?(Array.isArray(ludoTokens[p.seat])?ludoTokens[p.seat].filter(v=>Number(v)===57).length:0)+" مهره به مقصد رسیده"+(p.seat===mySeat?" · شما":""):"خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"");info.append(name,pos);item.append(icon,info);box.appendChild(item);});
+ for(let seat=0;seat<4;seat++){const p=players.find(x=>x.seat===seat);const item=document.createElement("div");item.className="player"+(playing&&p&&p.seat===turn?" active":"")+(p?"":" empty");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p?p.name:"صندلی خالی · "+["قرمز","آبی","سبز","زرد"][seat];const pos=document.createElement("div");pos.className="player-pos";pos.textContent=p?(roomGameType==="ludo"?(Array.isArray(ludoTokens[p.seat])?ludoTokens[p.seat].filter(v=>Number(v)===57).length:0)+" مهره به مقصد رسیده"+(p.seat===mySeat?" · شما":""):"خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"")):"منتظر ورود بازیکن";info.append(name,pos);item.append(icon,info);box.appendChild(item);}
  const current=players.find(p=>p.seat===turn);
  document.getElementById("turnLabel").textContent=playing?(current?"نوبت "+current.name:"در انتظار بازیکن"):(roomStatus==="waiting"?"لابی اتاق":"مسابقه متوقف");
  const canRoll=playing&&!locked&&!remoteAnimating&&mySeat===turn&&!pendingMove;
