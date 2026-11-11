@@ -158,8 +158,8 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .board.ludo-board .board-art,.board.ludo-board .tokens-layer{display:none!important}
 .board.ludo-board:not(.legacy-ludo) .ludo-yard{
  position:relative;z-index:1;min-width:0;min-height:0;display:grid;
- grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));
- gap:0;padding:9%;border-radius:7%;border:1px solid #ffffffd0;box-shadow:inset 0 0 0 1px #00000012;
+ grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));
+ gap:0;padding:10%;border-radius:8%;border:1px solid #ffffffd0;box-shadow:inset 0 0 0 1px #00000012;
 }
 .board.ludo-board:not(.legacy-ludo) .ludo-yard.red{background:linear-gradient(145deg,#ff7890,#bd244b)}
 .board.ludo-board:not(.legacy-ludo) .ludo-yard.blue{background:linear-gradient(145deg,#75d3ff,#1765b8)}
@@ -171,9 +171,9 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
  border:1px solid #ffffff;box-shadow:inset 0 1px 3px #53647a55,0 1px 2px #0003;
 }
 .board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="0"]{grid-row:2;grid-column:2}
-.board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="1"]{grid-row:2;grid-column:4}
-.board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="2"]{grid-row:4;grid-column:2}
-.board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="3"]{grid-row:4;grid-column:4}
+.board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="1"]{grid-row:2;grid-column:5}
+.board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="2"]{grid-row:5;grid-column:2}
+.board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="3"]{grid-row:5;grid-column:5}
 .board.ludo-board:not(.legacy-ludo) .ludo-square{
  position:relative;z-index:2;min-width:0;min-height:0;display:grid;place-items:center;
  border:1px solid #aeb9c7;border-radius:0;background:linear-gradient(145deg,#fff,#e6ebf2);
@@ -240,7 +240,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.37 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.38 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -591,13 +591,13 @@ function createLudoBoard(){
  board.querySelectorAll(".cell,.ludo-cell,.ludo-token,.ludo-yard,.ludo-home-slot,.ludo-square,.ludo-center,.ludo-track-overlay,.ludo-home-overlay,.ludo-token-stack").forEach(e=>e.remove());
  const track=modern?LUDO_TRACK:LUDO_TRACK_LEGACY,lanes=modern?LUDO_LANES:LUDO_LANES_LEGACY,starts=modern?LUDO_START:LUDO_START_LEGACY;
  const yards=modern?[
-  {seat:0,row:8,col:2},{seat:1,row:2,col:2},{seat:2,row:2,col:8},{seat:3,row:8,col:8}
+  {seat:0,row:1,col:1},{seat:1,row:1,col:8},{seat:2,row:8,col:8},{seat:3,row:8,col:1}
  ]:[
   {seat:0,row:1,col:1},{seat:1,row:1,col:10},{seat:2,row:10,col:10},{seat:3,row:10,col:1}
  ];
  yards.forEach(({seat,row,col})=>{
   const yard=document.createElement("div");yard.className="ludo-yard "+LUDO_COLORS[seat];yard.dataset.seat=String(seat);
-  const span=modern?5:6;yard.style.gridRow=row+"/span "+span;yard.style.gridColumn=col+"/span "+span;
+  const span=6;yard.style.gridRow=row+"/span "+span;yard.style.gridColumn=col+"/span "+span;
   for(let token=0;token<4;token++){const slot=document.createElement("div");slot.className="ludo-home-slot";slot.dataset.token=String(token);yard.appendChild(slot);}
   board.appendChild(yard);
  });
