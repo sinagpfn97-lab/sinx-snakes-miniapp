@@ -227,6 +227,78 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
  .board.ludo-board:not(.legacy-ludo) .ludo-yard{padding:0}
  .board.ludo-board .ludo-token{border-width:1.5px}
 }
+
+/* Neon Ludo skin inspired by the user-provided reference artwork. */
+.board.ludo-board:not(.legacy-ludo){
+ background-color:#03071d!important;
+ background-image:
+  linear-gradient(to right,#8bdfff55 1px,transparent 1px),
+  linear-gradient(to bottom,#8bdfff55 1px,transparent 1px),
+  radial-gradient(ellipse at 50% 50%,#38206b88 0%,#080b2a00 54%)!important;
+ background-size:calc(100% / 15) calc(100% / 15),calc(100% / 15) calc(100% / 15),100% 100%!important;
+ border:2px solid #8de8ff!important;border-radius:3px!important;
+ box-shadow:0 0 10px #35cfff88,0 0 28px #174bff44,inset 0 0 35px #080d35!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-yard{
+ border:2px solid currentColor!important;
+ box-shadow:inset 0 0 20px currentColor,0 0 12px currentColor!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-yard.red{color:#ff286d;background:linear-gradient(145deg,#4d092d,#24051f)!important}
+.board.ludo-board:not(.legacy-ludo) .ludo-yard.blue{color:#19dfff;background:linear-gradient(145deg,#063d70,#061b43)!important}
+.board.ludo-board:not(.legacy-ludo) .ludo-yard.green{color:#37ff67;background:linear-gradient(145deg,#064d31,#06291f)!important}
+.board.ludo-board:not(.legacy-ludo) .ludo-yard.yellow{color:#ffd33d;background:linear-gradient(145deg,#5b3b12,#2b1b12)!important}
+.board.ludo-board:not(.legacy-ludo) .ludo-home-slot{
+ background:transparent!important;border:0!important;box-shadow:none!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-square{
+ background:linear-gradient(145deg,#07142b,#03091e)!important;
+ border:1px solid #76dfff99!important;
+ box-shadow:inset 0 0 12px #0a65a833!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.safe:after{
+ color:#42eaff!important;text-shadow:0 0 8px #00dfff;font-size:clamp(9px,2.3vw,16px)!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.start.red,
+.board.ludo-board:not(.legacy-ludo) .ludo-square.lane.red{
+ background:linear-gradient(145deg,#8d0b43,#3e062a)!important;border:2px solid #ff4b91!important;
+ box-shadow:inset 0 0 12px #ff1b6b88,0 0 10px #ff1b6b88!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.start.blue,
+.board.ludo-board:not(.legacy-ludo) .ludo-square.lane.blue{
+ background:linear-gradient(145deg,#07568c,#062b59)!important;border:2px solid #17dfff!important;
+ box-shadow:inset 0 0 12px #00cfff88,0 0 10px #00cfff88!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.start.green,
+.board.ludo-board:not(.legacy-ludo) .ludo-square.lane.green{
+ background:linear-gradient(145deg,#08713d,#063c2b)!important;border:2px solid #4dff75!important;
+ box-shadow:inset 0 0 12px #00ff6688,0 0 10px #00ff6688!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.start.yellow,
+.board.ludo-board:not(.legacy-ludo) .ludo-square.lane.yellow{
+ background:linear-gradient(145deg,#8b5b0b,#4a2c0a)!important;border:2px solid #ffd84b!important;
+ box-shadow:inset 0 0 12px #ffb90088,0 0 10px #ffb90088!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-center{
+ z-index:3!important;border:2px solid #8feeff!important;border-radius:0!important;
+ background:conic-gradient(from -45deg,#ff286d 0 25%,#13dfff 0 50%,#ffd33d 0 75%,#31f56b 0)!important;
+ box-shadow:0 0 14px #a34dff,0 0 28px #4b70ff,inset 0 0 18px #ffffff88!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-center span{
+ width:48%!important;height:48%!important;border:3px solid #a6f5ff;
+ background:radial-gradient(circle,#45318b,#10143e)!important;color:#fff7a8!important;
+ box-shadow:0 0 12px #58eaff,0 0 24px #a34dff!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-token{
+ color:#fff!important;background:#f8fcff!important;border:3px solid #ffffff!important;
+ text-shadow:0 1px 2px #0008!important;
+ box-shadow:0 0 7px #ffffffdd,0 0 14px currentColor,inset 0 0 7px #ffffff!important;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-token.red{color:#ff3e83!important}
+.board.ludo-board:not(.legacy-ludo) .ludo-token.blue{color:#22ddff!important}
+.board.ludo-board:not(.legacy-ludo) .ludo-token.green{color:#36ff80!important}
+.board.ludo-board:not(.legacy-ludo) .ludo-token.yellow{color:#ffd94a!important}
+.board.ludo-board:not(.legacy-ludo) .ludo-token:before{background:#ffffffaa!important;filter:blur(1px)}
+
 /* Keep the original geometry only for rooms created with the legacy 52+6 ruleset. */
 .board.ludo-board.legacy-ludo{gap:1px!important;padding:2px!important;background:#090d24}
 .board.ludo-board.legacy-ludo .ludo-yard{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));}
@@ -239,7 +311,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.43 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.44 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
