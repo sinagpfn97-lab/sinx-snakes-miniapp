@@ -148,34 +148,99 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 @media(max-width:380px){.board-wrap{border-radius:14px}.board{border-radius:14px}.ludo-token{width:82%;height:82%}}
 
 
-/* SINX Ludo — fully custom 15×15 board and original pawn pieces */
-.board.ludo-board{display:grid!important;position:relative;grid-template-columns:repeat(15,minmax(0,1fr))!important;grid-template-rows:repeat(15,minmax(0,1fr))!important;gap:2px!important;padding:6px!important;aspect-ratio:1/1;overflow:hidden;isolation:isolate;border-radius:18px;background:linear-gradient(145deg,#111a30,#080e1e);box-shadow:inset 0 0 0 1px #ffffff18,0 12px 30px #0008}
+/* SINX Ludo — seamless 15×15 board, flush bases and continuous outer route */
+.board.ludo-board:not(.legacy-ludo){
+ display:grid!important;position:relative;grid-template-columns:repeat(15,minmax(0,1fr))!important;
+ grid-template-rows:repeat(15,minmax(0,1fr))!important;gap:0!important;padding:0!important;
+ aspect-ratio:1/1;overflow:hidden;isolation:isolate;border-radius:12px;
+ background:#e8edf3;box-shadow:inset 0 0 0 1px #aab5c5,0 8px 22px #0004;
+}
 .board.ludo-board .board-art,.board.ludo-board .tokens-layer{display:none!important}
-.ludo-yard{position:relative;z-index:1;min-width:0;min-height:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:5%;padding:12%;border-radius:13%;border:2px solid #ffffff66;box-shadow:inset 0 0 0 2px #0003,inset 0 0 24px #0003,0 3px 8px #0006}
-.ludo-yard.red{background:linear-gradient(145deg,#ff6681,#a81742)}.ludo-yard.blue{background:linear-gradient(145deg,#61c7ff,#1453a5)}.ludo-yard.green{background:linear-gradient(145deg,#65efa4,#087345)}.ludo-yard.yellow{background:linear-gradient(145deg,#ffe17a,#b66b0d)}
-.ludo-home-slot{display:grid;place-items:center;min-width:0;min-height:0;border-radius:50%;background:radial-gradient(circle at 35% 28%,#ffffff,#e4e8f2 68%,#aab5c8);border:2px solid #ffffffb0;box-shadow:inset 0 2px 6px #52607866,0 2px 4px #0004}
-.ludo-home-slot[data-token="0"]{grid-row:2;grid-column:2}.ludo-home-slot[data-token="1"]{grid-row:2;grid-column:5}.ludo-home-slot[data-token="2"]{grid-row:5;grid-column:2}.ludo-home-slot[data-token="3"]{grid-row:5;grid-column:5}
-.ludo-square{position:relative;z-index:2;min-width:0;min-height:0;display:grid;place-items:center;border:1px solid #aab5c8;border-radius:3px;background:linear-gradient(145deg,#fffef7,#dce3ed);box-shadow:inset 0 1px 2px #fff,0 1px 2px #0004}
-.ludo-square.safe:after{content:"✦";position:absolute;color:#9c76d8;font-size:clamp(7px,2.2vw,14px);opacity:.8;pointer-events:none}
-.ludo-square.start.red{background:linear-gradient(145deg,#ff9aac,#f04468);border-color:#ffdae1}.ludo-square.start.blue{background:linear-gradient(145deg,#a1e2ff,#3999ee);border-color:#e2f7ff}.ludo-square.start.green{background:linear-gradient(145deg,#a4ffc5,#32c879);border-color:#e3ffed}.ludo-square.start.yellow{background:linear-gradient(145deg,#fff0a1,#efb638);border-color:#fff8d7}
-.ludo-square.lane.red{background:linear-gradient(145deg,#ff8da6,#e52f5d);border-color:#ffb8c8}.ludo-square.lane.blue{background:linear-gradient(145deg,#9be0ff,#3195ec);border-color:#c7edff}.ludo-square.lane.green{background:linear-gradient(145deg,#a0ffc1,#2fc979);border-color:#d5ffe4}.ludo-square.lane.yellow{background:linear-gradient(145deg,#fff0a0,#edb22e);border-color:#fff6ca}
-.ludo-center{position:relative;z-index:3;display:grid;place-items:center;min-width:0;min-height:0;border:2px solid #ffffffa8;border-radius:12%;background:conic-gradient(from -45deg,#f04468 0 25%,#3195ec 0 50%,#efb638 0 75%,#2fc979 0);box-shadow:inset 0 0 0 3px #ffffff55,0 2px 8px #0007}
-.ludo-center span{display:grid;place-items:center;width:42%;height:42%;border-radius:50%;background:#101a30;color:#fff5c2;font-size:clamp(11px,4vw,22px);box-shadow:0 0 12px #fff8}
-.ludo-token-stack{width:100%;height:100%;min-width:0;min-height:0;display:grid;place-items:center;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:0;pointer-events:none;padding:1px}
-.ludo-token-stack[data-count="1"]{display:flex}
-.board.ludo-board .ludo-token{position:relative;z-index:2;display:grid;place-items:center;place-self:center;width:82%;height:82%;min-width:0;min-height:0;aspect-ratio:1;padding:0;border:2px solid #ffffffed;border-radius:48% 48% 42% 42%;color:#fff;font-size:clamp(7px,2.2vw,12px);font-weight:900;line-height:1;text-shadow:0 1px 2px #0009;box-shadow:0 2px 4px #0008,inset 0 2px 3px #ffffff88;cursor:pointer;pointer-events:auto;touch-action:manipulation}
+.board.ludo-board:not(.legacy-ludo) .ludo-yard{
+ position:relative;z-index:1;min-width:0;min-height:0;display:grid;
+ grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));
+ gap:0;padding:9%;border-radius:7%;border:1px solid #ffffffd0;box-shadow:inset 0 0 0 1px #00000012;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-yard.red{background:linear-gradient(145deg,#ff7890,#bd244b)}
+.board.ludo-board:not(.legacy-ludo) .ludo-yard.blue{background:linear-gradient(145deg,#75d3ff,#1765b8)}
+.board.ludo-board:not(.legacy-ludo) .ludo-yard.green{background:linear-gradient(145deg,#72efac,#12804d)}
+.board.ludo-board:not(.legacy-ludo) .ludo-yard.yellow{background:linear-gradient(145deg,#ffe58c,#c27a18)}
+.board.ludo-board:not(.legacy-ludo) .ludo-home-slot{
+ display:grid;place-items:center;min-width:0;min-height:0;border-radius:50%;
+ background:radial-gradient(circle at 35% 28%,#ffffff,#e8edf4 70%,#c0cad7);
+ border:1px solid #ffffff;box-shadow:inset 0 1px 3px #53647a55,0 1px 2px #0003;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="0"]{grid-row:2;grid-column:2}
+.board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="1"]{grid-row:2;grid-column:4}
+.board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="2"]{grid-row:4;grid-column:2}
+.board.ludo-board:not(.legacy-ludo) .ludo-home-slot[data-token="3"]{grid-row:4;grid-column:4}
+.board.ludo-board:not(.legacy-ludo) .ludo-square{
+ position:relative;z-index:2;min-width:0;min-height:0;display:grid;place-items:center;
+ border:1px solid #aeb9c7;border-radius:0;background:linear-gradient(145deg,#fff,#e6ebf2);
+ box-shadow:none;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.safe:after{content:"✦";position:absolute;color:#9471c8;font-size:clamp(7px,2vw,13px);opacity:.9;pointer-events:none}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.start.red{background:linear-gradient(145deg,#ffb0bf,#f04468);border-color:#d83a5d}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.start.blue{background:linear-gradient(145deg,#b7eaff,#3999ee);border-color:#2883d1}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.start.green{background:linear-gradient(145deg,#b4ffd0,#32c879);border-color:#20a764}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.start.yellow{background:linear-gradient(145deg,#fff2b5,#efb638);border-color:#d49b22}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.lane.red{background:linear-gradient(145deg,#ff9eb2,#e52f5d);border-color:#d83a5d}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.lane.blue{background:linear-gradient(145deg,#a9e5ff,#3195ec);border-color:#2883d1}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.lane.green{background:linear-gradient(145deg,#a9ffd0,#2fc979);border-color:#20a764}
+.board.ludo-board:not(.legacy-ludo) .ludo-square.lane.yellow{background:linear-gradient(145deg,#fff0a0,#edb22e);border-color:#d49b22}
+.board.ludo-board:not(.legacy-ludo) .ludo-center{
+ position:relative;z-index:3;display:grid;place-items:center;min-width:0;min-height:0;
+ border:1px solid #ffffff;border-radius:0;
+ background:conic-gradient(from -45deg,#f04468 0 25%,#3195ec 0 50%,#efb638 0 75%,#2fc979 0);
+ box-shadow:inset 0 0 0 1px #00000012;
+}
+.board.ludo-board:not(.legacy-ludo) .ludo-center span{
+ display:grid;place-items:center;width:40%;height:40%;border-radius:50%;
+ background:#17233b;color:#fff5c2;font-size:clamp(11px,4vw,22px);box-shadow:0 0 8px #fff8;
+}
+.board.ludo-board .ludo-token-stack{
+ width:100%;height:100%;min-width:0;min-height:0;display:grid;place-items:center;
+ grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));
+ gap:0;pointer-events:none;padding:1px;
+}
+.board.ludo-board .ludo-token-stack[data-count="1"]{display:flex}
+.board.ludo-board .ludo-token{
+ position:relative;z-index:2;display:grid;place-items:center;place-self:center;
+ width:82%;height:82%;min-width:0;min-height:0;aspect-ratio:1;padding:0;
+ border:2px solid #ffffffed;border-radius:48% 48% 42% 42%;
+ color:#fff;font-size:clamp(7px,2.2vw,12px);font-weight:900;line-height:1;
+ text-shadow:0 1px 2px #0009;box-shadow:0 2px 4px #0008,inset 0 2px 3px #ffffff88;
+ cursor:pointer;pointer-events:auto;touch-action:manipulation;
+}
 .board.ludo-board .ludo-token:before{content:"";position:absolute;top:16%;left:22%;width:24%;height:24%;border-radius:50%;background:#ffffff99;filter:blur(.5px);pointer-events:none}
-.board.ludo-board .ludo-token.red{background:radial-gradient(circle at 32% 25%,#ffccd3,#f04468 54%,#991332)}.board.ludo-board .ludo-token.blue{background:radial-gradient(circle at 32% 25%,#d4f4ff,#3195ec 54%,#10447f)}.board.ludo-board .ludo-token.green{background:radial-gradient(circle at 32% 25%,#d5ffe3,#2fc979 54%,#08613a)}.board.ludo-board .ludo-token.yellow{background:radial-gradient(circle at 32% 25%,#fff8c9,#efb638 54%,#9a5709)}
-.board.ludo-board .ludo-token.selectable{outline:2px solid #fff;outline-offset:1px;animation:ludoPawnPulse .65s ease-in-out infinite alternate}.board.ludo-board .ludo-token.moving{animation:ludoPawnHop .12s ease-out}
-.ludo-token-stack[data-count="2"] .ludo-token{width:92%;height:92%}.ludo-token-stack[data-count="3"] .ludo-token,.ludo-token-stack[data-count="4"] .ludo-token{width:94%;height:94%}
-@keyframes ludoPawnPulse{to{filter:brightness(1.35);box-shadow:0 0 10px #fff,0 2px 5px #0008}}@keyframes ludoPawnHop{50%{transform:translateY(-18%) scale(1.12)}}
-@media(max-width:420px){.board.ludo-board{gap:1px!important;padding:4px!important;border-radius:14px}.ludo-yard{gap:4%;padding:10%}.ludo-home-slot{border-width:1px}.board.ludo-board .ludo-token{border-width:1.5px}}
+.board.ludo-board .ludo-token.red{background:radial-gradient(circle at 32% 25%,#ffccd3,#f04468 54%,#991332)}
+.board.ludo-board .ludo-token.blue{background:radial-gradient(circle at 32% 25%,#d4f4ff,#3195ec 54%,#10447f)}
+.board.ludo-board .ludo-token.green{background:radial-gradient(circle at 32% 25%,#d5ffe3,#2fc979 54%,#08613a)}
+.board.ludo-board .ludo-token.yellow{background:radial-gradient(circle at 32% 25%,#fff8c9,#efb638 54%,#9a5709)}
+.board.ludo-board .ludo-token.selectable{outline:2px solid #fff;outline-offset:1px;animation:ludoPawnPulse .65s ease-in-out infinite alternate}
+.board.ludo-board .ludo-token.moving{animation:ludoPawnHop .12s ease-out}
+.board.ludo-board .ludo-token-stack[data-count="2"] .ludo-token{width:92%;height:92%}
+.board.ludo-board .ludo-token-stack[data-count="3"] .ludo-token,.board.ludo-board .ludo-token-stack[data-count="4"] .ludo-token{width:94%;height:94%}
+@keyframes ludoPawnPulse{to{filter:brightness(1.35);box-shadow:0 0 10px #fff,0 2px 5px #0008}}
+@keyframes ludoPawnHop{50%{transform:translateY(-18%) scale(1.12)}}
+@media(max-width:420px){
+ .board.ludo-board:not(.legacy-ludo){border-radius:9px}
+ .board.ludo-board:not(.legacy-ludo) .ludo-yard{padding:8%}
+ .board.ludo-board .ludo-token{border-width:1.5px}
+}
+/* Keep the original geometry only for rooms created with the legacy 52+6 ruleset. */
+.board.ludo-board.legacy-ludo{gap:1px!important;padding:2px!important;background:#090d24}
+.board.ludo-board.legacy-ludo .ludo-yard{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));}
+.board.ludo-board.legacy-ludo .ludo-home-slot[data-token="0"]{grid-row:2;grid-column:2}
+.board.ludo-board.legacy-ludo .ludo-home-slot[data-token="1"]{grid-row:2;grid-column:5}
+.board.ludo-board.legacy-ludo .ludo-home-slot[data-token="2"]{grid-row:5;grid-column:2}
+.board.ludo-board.legacy-ludo .ludo-home-slot[data-token="3"]{grid-row:5;grid-column:5}
 /* Visible build marker */
 #sinxBuildVersion{position:fixed;right:8px;bottom:7px;z-index:99999;padding:5px 9px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(8,12,30,.88);color:#fff;font:600 10px/1.2 system-ui,sans-serif;letter-spacing:.25px;direction:ltr;pointer-events:none;box-shadow:0 2px 10px #0005}
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.36 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.37 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -499,7 +564,7 @@ function renderTokens(){
 }
 const LUDO_TRACK_LEGACY=[[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
 const LUDO_START_LEGACY=[0,13,26,39],LUDO_LANES_LEGACY=[[[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],[[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],[[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]];
-const LUDO_TRACK=[[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0],[6,1],[6,2],[6,3],[6,4],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7]];
+const LUDO_TRACK=[[1,8],[1,9],[1,10],[1,11],[1,12],[1,13],[2,13],[3,13],[4,13],[5,13],[6,13],[7,13],[8,13],[9,13],[10,13],[11,13],[12,13],[13,13],[13,12],[13,11],[13,10],[13,9],[13,8],[13,7],[13,6],[13,5],[13,4],[13,3],[13,2],[13,1],[12,1],[11,1],[10,1],[9,1],[8,1],[7,1],[6,1],[5,1],[4,1],[3,1],[2,1],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]];
 const LUDO_START=[36,0,12,24],LUDO_COLORS=["red","blue","green","yellow"];
 const LUDO_LANES=[
  [[7,2],[7,3],[7,4],[7,5]],
@@ -520,18 +585,19 @@ function ludoPositionFor(seat,progress){
 }
 function ludoFinishProgress(){return ludoRulesVersion===2?52:57;}
 function createLudoBoard(){
- const board=document.getElementById("board");
- board.classList.add("ludo-board");board.style.backgroundImage="";
- document.getElementById("boardArt").style.display="none";
- document.getElementById("tokensLayer").style.display="none";
+ const board=document.getElementById("board"),modern=ludoRulesVersion===2;
+ board.classList.add("ludo-board");board.classList.toggle("legacy-ludo",!modern);board.style.backgroundImage="";
+ document.getElementById("boardArt").style.display="none";document.getElementById("tokensLayer").style.display="none";
  board.querySelectorAll(".cell,.ludo-cell,.ludo-token,.ludo-yard,.ludo-home-slot,.ludo-square,.ludo-center,.ludo-track-overlay,.ludo-home-overlay,.ludo-token-stack").forEach(e=>e.remove());
- const track=ludoRulesVersion===2?LUDO_TRACK:LUDO_TRACK_LEGACY;
- const lanes=ludoRulesVersion===2?LUDO_LANES:LUDO_LANES_LEGACY;
- const starts=ludoRulesVersion===2?LUDO_START:LUDO_START_LEGACY;
- const yards=[{seat:0,row:1,col:1},{seat:1,row:1,col:10},{seat:2,row:10,col:10},{seat:3,row:10,col:1}];
+ const track=modern?LUDO_TRACK:LUDO_TRACK_LEGACY,lanes=modern?LUDO_LANES:LUDO_LANES_LEGACY,starts=modern?LUDO_START:LUDO_START_LEGACY;
+ const yards=modern?[
+  {seat:0,row:8,col:2},{seat:1,row:2,col:2},{seat:2,row:2,col:8},{seat:3,row:8,col:8}
+ ]:[
+  {seat:0,row:1,col:1},{seat:1,row:1,col:10},{seat:2,row:10,col:10},{seat:3,row:10,col:1}
+ ];
  yards.forEach(({seat,row,col})=>{
   const yard=document.createElement("div");yard.className="ludo-yard "+LUDO_COLORS[seat];yard.dataset.seat=String(seat);
-  yard.style.gridRow=row+"/span 6";yard.style.gridColumn=col+"/span 6";
+  const span=modern?5:6;yard.style.gridRow=row+"/span "+span;yard.style.gridColumn=col+"/span "+span;
   for(let token=0;token<4;token++){const slot=document.createElement("div");slot.className="ludo-home-slot";slot.dataset.token=String(token);yard.appendChild(slot);}
   board.appendChild(yard);
  });
@@ -540,20 +606,19 @@ function createLudoBoard(){
   const key=row+":"+col;if(tileMap.has(key))return tileMap.get(key);
   const square=document.createElement("div");square.className="ludo-square "+classes;square.dataset.pos=key;
   if(trackIndex!=="")square.dataset.trackIndex=String(trackIndex);
-  square.style.gridRow=String(row+1);square.style.gridColumn=String(col+1);
-  board.appendChild(square);tileMap.set(key,square);return square;
+  square.style.gridRow=String(row+1);square.style.gridColumn=String(col+1);board.appendChild(square);tileMap.set(key,square);return square;
  };
  track.forEach(([row,col],index)=>{
   const square=addSquare(row,col,"track",index);
-  if([0,8,12,20,24,32,36,44].includes(index))square.classList.add("safe");
+  if(modern?[0,12,24,36].includes(index):[0,8,12,20,24,32,36,44].includes(index))square.classList.add("safe");
  });
  lanes.forEach((lane,seat)=>lane.forEach(([row,col])=>addSquare(row,col,"lane "+LUDO_COLORS[seat])));
  starts.forEach((index,seat)=>{const point=track[index],square=tileMap.get(point[0]+":"+point[1]);if(square)square.classList.add("start",LUDO_COLORS[seat]);});
  const center=document.createElement("div");center.className="ludo-center";center.innerHTML='<span>★</span>';
- center.style.gridRow="7/span 3";center.style.gridColumn="7/span 3";board.appendChild(center);
- drawLudoTokens();
+ if(modern){center.style.gridRow="7/span 3";center.style.gridColumn="7/span 3";}
+ else{center.style.gridRow="7/span 3";center.style.gridColumn="7/span 3";}
+ board.appendChild(center);drawLudoTokens();
 }
-
 function ludoTokenProgress(seat,token){
  if(ludoAnimationOverride&&ludoAnimationOverride.seat===seat&&ludoAnimationOverride.tokenIndex===token)return ludoAnimationOverride.progress;
  return Number(ludoTokens[seat]?.[token]||0);
