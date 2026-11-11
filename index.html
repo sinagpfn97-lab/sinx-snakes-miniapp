@@ -203,15 +203,15 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 }
 .board.ludo-board .ludo-token.moving{animation:ludoTokenHop .12s ease-out}
 .board.ludo-board .ludo-token:focus-visible{outline:2px solid #fff;outline-offset:2px}
-.ludo-token-stack[data-count="2"] .ludo-token:nth-child(1){transform:translate(-18%,0)}
-.ludo-token-stack[data-count="2"] .ludo-token:nth-child(2){transform:translate(18%,0)}
-.ludo-token-stack[data-count="3"] .ludo-token:nth-child(1){transform:translate(-15%,-15%)}
-.ludo-token-stack[data-count="3"] .ludo-token:nth-child(2){transform:translate(15%,-15%)}
-.ludo-token-stack[data-count="3"] .ludo-token:nth-child(3){transform:translate(0,18%)}
-.ludo-token-stack[data-count="4"] .ludo-token:nth-child(1){transform:translate(-16%,-16%)}
-.ludo-token-stack[data-count="4"] .ludo-token:nth-child(2){transform:translate(16%,-16%)}
-.ludo-token-stack[data-count="4"] .ludo-token:nth-child(3){transform:translate(-16%,16%)}
-.ludo-token-stack[data-count="4"] .ludo-token:nth-child(4){transform:translate(16%,16%)}
+.ludo-token-stack[data-count="2"] .ludo-token:nth-child(1){transform:translate(-42%,0)}
+.ludo-token-stack[data-count="2"] .ludo-token:nth-child(2){transform:translate(42%,0)}
+.ludo-token-stack[data-count="3"] .ludo-token:nth-child(1){transform:translate(-38%,-38%)}
+.ludo-token-stack[data-count="3"] .ludo-token:nth-child(2){transform:translate(38%,-38%)}
+.ludo-token-stack[data-count="3"] .ludo-token:nth-child(3){transform:translate(0,42%)}
+.ludo-token-stack[data-count="4"] .ludo-token:nth-child(1){transform:translate(-38%,-38%)}
+.ludo-token-stack[data-count="4"] .ludo-token:nth-child(2){transform:translate(38%,-38%)}
+.ludo-token-stack[data-count="4"] .ludo-token:nth-child(3){transform:translate(-38%,38%)}
+.ludo-token-stack[data-count="4"] .ludo-token:nth-child(4){transform:translate(38%,38%)}
 @keyframes ludoTokenHop{0%{filter:brightness(1.5);scale:.82}100%{filter:brightness(1);scale:1}}
 @media(max-width:420px){
  .board.ludo-board{border-radius:14px}
