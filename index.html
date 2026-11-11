@@ -335,7 +335,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.49 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.50 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -527,7 +527,7 @@ function applyState(data){
  const leaveBtn=document.getElementById("leaveRoomBtn");if(leaveBtn)leaveBtn.style.display=roomCode?"block":"none";
 
  if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent=players.length+" بازیکن از ۴";
- if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج «"+departed+"» به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const w=roomGameType==="ludo"?players.find(p=>Array.isArray(ludoTokens[p.seat])&&ludoTokens[p.seat].every(v=>Number(v)===ludoFinishProgress())):players.find(p=>p.pos===100);if(w){document.getElementById("winnerTitle").textContent="🏆 "+w.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}}
+ if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج «"+departed+"» به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const winners=roomGameType==="ludo"?(data.room?.game_state?.winner_seats||[]).map(seat=>players.find(p=>p.seat===Number(seat))).filter(Boolean):players.filter(p=>p.pos===100);if(winners.length){document.getElementById("winnerTitle").textContent="🏆 "+(roomGameType==="ludo"?"برندگان مسابقه":"🏆 "+winners[0].name);document.getElementById("winnerText").textContent=winners.map(p=>p.name).join("، ")+" برنده شدند.";document.getElementById("winOverlay").style.display="flex";}}}
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
 function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
@@ -794,7 +794,7 @@ function render(){
  renderTokens();const box=document.getElementById("players");box.innerHTML="";
  const countEl=document.getElementById("playersCount");if(countEl)countEl.innerHTML="تعداد بازیکنان: <strong>"+players.length+"</strong>";
  const roomDisplay=document.getElementById("roomCodeDisplay"),roomValue=document.getElementById("roomCodeValue");if(roomValue)roomValue.textContent=roomCode||"—";if(roomDisplay)roomDisplay.classList.toggle("visible",!!roomCode);
- for(let seat=0;seat<4;seat++){const p=players.find(x=>x.seat===seat);const item=document.createElement("div");item.className="player"+(playing&&p&&p.seat===turn?" active":"")+(p?"":" empty");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p?p.name:"صندلی خالی · "+["قرمز","آبی","سبز","زرد"][seat];const pos=document.createElement("div");pos.className="player-pos";pos.textContent=p?(roomGameType==="ludo"?(Array.isArray(ludoTokens[p.seat])?ludoTokens[p.seat].filter(v=>Number(v)===ludoFinishProgress()).length:0)+" مهره به مقصد رسیده"+(p.seat===mySeat?" · شما":""):"خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"")):"منتظر ورود بازیکن";info.append(name,pos);item.append(icon,info);box.appendChild(item);}
+ for(let seat=0;seat<4;seat++){const p=players.find(x=>x.seat===seat);const item=document.createElement("div");item.className="player"+(playing&&p&&p.seat===turn?" active":"")+(p?"":" empty");const icon=document.createElement("div");icon.className="player-icon";icon.textContent=ICONS[seat]||"🎮";const info=document.createElement("div");info.className="player-info";const name=document.createElement("div");name.className="player-name";name.textContent=p?p.name:"صندلی خالی · "+["قرمز","آبی","سبز","زرد"][seat];const pos=document.createElement("div");pos.className="player-pos";pos.textContent=p?(roomGameType==="ludo"?(Array.isArray(ludoTokens[p.seat])?ludoTokens[p.seat].filter(v=>Number(v)>=49&&Number(v)<=52).length:0)+" مهره به مقصد رسیده"+(p.seat===mySeat?" · شما":""):"خانه "+p.pos+" از ۱۰۰"+(p.seat===mySeat?" · شما":"")):"منتظر ورود بازیکن";info.append(name,pos);item.append(icon,info);box.appendChild(item);}
  const current=players.find(p=>p.seat===turn);
  document.getElementById("turnLabel").textContent=playing?(current?"نوبت "+current.name:"در انتظار بازیکن"):(roomStatus==="waiting"?"لابی اتاق":"مسابقه متوقف");
  const canRoll=playing&&!locked&&!remoteAnimating&&mySeat===turn&&!pendingMove;
