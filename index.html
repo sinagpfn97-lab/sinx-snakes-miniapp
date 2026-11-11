@@ -246,22 +246,22 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
  background-color:transparent;
  pointer-events:none;
 }
-/* Anchor locations measured inside each 1024px quadrant of the supplied 2048px sprite sheet. */
+/* تنظیم لنگرگاه (Anchor) دقیق و استاندارد برای مختصات جدید */
 .board.ludo-board .ludo-token.red::before{
  background-position:0 0;
- transform:translate(-39.5%, -46%);
+ transform:translate(-50%, -64%);
 }
 .board.ludo-board .ludo-token.blue::before{
  background-position:100% 0;
- transform:translate(-46.5%, -46%);
+ transform:translate(-50%, -64%);
 }
 .board.ludo-board .ludo-token.yellow::before{
  background-position:0 100%;
- transform:translate(-37.5%, -54%);
+ transform:translate(-50%, -64%);
 }
 .board.ludo-board .ludo-token.green::before{
  background-position:100% 100%;
- transform:translate(-45.5%, -54%);
+ transform:translate(-50%, -64%);
 }
 .board.ludo-board .ludo-token.selectable::before{
  filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 7px #fff);
@@ -273,7 +273,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.30 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.31 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -624,7 +624,7 @@ function createLudoBoard(){
  drawLudoTokens();
 }
 // The artwork's 15x15 playable grid is inset from the image edges.
-const LUDO_GRID_ORIGIN=34,LUDO_GRID_STEP_X=38,LUDO_GRID_STEP_Y=38;
+const LUDO_GRID_ORIGIN=26.5,LUDO_GRID_STEP_X=39.1,LUDO_GRID_STEP_Y=39.1;
 function ludoGridCenterX(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_X;}
 function ludoGridCenterY(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_Y;}
 function drawLudoGridDebug(board){
