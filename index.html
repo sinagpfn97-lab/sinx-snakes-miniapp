@@ -239,7 +239,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.42 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.43 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -598,10 +598,10 @@ function createLudoBoard(){
   const yard=document.createElement("div");yard.className="ludo-yard "+LUDO_COLORS[seat];yard.dataset.seat=String(seat);
   const span=modern?5:6;yard.style.gridRow=row+"/span "+span;yard.style.gridColumn=col+"/span "+span;
   const homeCenters=modern?[
-   [[22,22],[48,22],[22,48],[48,48]],
-   [[52,22],[78,22],[52,48],[78,48]],
-   [[52,52],[78,52],[52,78],[78,78]],
-   [[22,52],[48,52],[22,78],[48,78]]
+   [[30,30],[56,30],[30,56],[56,56]],
+   [[44,30],[70,30],[44,56],[70,56]],
+   [[44,44],[70,44],[44,70],[70,70]],
+   [[30,44],[56,44],[30,70],[56,70]]
   ][seat]:null;
   for(let token=0;token<4;token++){
    const slot=document.createElement("div");slot.className="ludo-home-slot";slot.dataset.token=String(token);
