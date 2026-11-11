@@ -157,7 +157,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 }
 .board.ludo-board .board-art,.board.ludo-board .tokens-layer{display:none!important}
 .board.ludo-board:not(.legacy-ludo) .ludo-yard{
- position:relative;z-index:1;min-width:0;min-height:0;display:grid;box-sizing:border-box;
+ position:relative;z-index:auto;min-width:0;min-height:0;display:grid;box-sizing:border-box;
  grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));
  gap:0;padding:0;border-radius:0;overflow:hidden;border:1px solid #ffffffd0;
  box-shadow:inset 0 0 0 1px #00000012;
@@ -167,7 +167,8 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .board.ludo-board:not(.legacy-ludo) .ludo-yard.green{background:linear-gradient(145deg,#72efac,#12804d)}
 .board.ludo-board:not(.legacy-ludo) .ludo-yard.yellow{background:linear-gradient(145deg,#ffe58c,#c27a18)}
 .board.ludo-board:not(.legacy-ludo) .ludo-home-slot{
- display:grid;place-items:center;min-width:0;min-height:0;border-radius:50%;
+ position:relative;z-index:4;display:grid;place-items:center;place-self:center;
+ width:72%;height:72%;min-width:0;min-height:0;border-radius:50%;
  background:radial-gradient(circle at 35% 28%,#ffffff,#e8edf4 70%,#c0cad7);
  border:1px solid #ffffff;box-shadow:inset 0 1px 3px #53647a55,0 1px 2px #0003;
 }
@@ -254,7 +255,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.40 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.41 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
