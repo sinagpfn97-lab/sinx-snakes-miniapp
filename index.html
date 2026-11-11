@@ -148,132 +148,82 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 @media(max-width:380px){.board-wrap{border-radius:14px}.board{border-radius:14px}.ludo-token{width:82%;height:82%}}
 
 
-/* Ludo board: classic geometry with a neon arcade finish */
-.board.ludo-board{gap:2px;padding:0;background:#090d20;border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px #8c80ff66,0 0 28px #47eaff22,0 18px 45px #0009}
-.ludo-cell{border:0;background:#10172d;overflow:visible;z-index:1}
-.ludo-cell.home-red{background:linear-gradient(145deg,#781b49,#3c1238)}
-.ludo-cell.home-blue{background:linear-gradient(145deg,#125b91,#102c5b)}
-.ludo-cell.home-green{background:linear-gradient(145deg,#146b4b,#103b38)}
-.ludo-cell.home-yellow{background:linear-gradient(145deg,#8b651e,#493018)}
-.ludo-cell.track{background:linear-gradient(145deg,#f5f4ff,#c9d0e9);border:1px solid #7e8bad;border-radius:3px;box-shadow:inset 0 1px #fff,0 1px 2px #0005}
-.ludo-cell.safe:after{content:"✦";color:#9571ed;text-shadow:0 0 8px #b58cff;font-size:clamp(8px,2vw,13px)}
-.ludo-cell.lane-red{background:linear-gradient(145deg,#ff5689,#d92c68);border:1px solid #ff9ab8}
-.ludo-cell.lane-blue{background:linear-gradient(145deg,#48c4ff,#167ee1);border:1px solid #8ee3ff}
-.ludo-cell.lane-green{background:linear-gradient(145deg,#5af2a0,#18a968);border:1px solid #9bffd0}
-.ludo-cell.lane-yellow{background:linear-gradient(145deg,#ffe477,#e8a92e);border:1px solid #fff0a2}
-.ludo-cell.center-area{background:#101a35;border:0}
-.ludo-cell.home-slot{z-index:3}
-.ludo-cell.home-slot:before{content:"";position:absolute;inset:9%;border-radius:50%;background:radial-gradient(circle at 35% 28%,#ffffff24,#0004 72%);border:2px solid #ffffffaa;box-shadow:inset 0 3px 9px #0007,0 2px 8px #0006}
-.ludo-yard{position:absolute;width:26.6667%;height:26.6667%;z-index:2;border-radius:22%;border:2px solid #ffffffb0;box-shadow:0 0 0 2px #ffffff18,inset 0 0 24px #fff2,0 0 22px currentColor;pointer-events:none}
-.ludo-yard.red{background:linear-gradient(145deg,#ec2864,#78173e);color:#ff4c86}
-.ludo-yard.blue{background:linear-gradient(145deg,#31aaff,#124b83);color:#39c4ff}
-.ludo-yard.green{background:linear-gradient(145deg,#3ce28a,#126440);color:#4effa0}
-.ludo-yard.yellow{background:linear-gradient(145deg,#ffd65b,#8b5b18);color:#ffdc63}
-.ludo-center-art{position:absolute;left:40%;top:40%;width:20%;height:20%;z-index:2;pointer-events:none;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:conic-gradient(from -45deg,#f23d78 0 25%,#39aaff 0 50%,#ffd45b 0 75%,#38d982 0);border:2px solid #fff;filter:drop-shadow(0 0 8px #a78bff)}
-.ludo-token{position:relative;z-index:4;width:76%;height:76%;border:2px solid #ffffffed;border-radius:50%;box-shadow:inset 0 2px 3px #fff9,inset 0 -5px 8px #0005,0 3px 7px #000b,0 0 10px currentColor;transform:translateZ(0)}
-.ludo-token.red{background:radial-gradient(circle at 32% 23%,#ffb1ca 0,#ff477d 30%,#dc1454 68%,#760c37 100%);color:#ff3b79}
-.ludo-token.blue{background:radial-gradient(circle at 32% 23%,#c4f7ff 0,#54d4ff 30%,#168be8 68%,#07417d 100%);color:#37caff}
-.ludo-token.green{background:radial-gradient(circle at 32% 23%,#d7ffbd 0,#75f59a 30%,#22bf69 68%,#08643a 100%);color:#43ed8b}
-.ludo-token.yellow{background:radial-gradient(circle at 32% 23%,#fff8be 0,#ffe06a 30%,#efa92b 68%,#92510b 100%);color:#ffd34d}
-.ludo-token.selectable{outline:3px solid white;outline-offset:2px;animation:targetPulse .55s infinite alternate}
-.ludo-cell:has(.ludo-token:nth-of-type(2)){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:2px;padding:12%}
-.ludo-cell:has(.ludo-token:nth-of-type(2)) .ludo-token{width:100%;height:100%;border-width:1px}
-@media(max-width:420px){.board.ludo-board{border-radius:14px;gap:1px}.ludo-yard{border-radius:18%}.ludo-cell.home-slot:before{border-width:1px}}
-
-
-/* Absolute-coordinate Ludo canvas; no grid layout. */
-.board.ludo-board{display:block;position:relative;aspect-ratio:1/1;grid-template-columns:none;grid-template-rows:none;gap:0;padding:0;overflow:hidden;border-radius:18px;background:#080d22;isolation:isolate;box-shadow:0 0 0 1px #8f83ff88,0 0 34px #36dfff35,0 18px 48px #000b}
-.ludo-cell{position:absolute;display:block;min-width:0;min-height:0;border:1px solid #9da7c966;border-radius:3px;background:linear-gradient(145deg,#f8f7ff,#c9d1e9);box-shadow:inset 0 1px 1px #fff,0 1px 3px #0006;z-index:1}
-.ludo-cell.safe:after{content:"✦";position:absolute;inset:0;display:grid;place-items:center;color:#a783ff;font-size:clamp(8px,2vw,14px);text-shadow:0 0 8px #bd9aff}
-.ludo-cell.lane-red{background:linear-gradient(145deg,#ff6598,#e52266);border-color:#ffb4cb}.ludo-cell.lane-blue{background:linear-gradient(145deg,#62d7ff,#1686e9);border-color:#a8edff}.ludo-cell.lane-green{background:linear-gradient(145deg,#6affae,#18b76a);border-color:#aaffd0}.ludo-cell.lane-yellow{background:linear-gradient(145deg,#ffea83,#f2b52d);border-color:#fff4ba}
-.ludo-yard{position:absolute;z-index:2;border-radius:0;pointer-events:none;box-sizing:border-box;display:block;box-shadow:inset 0 0 28px #0007,inset 0 0 0 1px #ffffff35}.ludo-yard:after{content:"";position:absolute;inset:11%;border-radius:16%;border:2px solid #ffffffaa;background:linear-gradient(145deg,#ffffff18,#080d2533);box-shadow:inset 0 4px 18px #0007,0 0 18px currentColor}.ludo-yard.red{color:#ff5488}.ludo-yard.blue{color:#48c8ff}.ludo-yard.green{color:#4bffa0}.ludo-yard.yellow{color:#ffdf63}
-.ludo-yard.red{background:linear-gradient(145deg,#a81c50,#581434)}.ludo-yard.blue{background:linear-gradient(145deg,#1769a7,#10365f)}.ludo-yard.green{background:linear-gradient(145deg,#168653,#104c3b)}.ludo-yard.yellow{background:linear-gradient(145deg,#a87820,#5c4119)}
-.ludo-home-socket{position:absolute;width:27%;height:27%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 25%,#ffffff25,#0006 75%);border:2px solid #ffffffb8;box-shadow:inset 0 4px 10px #0007,0 2px 8px #0007}
-.ludo-center-art{position:absolute;left:40%;top:40%;width:20%;height:20%;z-index:3;pointer-events:none;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:conic-gradient(from -45deg,#f23d78 0 25%,#39aaff 0 50%,#ffd45b 0 75%,#38d982 0);filter:drop-shadow(0 0 9px #b28cff)}
-.ludo-token{position:absolute;z-index:5;left:0;top:0;width:5.2%;height:5.2%;padding:0;transform:translate(-50%,-50%);border:2px solid #fff;border-radius:50%;box-sizing:border-box;box-shadow:inset 0 2px 3px #fff9,inset 0 -5px 8px #0006,0 3px 8px #000b,0 0 11px currentColor;cursor:pointer}
-.ludo-token.red{background:radial-gradient(circle at 32% 23%,#ffd0dc 0,#ff477d 32%,#d91454 70%,#760c37 100%);color:#ff3b79}.ludo-token.blue{background:radial-gradient(circle at 32% 23%,#d4faff 0,#54d4ff 32%,#168be8 70%,#07417d 100%);color:#37caff}.ludo-token.green{background:radial-gradient(circle at 32% 23%,#e2ffc9 0,#75f59a 32%,#22bf69 70%,#08643a 100%);color:#43ed8b}.ludo-token.yellow{background:radial-gradient(circle at 32% 23%,#fffbd0 0,#ffe06a 32%,#efa92b 70%,#92510b 100%);color:#ffd34d}
-.ludo-token.selectable{outline:3px solid #fff;outline-offset:2px;animation:targetPulse .55s infinite alternate}
-@media(max-width:420px){.board.ludo-board{border-radius:13px}.ludo-token{width:5.6%;height:5.6%}.ludo-home-socket{border-width:1px}}
-
-
-/* Correct Ludo color ownership, standard safe/start squares and a full neon X center. */
-.ludo-cell.start-red,.ludo-cell.lane-red{background:linear-gradient(145deg,#a81c50,#581434);border-color:#f58aaa}
-.ludo-cell.start-blue,.ludo-cell.lane-blue{background:linear-gradient(145deg,#1769a7,#10365f);border-color:#86dfff}
-.ludo-cell.start-green,.ludo-cell.lane-green{background:linear-gradient(145deg,#168653,#104c3b);border-color:#8df0b7}
-.ludo-cell.start-yellow,.ludo-cell.lane-yellow{background:linear-gradient(145deg,#a87820,#5c4119);border-color:#ffe18a}
-.ludo-cell.safe:after{content:"✦";color:#9c83ff;text-shadow:0 0 7px #a98cff}
-.ludo-center-art{position:absolute;left:40%;top:40%;width:20%;height:20%;z-index:4;pointer-events:none;overflow:hidden;clip-path:none;filter:drop-shadow(0 0 8px #59eaff)}
-.ludo-center-triangle{position:absolute;inset:0;display:block}
-.ludo-center-triangle.top{clip-path:polygon(50% 0,0 50%,100% 50%)}
-.ludo-center-triangle.right{clip-path:polygon(100% 50%,50% 0,50% 100%)}
-.ludo-center-triangle.bottom{clip-path:polygon(50% 100%,0 50%,100% 50%)}
-.ludo-center-triangle.left{clip-path:polygon(0 50%,50% 0,50% 100%)}
-.ludo-center-triangle.red{background:linear-gradient(135deg,#ff4c8a,#9f174d)}
-.ludo-center-triangle.blue{background:linear-gradient(135deg,#55d7ff,#1769a7)}
-.ludo-center-triangle.green{background:linear-gradient(135deg,#62f5a4,#168653)}
-.ludo-center-triangle.yellow{background:linear-gradient(135deg,#ffe477,#a87820)}
-.ludo-center-x{position:absolute;left:50%;top:50%;transform:translate(-50%,-53%);font-family:Arial,sans-serif;font-size:clamp(23px,6vw,48px);font-weight:1000;line-height:1;color:#e8ffff;-webkit-text-stroke:1px #48eaff;text-shadow:0 0 3px #fff,0 0 8px #47eaff,0 0 18px #23cfff,0 0 28px #8a5cff}
-
-
-/* JSON-anchored Ludo pawn geometry and stacked-token sizing. */
-.ludo-home-socket{left:0;top:0;width:13%;height:13%}
-.ludo-token.stacked{width:3%;height:3%;border-width:1.5px}
-.ludo-token{width:4.5%;height:4.5%;transform:translate(-50%,-50%);padding:0}
-.board.ludo-board{display:block;grid-template-columns:none;grid-template-rows:none;gap:0;padding:0;position:relative;aspect-ratio:1/1}
-
-/* Calibration v2: keep the clickable hitbox small, but render a large sprite layer.
-   The red marker inside each quadrant is the anchor placed at the logical board coordinate. */
+/* SINX Ludo v3 — image-preserving, cell-anchored board */
 .board.ludo-board{
- background-color:#080b20;
- background-image:url("./1794340298652.jpg?v=2")!important;
- background-repeat:no-repeat;
- background-position:center;
- background-size:100% 100%;
+ display:block!important;position:relative;aspect-ratio:1/1;
+ grid-template-columns:none!important;grid-template-rows:none!important;
+ gap:0!important;padding:0!important;overflow:hidden;isolation:isolate;
+ border-radius:18px;background-color:#080b20;
+ background-image:url("./1794340298652.jpg?v=3")!important;
+ background-repeat:no-repeat;background-position:center;background-size:100% 100%;
+ box-shadow:0 0 0 1px #8f83ff88,0 0 34px #36dfff35,0 18px 48px #000b;
+}
+.board.ludo-board .board-art{display:none!important}
+.ludo-track-overlay{
+ position:absolute;left:2.15%;right:2.35%;top:2.15%;bottom:2.35%;
+ display:grid;grid-template-columns:repeat(15,minmax(0,1fr));
+ grid-template-rows:repeat(15,minmax(0,1fr));z-index:5;pointer-events:none;
+}
+.ludo-home-overlay{
+ position:absolute;width:40%;height:40%;display:grid;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ grid-template-rows:repeat(4,minmax(0,1fr));
+ z-index:6;pointer-events:none;
+}
+.ludo-home-overlay.red{left:0;top:0}
+.ludo-home-overlay.blue{right:0;top:0}
+.ludo-home-overlay.green{right:0;bottom:0}
+.ludo-home-overlay.yellow{left:0;bottom:0}
+.ludo-token-stack{
+ position:relative;width:100%;height:100%;min-width:0;min-height:0;
+ display:grid;place-items:center;pointer-events:none;
 }
 .board.ludo-board .ludo-token{
- position:absolute!important;
- width:5.2%!important;height:5.2%!important;
- padding:0!important;border:0!important;border-radius:0!important;
- background:transparent!important;box-shadow:none!important;color:transparent!important;
- transform:translate(-50%,-50%)!important;
- overflow:visible!important;isolation:isolate;
+ grid-area:1/1;position:relative!important;display:block;
+ width:80%!important;height:80%!important;min-width:0;min-height:0;
+ aspect-ratio:1/1;padding:0!important;margin:0;
+ border:1.5px solid #ffffffed!important;border-radius:50%!important;
+ background-color:transparent!important;
+ background-image:url("./1794340921890.png?v=3")!important;
+ background-repeat:no-repeat!important;background-size:200% 200%!important;
+ box-shadow:inset 0 1px 2px #fff9,0 2px 6px #000b,0 0 9px currentColor!important;
+ color:transparent!important;cursor:pointer;pointer-events:auto;
+ transform:translate(0,0);touch-action:manipulation;
+ transition:filter .12s ease,outline-color .12s ease;
 }
-.board.ludo-board .ludo-token::before{
- content:"";position:absolute;left:50%;top:50%;
- width:300%;height:300%;
- background-image:url("./1794340921890.png?v=2");
- background-repeat:no-repeat;background-size:200% 200%;
- background-color:transparent;
- pointer-events:none;
+.board.ludo-board .ludo-home-overlay .ludo-token{width:55%!important;height:55%!important}
+.board.ludo-board .ludo-token.red{background-position:0 0!important;color:#ff3b79}
+.board.ludo-board .ludo-token.blue{background-position:100% 0!important;color:#37caff}
+.board.ludo-board .ludo-token.yellow{background-position:0 100%!important;color:#ffd34d}
+.board.ludo-board .ludo-token.green{background-position:100% 100%!important;color:#43ed8b}
+.board.ludo-board .ludo-token.selectable{
+ outline:2px solid #fff!important;outline-offset:1px;
+ filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 8px currentColor);
+ animation:targetPulse .55s infinite alternate;
 }
-/* Anchor locations perfectly calibrated */
-.board.ludo-board .ludo-token.red::before{
- background-position:0 0;
- transform:translate(-50%, -64%);
+.board.ludo-board .ludo-token.moving{animation:ludoTokenHop .12s ease-out}
+.board.ludo-board .ludo-token:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.ludo-token-stack[data-count="2"] .ludo-token:nth-child(1){transform:translate(-18%,0)}
+.ludo-token-stack[data-count="2"] .ludo-token:nth-child(2){transform:translate(18%,0)}
+.ludo-token-stack[data-count="3"] .ludo-token:nth-child(1){transform:translate(-15%,-15%)}
+.ludo-token-stack[data-count="3"] .ludo-token:nth-child(2){transform:translate(15%,-15%)}
+.ludo-token-stack[data-count="3"] .ludo-token:nth-child(3){transform:translate(0,18%)}
+.ludo-token-stack[data-count="4"] .ludo-token:nth-child(1){transform:translate(-16%,-16%)}
+.ludo-token-stack[data-count="4"] .ludo-token:nth-child(2){transform:translate(16%,-16%)}
+.ludo-token-stack[data-count="4"] .ludo-token:nth-child(3){transform:translate(-16%,16%)}
+.ludo-token-stack[data-count="4"] .ludo-token:nth-child(4){transform:translate(16%,16%)}
+@keyframes ludoTokenHop{0%{filter:brightness(1.5);scale:.82}100%{filter:brightness(1);scale:1}}
+@media(max-width:420px){
+ .board.ludo-board{border-radius:14px}
+ .board.ludo-board .ludo-token{width:86%!important;height:86%!important}
+ .board.ludo-board .ludo-home-overlay .ludo-token{width:58%!important;height:58%!important}
 }
-.board.ludo-board .ludo-token.blue::before{
- background-position:100% 0;
- transform:translate(-50%, -64%);
-}
-.board.ludo-board .ludo-token.yellow::before{
- background-position:0 100%;
- transform:translate(-50%, -64%);
-}
-.board.ludo-board .ludo-token.green::before{
- background-position:100% 100%;
- transform:translate(-50%, -64%);
-}
-.board.ludo-board .ludo-token.selectable::before{
- filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 7px #fff);
-}
-.board.ludo-board .ludo-token.stacked{width:5.2%!important;height:5.2%!important}
-
 /* Visible build marker */
 #sinxBuildVersion{position:fixed;right:8px;bottom:7px;z-index:99999;padding:5px 9px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(8,12,30,.88);color:#fff;font:600 10px/1.2 system-ui,sans-serif;letter-spacing:.25px;direction:ltr;pointer-events:none;box-shadow:0 2px 10px #0005}
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.34 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.35 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -445,7 +395,7 @@ function applyState(data){
  }
  if(incomingMove?.id&&incomingMove.id!==lastSeenMoveId){
   const isNew=!!lastSeenMoveId||!firstSnapshot;lastSeenMoveId=incomingMove.id;
-  if(isNew&&Number(incomingMove.seat)!==mySeat)remoteAnimationQueue=remoteAnimationQueue.then(()=>animateRemoteMove(incomingMove)).catch(()=>{});
+  if(isNew){if(roomGameType==="ludo")remoteAnimationQueue=remoteAnimationQueue.then(()=>animateLudoMove(incomingMove)).catch(()=>{});else if(Number(incomingMove.seat)!==mySeat)remoteAnimationQueue=remoteAnimationQueue.then(()=>animateRemoteMove(incomingMove)).catch(()=>{});}
  }
  host=players.some(p=>p.seat===mySeat&&p.isHost);
  if(host&&roomStatus==="waiting")document.querySelector("#gameView .game-lobby").classList.add("room-created");
@@ -545,7 +495,7 @@ function createBoard(){
  const board=document.getElementById("board");
  if(roomGameType==="ludo"){createLudoBoard();return;}
  board.classList.remove("ludo-board");board.style.backgroundImage="";document.getElementById("boardArt").style.display="block";
- board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token").forEach(e=>e.remove());
+ board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token,.ludo-track-overlay,.ludo-home-overlay,.ludo-token-stack").forEach(e=>e.remove());
  const nums=[];
  for(let row=9;row>=0;row--){let line=[];for(let col=0;col<10;col++)line.push(row*10+col+1);if(row%2===1)line.reverse();nums.push(...line);}
  nums.forEach(n=>{
@@ -592,98 +542,128 @@ function renderTokens(){
 }
 const LUDO_TRACK_LEGACY=[[6,1],[6,2],[6,3],[6,4],[6,5],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[8,9],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0]];
 const LUDO_START_LEGACY=[0,13,26,39],LUDO_LANES_LEGACY=[[[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],[[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],[[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]],[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]]];
-const LUDO_HOME_PAWNS_LEGACY={red:[[88,85],[151,85],[88,147],[151,147]],blue:[[449,85],[512,85],[449,147],[512,147]],green:[[449,449],[512,449],[449,512],[512,512]],yellow:[[88,449],[151,449],[88,512],[151,512]]};
 const LUDO_TRACK=[[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,10],[6,11],[6,12],[6,13],[6,14],[7,14],[8,14],[8,13],[8,12],[8,11],[8,10],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[14,7],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0],[6,0],[6,1],[6,2],[6,3],[6,4],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[0,7]];
 const LUDO_START=[36,0,12,24],LUDO_COLORS=["red","blue","green","yellow"];
-const LUDO_BOARD_SIZE=600,LUDO_CELL_SIZE=40;
-// Home pawn centers measured from the new 640px board artwork and scaled to the 600px canvas.
-const LUDO_HOME_PAWNS={
- red:[[90,90],[149,90],[90,149],[149,149]],
- blue:[[451,90],[510,90],[451,149],[510,149]],
- green:[[451,451],[510,451],[451,510],[510,510]],
- yellow:[[90,451],[149,451],[90,510],[149,510]]
-};
 const LUDO_LANES=[
  [[7,1],[7,2],[7,3],[7,4]],
  [[1,7],[2,7],[3,7],[4,7]],
  [[7,13],[7,12],[7,11],[7,10]],
  [[13,7],[12,7],[11,7],[10,7]]
 ];
-function ludoPx(v){return (v/LUDO_BOARD_SIZE*100)+"%";}
-function ludoSquare(board,r,c,color="track",safe=false){
- const cell=document.createElement("div");cell.className="ludo-cell "+color+(safe?" safe":"");
- cell.style.left=ludoPx(c*LUDO_CELL_SIZE);cell.style.top=ludoPx(r*LUDO_CELL_SIZE);
- cell.style.width=ludoPx(LUDO_CELL_SIZE);cell.style.height=ludoPx(LUDO_CELL_SIZE);
- cell.dataset.row=r;cell.dataset.col=c;board.appendChild(cell);return cell;
-}
-function createLudoBoard(){
- const board=document.getElementById("board");board.classList.add("ludo-board");board.style.backgroundImage=ludoRulesVersion===2?'url("./IMG_20261110_213051_896.png?v=1")':'url("./ludo-board-clean.jpg?v=2")';document.getElementById("boardArt").style.display="none";
- // The supplied artwork is the board itself. Keep the live tokens as the only overlay.
- board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token,.ludo-yard,.ludo-center-art,.ludo-grid-debug").forEach(e=>e.remove());
- drawLudoGridDebug(board);
- drawLudoTokens();
-}
-// The artwork's 15x15 playable grid is inset from the image edges.
-const LUDO_GRID_ORIGIN=32,LUDO_GRID_STEP_X=38.2,LUDO_GRID_STEP_Y=38.2;
-function ludoGridCenterX(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_X;}
-function ludoGridCenterY(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_Y;}
-function drawLudoGridDebug(board){
- const old=board.querySelector(".ludo-grid-debug");if(old)old.remove();
- if(new URLSearchParams(location.search).get("ludoGrid")!=="1")return;
- const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
- svg.setAttribute("class","ludo-grid-debug");svg.setAttribute("viewBox","0 0 600 600");svg.setAttribute("preserveAspectRatio","none");
- svg.setAttribute("aria-label","گرید تشخیصی ۱۵ در ۱۵");
- const x0=ludoGridCenterX(0),x1=ludoGridCenterX(14),y0=ludoGridCenterY(0),y1=ludoGridCenterY(14);
- let markup="";
- for(let i=0;i<15;i++){
-  const x=ludoGridCenterX(i),y=ludoGridCenterY(i);
-  markup+='<line x1="'+x+'" y1="'+y0+'" x2="'+x+'" y2="'+y1+'" stroke="#00f0ff" stroke-opacity=".28" stroke-width="1"/>';
-  markup+='<line x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'" stroke="#00f0ff" stroke-opacity=".28" stroke-width="1"/>';
-  markup+='<text x="'+x+'" y="17" text-anchor="middle" fill="#fff" stroke="#081020" stroke-width="2" paint-order="stroke" font-size="11" font-weight="700">'+i+'</text>';
-  markup+='<text x="17" y="'+(y+4)+'" text-anchor="middle" fill="#fff" stroke="#081020" stroke-width="2" paint-order="stroke" font-size="11" font-weight="700">'+i+'</text>';
- }
- svg.innerHTML=markup;board.appendChild(svg);
-}
+let ludoAnimationOverride=null;
 
-function ludoCoordinate(seat,progress,token){
- if(progress<=0)return (ludoRulesVersion===2?LUDO_HOME_PAWNS:LUDO_HOME_PAWNS_LEGACY)[LUDO_COLORS[seat]][token];
- if(ludoRulesVersion!==2){if(progress>=52){const [r,c]=LUDO_LANES_LEGACY[seat][Math.min(5,progress-52)];return [56.7+c*33,56.7+r*32];}const [r,c]=LUDO_TRACK_LEGACY[(LUDO_START_LEGACY[seat]+progress-1)%52];return [56.7+c*33,56.7+r*32];}
- if(progress>=49){const [r,c]=LUDO_LANES[seat][Math.min(3,progress-49)];return [ludoGridCenterX(c),ludoGridCenterY(r)];}
- const [r,c]=LUDO_TRACK[(LUDO_START[seat]+progress-1)%48];
- return [ludoGridCenterX(c),ludoGridCenterY(r)];
+function ludoPositionFor(seat,progress){
+ if(progress<=0)return {home:true};
+ if(ludoRulesVersion!==2){
+  if(progress>=52){const p=LUDO_LANES_LEGACY[seat][Math.min(5,progress-52)];return {row:p[0],col:p[1]};}
+  const p=LUDO_TRACK_LEGACY[(LUDO_START_LEGACY[seat]+progress-1)%52];return {row:p[0],col:p[1]};
+ }
+ if(progress>=49){const p=LUDO_LANES[seat][Math.min(3,progress-49)];return {row:p[0],col:p[1]};}
+ const p=LUDO_TRACK[(LUDO_START[seat]+progress-1)%48];return {row:p[0],col:p[1]};
 }
 function ludoFinishProgress(){return ludoRulesVersion===2?52:57;}
+function createLudoBoard(){
+ const board=document.getElementById("board");
+ board.classList.add("ludo-board");board.style.backgroundImage="";
+ document.getElementById("boardArt").style.display="none";
+ board.querySelectorAll(".cell,.ludo-cell,.tokens-layer,.ludo-token,.ludo-yard,.ludo-center-art,.ludo-grid-debug,.ludo-track-overlay,.ludo-home-overlay,.ludo-token-stack").forEach(e=>e.remove());
+ const trackLayer=document.createElement("div");trackLayer.className="ludo-track-overlay";board.appendChild(trackLayer);
+ for(let seat=0;seat<4;seat++){
+  const home=document.createElement("div");
+  home.className="ludo-home-overlay "+LUDO_COLORS[seat];
+  home.dataset.seat=String(seat);board.appendChild(home);
+ }
+ drawLudoTokens();
+}
+function ludoTokenProgress(seat,token){
+ if(ludoAnimationOverride&&ludoAnimationOverride.seat===seat&&ludoAnimationOverride.tokenIndex===token)return ludoAnimationOverride.progress;
+ return Number(ludoTokens[seat]?.[token]||0);
+}
+function createLudoTokenStack(items){
+ const stack=document.createElement("div");
+ stack.className="ludo-token-stack";stack.dataset.count=String(items.length);
+ items.forEach(item=>{
+  const token=document.createElement("button");
+  const valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];
+  const selectable=!!pendingMove&&mySeat===turn&&item.seat===mySeat&&valid.includes(item.tokenIndex);
+  const moving=!!ludoAnimationOverride&&ludoAnimationOverride.seat===item.seat&&ludoAnimationOverride.tokenIndex===item.tokenIndex;
+  token.className="ludo-token "+LUDO_COLORS[item.seat]+(selectable?" selectable":"")+(moving?" moving":"");
+  token.type="button";token.title="مهره "+(item.tokenIndex+1);
+  token.setAttribute("aria-label","مهره "+(item.tokenIndex+1)+"، "+LUDO_COLORS[item.seat]);
+  token.style.backgroundPosition={red:"0 0",blue:"100% 0",yellow:"0 100%",green:"100% 100%"}[LUDO_COLORS[item.seat]];
+  token.onclick=()=>chooseLudoToken(item.tokenIndex);
+  stack.appendChild(token);
+ });
+ return stack;
+}
 function drawLudoTokens(){
- const board=document.getElementById("board");board.querySelectorAll(".ludo-token").forEach(e=>e.remove());const grouped=new Map();
+ const board=document.getElementById("board");
+ const trackLayer=board.querySelector(".ludo-track-overlay");
+ if(!trackLayer)return;
+ trackLayer.replaceChildren();
+ const homeLayers=[];
+ for(let seat=0;seat<4;seat++){
+  const layer=board.querySelector('.ludo-home-overlay[data-seat="'+seat+'"]');
+  if(layer){layer.replaceChildren();homeLayers[seat]=layer;}
+ }
+ const groups=new Map();
  for(let seat=0;seat<4;seat++){
   if(!players.some(p=>p.seat===seat))continue;
-  for(let t=0;t<4;t++){
-   const progress=Number(ludoTokens[seat]?.[t]||0),[x,y]=ludoCoordinate(seat,progress,t),key=x+":"+y;
-   if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push({seat,t,x,y});
+  for(let token=0;token<4;token++){
+   const progress=ludoTokenProgress(seat,token);
+   const pos=ludoPositionFor(seat,progress);
+   const item={seat:seat,tokenIndex:token};
+   if(pos.home){
+    const stack=createLudoTokenStack([item]);
+    stack.style.gridRow=token<2?"2":"3";
+    stack.style.gridColumn=token%2===0?"2":"3";
+    if(homeLayers[seat])homeLayers[seat].appendChild(stack);
+   }else{
+    const key=pos.row+":"+pos.col;
+    if(!groups.has(key))groups.set(key,{row:pos.row,col:pos.col,items:[]});
+    groups.get(key).items.push(item);
+   }
   }
  }
- const offsets={1:[[0,0]],2:[[-8,0],[8,0]],3:[[-8,-7],[8,-7],[0,9]],4:[[-8,-8],[8,-8],[-8,8],[8,8]]};
- for(const group of grouped.values())group.forEach(({seat,t,x,y},index)=>{
-  const token=document.createElement("button"),valid=pendingMove?.valid_tokens||pendingMove?.validTokens||[];
-  token.className="ludo-token "+LUDO_COLORS[seat]+(Number(ludoTokens[seat]?.[t]||0)<=0?" home-token":"")+(group.length>1?" stacked":"")+(pendingMove&&seat===mySeat&&mySeat===turn&&valid.includes(t)?" selectable":"");
-  token.type="button";token.title="مهره "+(t+1);
-  const [ox,oy]=(offsets[group.length]||offsets[4])[index]||[0,0];
-  token.style.left=ludoPx(x+ox);token.style.top=ludoPx(y+oy);
-   const spritePosition={red:"18% 13%",blue:"82% 13%",green:"82% 85%",yellow:"18% 85%"}[LUDO_COLORS[seat]];
-   token.style.backgroundPosition=spritePosition;
-   token.onclick=()=>chooseLudoToken(t);board.appendChild(token);
- });
+ for(const group of groups.values()){
+  const stack=createLudoTokenStack(group.items);
+  stack.style.gridRow=String(group.row+1);
+  stack.style.gridColumn=String(group.col+1);
+  trackLayer.appendChild(stack);
+ }
 }
 function renderLudoTokens(){drawLudoTokens();}
+async function animateLudoMove(move){
+ const seat=Number(move.seat),tokenIndex=Number(move.token_index);
+ if(!Number.isInteger(seat)||seat<0||seat>3||!Number.isInteger(tokenIndex)||tokenIndex<0||tokenIndex>3)return;
+ const from=Number(move.from_progress||0),to=Number(move.to_progress||0);
+ const path=Array.isArray(move.path)?move.path.map(Number):[];
+ if(!path.length&&to>from){for(let p=from+1;p<=to;p++)path.push(p);}
+ if(!path.length){drawLudoTokens();return;}
+ try{
+  ludoAnimationOverride={seat:seat,tokenIndex:tokenIndex,progress:from};
+  drawLudoTokens();await sleep(75);
+  for(const progress of path){
+   ludoAnimationOverride.progress=progress;
+   drawLudoTokens();await sleep(115);
+  }
+ }finally{
+  ludoAnimationOverride=null;drawLudoTokens();
+ }
+}
 async function chooseLudoToken(index){
  if(!pendingMove||mySeat!==turn||locked)return;
  const valid=pendingMove.valid_tokens||pendingMove.validTokens||[];
- if(valid.length&&!valid.includes(index))return;
+ if(!valid.includes(index))return;
  selectedLudoToken=index;locked=true;
- try{const d=await api("move",{tokenIndex:index});applyState(d);document.getElementById("message").textContent="مهره "+(index+1)+" حرکت کرد.";}
- catch(e){document.getElementById("message").textContent=e.message;}
+ try{
+  const d=await api("move",{tokenIndex:index});
+  applyState(d);
+  document.getElementById("message").textContent="مهره "+(index+1)+" حرکت کرد.";
+ }catch(e){document.getElementById("message").textContent=e.message;}
  finally{locked=false;render();}
 }
+
 function render(){
  renderTokens();const box=document.getElementById("players");box.innerHTML="";
  const countEl=document.getElementById("playersCount");if(countEl)countEl.innerHTML="تعداد بازیکنان: <strong>"+players.length+"</strong>";
