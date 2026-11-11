@@ -157,9 +157,8 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 }
 .board.ludo-board .board-art,.board.ludo-board .tokens-layer{display:none!important}
 .board.ludo-board:not(.legacy-ludo) .ludo-yard{
- position:relative;z-index:auto;min-width:0;min-height:0;display:grid;box-sizing:border-box;
- grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));
- gap:0;padding:0;border-radius:0;overflow:hidden;border:1px solid #ffffffd0;
+ position:relative;z-index:auto;min-width:0;min-height:0;display:block;box-sizing:border-box;
+ padding:0;border-radius:0;overflow:hidden;border:1px solid #ffffffd0;
  box-shadow:inset 0 0 0 1px #00000012;
 }
 .board.ludo-board:not(.legacy-ludo) .ludo-yard.red{background:linear-gradient(145deg,#ff7890,#bd244b)}
@@ -167,27 +166,12 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .board.ludo-board:not(.legacy-ludo) .ludo-yard.green{background:linear-gradient(145deg,#72efac,#12804d)}
 .board.ludo-board:not(.legacy-ludo) .ludo-yard.yellow{background:linear-gradient(145deg,#ffe58c,#c27a18)}
 .board.ludo-board:not(.legacy-ludo) .ludo-home-slot{
- position:relative;z-index:4;display:grid;place-items:center;place-self:center;
- width:72%;height:72%;min-width:0;min-height:0;border-radius:50%;
+ position:absolute;z-index:4;display:grid;place-items:center;transform:translate(-50%,-50%);
+ width:20%;height:20%;min-width:0;min-height:0;border-radius:50%;
  background:radial-gradient(circle at 35% 28%,#ffffff,#e8edf4 70%,#c0cad7);
  border:1px solid #ffffff;box-shadow:inset 0 1px 3px #53647a55,0 1px 2px #0003;
 }
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="0"] .ludo-home-slot[data-token="0"]{grid-row:2;grid-column:2}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="0"] .ludo-home-slot[data-token="1"]{grid-row:2;grid-column:3}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="0"] .ludo-home-slot[data-token="2"]{grid-row:3;grid-column:2}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="0"] .ludo-home-slot[data-token="3"]{grid-row:3;grid-column:3}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="1"] .ludo-home-slot[data-token="0"]{grid-row:2;grid-column:4}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="1"] .ludo-home-slot[data-token="1"]{grid-row:2;grid-column:5}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="1"] .ludo-home-slot[data-token="2"]{grid-row:3;grid-column:4}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="1"] .ludo-home-slot[data-token="3"]{grid-row:3;grid-column:5}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="2"] .ludo-home-slot[data-token="0"]{grid-row:4;grid-column:4}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="2"] .ludo-home-slot[data-token="1"]{grid-row:4;grid-column:5}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="2"] .ludo-home-slot[data-token="2"]{grid-row:5;grid-column:4}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="2"] .ludo-home-slot[data-token="3"]{grid-row:5;grid-column:5}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="3"] .ludo-home-slot[data-token="0"]{grid-row:4;grid-column:2}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="3"] .ludo-home-slot[data-token="1"]{grid-row:4;grid-column:3}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="3"] .ludo-home-slot[data-token="2"]{grid-row:5;grid-column:2}
-.board.ludo-board:not(.legacy-ludo) .ludo-yard[data-seat="3"] .ludo-home-slot[data-token="3"]{grid-row:5;grid-column:3}
+/* Home slots are positioned with mirrored percentages in createLudoBoard(). */
 .board.ludo-board:not(.legacy-ludo) .ludo-square{
  position:relative;z-index:2;min-width:0;min-height:0;display:grid;place-items:center;
  border:1px solid #aeb9c7;border-radius:0;background:linear-gradient(145deg,#fff,#e6ebf2);
@@ -255,7 +239,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.41 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.42 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -613,7 +597,17 @@ function createLudoBoard(){
  yards.forEach(({seat,row,col})=>{
   const yard=document.createElement("div");yard.className="ludo-yard "+LUDO_COLORS[seat];yard.dataset.seat=String(seat);
   const span=modern?5:6;yard.style.gridRow=row+"/span "+span;yard.style.gridColumn=col+"/span "+span;
-  for(let token=0;token<4;token++){const slot=document.createElement("div");slot.className="ludo-home-slot";slot.dataset.token=String(token);yard.appendChild(slot);}
+  const homeCenters=modern?[
+   [[22,22],[48,22],[22,48],[48,48]],
+   [[52,22],[78,22],[52,48],[78,48]],
+   [[52,52],[78,52],[52,78],[78,78]],
+   [[22,52],[48,52],[22,78],[48,78]]
+  ][seat]:null;
+  for(let token=0;token<4;token++){
+   const slot=document.createElement("div");slot.className="ludo-home-slot";slot.dataset.token=String(token);
+   if(modern){slot.style.left=homeCenters[token][0]+"%";slot.style.top=homeCenters[token][1]+"%";}
+   yard.appendChild(slot);
+  }
   board.appendChild(yard);
  });
  const tileMap=new Map();
