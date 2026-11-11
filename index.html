@@ -591,7 +591,7 @@ function createLudoBoard(){
  board.querySelectorAll(".cell,.ludo-cell,.ludo-token,.ludo-yard,.ludo-home-slot,.ludo-square,.ludo-center,.ludo-track-overlay,.ludo-home-overlay,.ludo-token-stack").forEach(e=>e.remove());
  const track=modern?LUDO_TRACK:LUDO_TRACK_LEGACY,lanes=modern?LUDO_LANES:LUDO_LANES_LEGACY,starts=modern?LUDO_START:LUDO_START_LEGACY;
  const yards=modern?[
-  {seat:0,row:1,col:1},{seat:1,row:1,col:8},{seat:2,row:8,col:8},{seat:3,row:8,col:1}
+  {seat:0,row:2,col:2},{seat:1,row:2,col:8},{seat:2,row:8,col:8},{seat:3,row:8,col:2}
  ]:[
   {seat:0,row:1,col:1},{seat:1,row:1,col:10},{seat:2,row:10,col:10},{seat:3,row:10,col:1}
  ];
