@@ -831,7 +831,6 @@ async function rollDice(){
   const d=await api("roll");
   const finalValue=Number(d.dice);
   await animateDice(finalValue,820);
-  document.getElementById("dice").textContent=DICE[finalValue-1];
   document.getElementById("diceCaption").textContent="عدد تاس: "+finalValue;
   lastSeenRollId=d.rollId||d.lastRoll?.id||lastSeenRollId;
   applyState(d);
