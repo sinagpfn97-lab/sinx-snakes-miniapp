@@ -249,19 +249,19 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 /* Anchor locations perfectly calibrated */
 .board.ludo-board .ludo-token.red::before{
  background-position:0 0;
- transform:translate(-48.5%, -62%);
+ transform:translate(-50%, -64%);
 }
 .board.ludo-board .ludo-token.blue::before{
  background-position:100% 0;
- transform:translate(-51.5%, -62%);
+ transform:translate(-50%, -64%);
 }
 .board.ludo-board .ludo-token.yellow::before{
  background-position:0 100%;
- transform:translate(-48.5%, -62%);
+ transform:translate(-50%, -64%);
 }
 .board.ludo-board .ludo-token.green::before{
  background-position:100% 100%;
- transform:translate(-51.5%, -62%);
+ transform:translate(-50%, -64%);
 }
 .board.ludo-board .ludo-token.selectable::before{
  filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 7px #fff);
@@ -273,7 +273,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.32 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.33 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -598,10 +598,10 @@ const LUDO_START=[36,0,12,24],LUDO_COLORS=["red","blue","green","yellow"];
 const LUDO_BOARD_SIZE=600,LUDO_CELL_SIZE=40;
 // Home pawn centers measured from the new 640px board artwork and scaled to the 600px canvas.
 const LUDO_HOME_PAWNS={
- red:[[95,95],[150,95],[95,150],[150,150]],
- blue:[[450,95],[505,95],[450,150],[505,150]],
- green:[[450,450],[505,450],[450,505],[505,505]],
- yellow:[[95,450],[150,450],[95,505],[150,505]]
+ red:[[87,87],[146,87],[87,146],[146,146]],
+ blue:[[454,87],[513,87],[454,146],[513,146]],
+ green:[[454,454],[513,454],[454,505],[513,513]],
+ yellow:[[87,454],[146,454],[87,513],[146,513]]
 };
 const LUDO_LANES=[
  [[7,1],[7,2],[7,3],[7,4]],
@@ -624,7 +624,7 @@ function createLudoBoard(){
  drawLudoTokens();
 }
 // The artwork's 15x15 playable grid is inset from the image edges.
-const LUDO_GRID_ORIGIN=30.5,LUDO_GRID_STEP_X=38.5,LUDO_GRID_STEP_Y=38.5;
+const LUDO_GRID_ORIGIN=27,LUDO_GRID_STEP_X=39,LUDO_GRID_STEP_Y=39;
 function ludoGridCenterX(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_X;}
 function ludoGridCenterY(index){return LUDO_GRID_ORIGIN+index*LUDO_GRID_STEP_Y;}
 function drawLudoGridDebug(board){
