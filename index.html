@@ -81,7 +81,9 @@ h1{font-size:26px;margin:5px 0;font-weight:900}
 #dice[data-value="4"] .dice-cube{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(0deg) rotateY(90deg)}
 #dice[data-value="5"] .dice-cube{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(90deg) rotateY(0deg)}
 #dice[data-value="6"] .dice-cube{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(-90deg) rotateY(0deg)}
-.dice.rolling .dice-cube{animation:dice-tumble 1.35s cubic-bezier(.22,.75,.18,1) both}\n.dice.rolling{animation:dice-float 1.35s cubic-bezier(.35,0,.25,1) both}\n@keyframes dice-float{0%{transform:translateY(0) scale(.94)}22%{transform:translateY(-9px) scale(1.04)}48%{transform:translateY(1px) scale(.99)}72%{transform:translateY(-4px) scale(1.015)}100%{transform:translateY(0) scale(1)}}
+.dice.rolling .dice-cube{animation:dice-tumble 1.35s cubic-bezier(.22,.75,.18,1) both}
+.dice.rolling{animation:dice-float 1.35s cubic-bezier(.35,0,.25,1) both}
+@keyframes dice-float{0%{transform:translateY(0) scale(.94)}22%{transform:translateY(-9px) scale(1.04)}48%{transform:translateY(1px) scale(.99)}72%{transform:translateY(-4px) scale(1.015)}100%{transform:translateY(0) scale(1)}}
 @keyframes dice-tumble{0%{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(.84)}18%{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(155deg) rotateY(125deg) rotateZ(42deg) scale(1.12)}42%{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(390deg) rotateY(315deg) rotateZ(95deg) scale(1.04)}68%{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(590deg) rotateY(500deg) rotateZ(170deg) scale(1.08)}88%{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(700deg) rotateY(535deg) rotateZ(210deg) scale(1.01)}100%{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(720deg) rotateY(540deg) rotateZ(360deg) scale(1)}}
 .dice-caption{font-size:9px;color:var(--muted)}
 @media(prefers-reduced-motion:reduce){.dice-cube{transition:none}.dice.rolling .dice-cube{animation:none}}
