@@ -64,11 +64,27 @@ h1{font-size:26px;margin:5px 0;font-weight:900}
 .player-name{font-size:10px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .player-pos{font-size:9px;color:var(--muted)}
 .controls{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}
-.dice-box{background:#10152b;border:1px solid #39345c;border-radius:15px;padding:9px;text-align:center}
-.dice{font-size:42px;line-height:1.35;filter:drop-shadow(0 0 10px #a879ff88)}
-.dice.rolling{animation:shake .12s infinite alternate}
-@keyframes shake{from{transform:rotate(-13deg) scale(.9)}to{transform:rotate(13deg) scale(1.1)}}
+.dice-box{background:radial-gradient(ellipse at 50% 20%,#25204c99,#080d20cc);border:1px solid #5a4a91;border-radius:17px;padding:10px;text-align:center;display:grid;justify-items:center;gap:5px;overflow:hidden}
+.dice{width:76px;height:76px;display:grid;place-items:center;perspective:420px;filter:drop-shadow(0 8px 9px #0009);isolation:isolate}
+.dice-cube{--cube-size:54px;position:relative;width:var(--cube-size);height:var(--cube-size);transform-style:preserve-3d;transform:translateZ(calc(var(--cube-size) / -2));transition:transform .68s cubic-bezier(.18,.78,.2,1)}
+.dice-face{position:absolute;inset:0;width:var(--cube-size);height:var(--cube-size);display:grid;place-items:center;border:2px solid #fff;border-radius:11px;background:linear-gradient(145deg,#ffffff 0%,#e8f3ff 48%,#b8c9e7 100%);color:#11152a;box-shadow:inset 0 2px 5px #fff, inset 0 -4px 7px #64749b66,0 0 10px #63eaff66;backface-visibility:hidden;font-family:Arial,sans-serif;font-size:42px;line-height:1}
+.dice-face:before{content:attr(data-pips);text-shadow:0 1px 0 #ffffff88}
+.dice-face.front{transform:rotateY(0deg) translateZ(calc(var(--cube-size) / 2))}
+.dice-face.right{transform:rotateY(90deg) translateZ(calc(var(--cube-size) / 2))}
+.dice-face.back{transform:rotateY(180deg) translateZ(calc(var(--cube-size) / 2))}
+.dice-face.left{transform:rotateY(-90deg) translateZ(calc(var(--cube-size) / 2))}
+.dice-face.top{transform:rotateX(90deg) translateZ(calc(var(--cube-size) / 2))}
+.dice-face.bottom{transform:rotateX(-90deg) translateZ(calc(var(--cube-size) / 2))}
+#dice[data-value="1"] .dice-cube{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(0deg) rotateY(0deg)}
+#dice[data-value="2"] .dice-cube{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(0deg) rotateY(-90deg)}
+#dice[data-value="3"] .dice-cube{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(0deg) rotateY(180deg)}
+#dice[data-value="4"] .dice-cube{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(0deg) rotateY(90deg)}
+#dice[data-value="5"] .dice-cube{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(90deg) rotateY(0deg)}
+#dice[data-value="6"] .dice-cube{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(-90deg) rotateY(0deg)}
+.dice.rolling .dice-cube{animation:dice-tumble .82s cubic-bezier(.2,.72,.25,1) both}
+@keyframes dice-tumble{0%{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(0) rotateY(0) rotateZ(0) scale(.82)}35%{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(240deg) rotateY(190deg) rotateZ(75deg) scale(1.12)}70%{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(510deg) rotateY(410deg) rotateZ(155deg) scale(1.04)}100%{transform:translateZ(calc(var(--cube-size) / -2)) rotateX(720deg) rotateY(540deg) rotateZ(360deg) scale(1)}}
 .dice-caption{font-size:9px;color:var(--muted)}
+@media(prefers-reduced-motion:reduce){.dice-cube{transition:none}.dice.rolling .dice-cube{animation:none}}
 button{font-family:inherit;border:0;cursor:pointer;font-weight:800}
 .roll{min-height:85px;width:100%;border-radius:15px;color:#15112a;background:linear-gradient(135deg,#c09aff,#54eafa);box-shadow:0 5px 20px #8959e955;font-size:16px}
 .roll:disabled{opacity:.35;cursor:not-allowed}
@@ -311,7 +327,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.44 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.45 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -388,7 +404,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
   <div class="players-count" id="playersCount">تعداد بازیکنان: <strong>۰</strong></div>
   <div class="players" id="players"></div>
   <div class="controls">
-    <div class="dice-box"><div class="dice" id="dice">🎲</div><div class="dice-caption" id="diceCaption">منتظر پرتاب تاس</div></div>
+    <div class="dice-box"><div class="dice" id="dice" data-value="1" role="img" aria-label="تاس سه‌بعدی"><div class="dice-cube"><span class="dice-face front" data-pips="⚀"></span><span class="dice-face right" data-pips="⚁"></span><span class="dice-face back" data-pips="⚂"></span><span class="dice-face left" data-pips="⚃"></span><span class="dice-face top" data-pips="⚄"></span><span class="dice-face bottom" data-pips="⚅"></span></div></div><div class="dice-caption" id="diceCaption">منتظر پرتاب تاس</div></div>
     <button class="roll" id="rollBtn" onclick="rollDice()">🎲 انداختن تاس</button>
   </div>
   <div class="message" id="message">اتاق بساز یا با کد دعوت وارد بازی شو.</div>
@@ -781,11 +797,15 @@ function render(){
  document.querySelectorAll(".cell.destination").forEach(e=>e.classList.remove("destination"));
  if(pendingMove&&mySeat===turn){const target=document.getElementById("cell-"+pendingMove.target_position);if(target)target.classList.add("destination");}
 }
-async function animateDice(finalValue,duration=360){
+async function animateDice(finalValue,duration=820){
  const dice=document.getElementById("dice");dice.classList.add("rolling");
  const start=Date.now();
- while(Date.now()-start<duration){dice.textContent=DICE[Math.floor(Math.random()*6)];await sleep(42);}
- dice.textContent=DICE[finalValue-1];dice.classList.remove("rolling");
+ while(Date.now()-start<duration){
+  dice.dataset.value=String(1+Math.floor(Math.random()*6));
+  await sleep(65);
+ }
+ dice.dataset.value=String(finalValue);
+ dice.classList.remove("rolling");
  document.getElementById("diceCaption").textContent="عدد تاس: "+finalValue;
 }
 async function animateRemoteMove(move){
@@ -810,7 +830,7 @@ async function rollDice(){
  try{
   const d=await api("roll");
   const finalValue=Number(d.dice);
-  await animateDice(finalValue,360);
+  await animateDice(finalValue,820);
   document.getElementById("dice").textContent=DICE[finalValue-1];
   document.getElementById("diceCaption").textContent="عدد تاس: "+finalValue;
   lastSeenRollId=d.rollId||d.lastRoll?.id||lastSeenRollId;
