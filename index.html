@@ -335,7 +335,7 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.50 · build 2026-11-11</div>
+<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v1.0.51 · build 2026-11-11</div>
 <main class="hub" id="hubView">
   <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
   <section class="hub-hero">
@@ -527,7 +527,7 @@ function applyState(data){
  const leaveBtn=document.getElementById("leaveRoomBtn");if(leaveBtn)leaveBtn.style.display=roomCode?"block":"none";
 
  if(roomCode&&roomStatus==="waiting")document.getElementById("message").textContent=players.length+" بازیکن از ۴";
- if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج «"+departed+"» به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const winners=roomGameType==="ludo"?(data.room?.game_state?.winner_seats||[]).map(seat=>players.find(p=>p.seat===Number(seat))).filter(Boolean):players.filter(p=>p.pos===100);if(winners.length){document.getElementById("winnerTitle").textContent="🏆 "+(roomGameType==="ludo"?"برندگان مسابقه":"🏆 "+winners[0].name);document.getElementById("winnerText").textContent=winners.map(p=>p.name).join("، ")+" برنده شدند.";document.getElementById("winOverlay").style.display="flex";}}}
+ if(roomStatus==="finished"){const endReason=data.room?.game_state?.end_reason;if(endReason==="player_left"){const departed=data.room?.game_state?.ended_by||"یکی از بازیکنان";document.getElementById("message").textContent="بازی به دلیل خروج «"+departed+"» به پایان رسید.";document.getElementById("gameStatus").textContent="بازی به پایان رسید";document.getElementById("winOverlay").style.display="none";}else{const winners=roomGameType==="ludo"?(data.room?.game_state?.winner_seats||[]).map(seat=>players.find(p=>p.seat===Number(seat))).filter(Boolean):players.filter(p=>p.pos===100);if(winners.length){const firstWinner=winners[0];document.getElementById("winnerTitle").textContent="🏆 "+firstWinner.name;document.getElementById("winnerText").textContent="برنده مسابقه شد.";document.getElementById("winOverlay").style.display="flex";}}}
 }
 async function syncState(){const d=await api("state");applyState(d);return d;}
 function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
