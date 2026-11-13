@@ -56,7 +56,7 @@ const SUITS=["♠","♣","♦","♥"],RED=["♦","♥"],RANKS=["2","3","4","5","
 const VALUE=Object.fromEntries(RANKS.map((r,i)=>[r,i]));
 const NAMES={"♠":"پیک","♣":"گشنیز","♦":"خشت","♥":"دل"};
 const $=id=>document.getElementById(id);
-const state={hands:[[],[],[],[]],scores:[0,0],seriesWins:[0,0],roundsPerHand:3,tricks:[0,0],trick:[],trump:null,turn:0,leader:0,hakem:0,lastHakem:0,round:0,target:7,phase:"idle",human:2,matchOver:false,roundWinner:null,dealNo:0};
+const state={hands:[[],[],[],[]],scores:[0,0],seriesWins:[0,0],roundsPerHand:3,tricks:[0,0],trick:[],trump:null,turn:0,leader:0,hakem:0,lastHakem:0,round:0,target:7,phase:"idle",human:2,matchOver:false,roundWinner:null,dealNo:0,playedCards:[]};
 const persian=n=>String(n).replace(/[0-9]/g,d=>"۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function makeDeck(){return shuffle(SUITS.flatMap(s=>RANKS.map(r=>({suit:s,rank:r,id:r+s,value:VALUE[r]}))));}
@@ -64,57 +64,60 @@ function team(seat){return seat%2===0?0:1;}
 function labelTeam(t){return t===0?"تیم فیروزه‌ای":"تیم بنفش";}
 function sortHand(hand){hand.sort((a,b)=>SUITS.indexOf(a.suit)-SUITS.indexOf(b.suit)||b.value-a.value);}
 function startRound(first=false){state.round++;state.scores=[0,0];state.matchOver=false;state.roundWinner=null;state.dealNo=0;if(first){state.hakem=Math.floor(Math.random()*4);state.lastHakem=state.hakem;}startDeal();}
-function startDeal(){state.dealNo++;state.tricks=[0,0];state.trick=[];state.trump=null;const deck=makeDeck();state.hands=[[],[],[],[]];for(let i=0;i<5;i++)for(let offset=0;offset<4;offset++)state.hands[(state.hakem+offset)%4].push(deck.pop());state.hands.forEach(sortHand);state.turn=state.hakem;state.leader=state.hakem;state.phase="choose";$("feed").textContent="دست جدید؛ "+seatName(state.hakem)+" حاکم است و خال حکم را انتخاب می‌کند.";if(state.hakem!==state.human){const chosen=chooseBotTrump(state.hands[state.hakem]);setTimeout(()=>{if(state.phase==="choose")selectTrump(chosen);},650);}render();}
+function startDeal(){state.dealNo++;state.tricks=[0,0];state.trick=[];state.playedCards=[];state.trump=null;const deck=makeDeck();state.hands=[[],[],[],[]];for(let i=0;i<5;i++)for(let offset=0;offset<4;offset++)state.hands[(state.hakem+offset)%4].push(deck.pop());state.hands.forEach(sortHand);state.turn=state.hakem;state.leader=state.hakem;state.phase="choose";$("feed").textContent="دست جدید؛ "+seatName(state.hakem)+" حاکم است و خال حکم را انتخاب می‌کند.";if(state.hakem!==state.human){const chosen=chooseBotTrump(state.hands[state.hakem]);setTimeout(()=>{if(state.phase==="choose")selectTrump(chosen);},650);}render();}
 function chooseBotTrump(hand){
- return SUITS.map(s=>({s,n:hand.filter(c=>c.suit===s).length,high:hand.filter(c=>c.suit===s).reduce((v,c)=>v+c.value,0)})).sort((a,b)=>b.n-a.n||b.high-a.high)[0].s;
-}
-function selectTrump(suit){
- if(state.phase!=="choose"||!SUITS.includes(suit))return;
- state.trump=suit;
- const deck=state._deck||null;
- // The remaining 32 cards are dealt after the first five-card auction.
- const used=new Set(state.hands.flat().map(c=>c.id));
- const rest=SUITS.flatMap(s=>RANKS.map(r=>({suit:s,rank:r,id:r+s,value:VALUE[r]}))).filter(c=>!used.has(c.id));
- shuffle(rest);for(let i=0;i<4;i++)for(let j=0;j<8;j++)state.hands[(state.hakem+i)%4].push(rest.pop());
- state.hands.forEach(sortHand);state.phase="play";state.turn=state.hakem;state.leader=state.hakem;
- $("feed").textContent="حکم "+NAMES[suit]+" شد؛ بازی شروع شد.";
- render();scheduleBot();
+ const options=SUITS.map(s=>{
+  const cards=hand.filter(c=>c.suit===s);
+  const honors=cards.reduce((n,c)=>n+({A:9,K:6,Q:4,J:2,10:1}[c.rank]||0),0);
+  const top=cards.filter(c=>c.rank==="A"||c.rank==="K"||c.rank==="Q").length;
+  return {s,score:cards.length*4.2+honors+top*1.4+(cards.length>=5?3:0)};
+ });
+ return options.sort((a,b)=>b.score-a.score)[0].s;
 }
 function legalCards(seat){
  const hand=state.hands[seat],lead=state.trick[0]?.card?.suit;
  if(!lead)return hand.slice();
  const same=hand.filter(c=>c.suit===lead);return same.length?same:hand.slice();
 }
-function winnerOfTrick(){
- const lead=state.trick[0].card.suit;
- return state.trick.reduce((best,item)=>{
+function winnerOfCards(items){
+ const lead=items[0].card.suit;
+ return items.reduce((best,item)=>{
   const a=item.card,b=best.card;
   const rank=c=>c.suit===state.trump?2:c.suit===lead?1:0;
   if(rank(a)>rank(b)||(rank(a)===rank(b)&&a.value>b.value))return item;
   return best;
  }).seat;
 }
-function playCard(seat,cardId){
- if(state.phase!=="play"||state.turn!==seat)return;
- const hand=state.hands[seat],idx=hand.findIndex(c=>c.id===cardId);if(idx<0)return;
- const card=hand[idx];if(!legalCards(seat).some(c=>c.id===cardId)){ $("feed").textContent="باید از خال شروع‌شده بازی کنید.";return;}
- hand.splice(idx,1);state.trick.push({seat,card});state.turn=(seat+1)%4;render();
- if(state.trick.length===4){const win=winnerOfTrick(),winningTeam=team(win);state._lastTrickWinner=win;state.tricks[winningTeam]++;state.scores[winningTeam]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win)+" · یک امتیاز برای "+labelTeam(winningTeam);render();if(state.scores[winningTeam]>=7){finishRound(winningTeam);}else{setTimeout(()=>{state.trick=[];render();scheduleBot();},850);}}
- else scheduleBot();
-}
-function seatName(s){return s===state.human?(window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name||"شما"):"ربات "+(s===0?1:s===1?2:3); }
+function winnerOfTrick(){return winnerOfCards(state.trick);}
 function botChoose(seat){
  const legal=legalCards(seat),lead=state.trick[0]?.card?.suit;
- const current=state.trick.length?winnerOfTrick():null;
- const teammateWinning=current!==null&&team(current)===team(seat);
- if(!state.trick.length)return legal.slice().sort((a,b)=>a.value-b.value)[0];
- if(teammateWinning)return legal.slice().sort((a,b)=>a.value-b.value)[0];
- const winning=legal.filter(c=>{
-  const trial=[...state.trick,{seat,card:c}];
-  const leadSuit=trial[0].card.suit;
-  let best=trial[0];for(const item of trial.slice(1)){const ra=item.card.suit===state.trump?2:item.card.suit===leadSuit?1:0;const rb=best.card.suit===state.trump?2:best.card.suit===leadSuit?1:0;if(ra>rb||(ra===rb&&item.card.value>best.card.value))best=item;}return best.seat===seat;
+ const teamMateWinning=state.trick.length>0&&team(winnerOfTrick())===team(seat);
+ const strength=c=>c.value+(c.suit===state.trump?15:0);
+ const lowest=(cards)=>cards.slice().sort((a,b)=>strength(a)-strength(b))[0];
+ if(state.trick.length){
+  if(teamMateWinning){
+   const safe=legal.filter(c=>c.suit!==state.trump);
+   return lowest(safe.length?safe:legal);
+  }
+  const winners=legal.filter(c=>winnerOfCards([...state.trick,{seat,card:c}])===seat);
+  if(winners.length)return winners.sort((a,b)=>strength(a)-strength(b))[0];
+  const cheapNonTrump=legal.filter(c=>c.suit!==state.trump);
+  return lowest(cheapNonTrump.length?cheapNonTrump:legal);
+ }
+ // Lead with a remaining top card where possible; prefer a long side suit.
+ const played=new Set(state.playedCards.map(x=>x.card.id));
+ const candidates=legal.map(c=>{
+  const same=legal.filter(x=>x.suit===c.suit);
+  const unseenHigher=RANKS.filter(r=>VALUE[r]>c.value).some(r=>!played.has(r+c.suit)&&!state.hands[seat].some(x=>x.id===r+c.suit));
+  const isTop=!unseenHigher;
+  const isAce=c.rank==="A";
+  const trumpPenalty=c.suit===state.trump?5:0;
+  const score=(isTop?18:0)+(isAce?8:0)+same.length*2.2+c.value*.12-trumpPenalty;
+  return {card:c,score};
  });
- return (winning.length?winning:legal).slice().sort((a,b)=>a.value-b.value)[0];
+ const bestScore=Math.max(...candidates.map(x=>x.score));
+ const best=candidates.filter(x=>x.score===bestScore).map(x=>x.card);
+ return best.sort((a,b)=>b.value-a.value)[0];
 }
 function scheduleBot(){
  if(state.phase==="choose"&&state.hakem!==state.human){setTimeout(()=>{if(state.phase==="choose")selectTrump(chooseBotTrump(state.hands[state.hakem]));},450);return;}
