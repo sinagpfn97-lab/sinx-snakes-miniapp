@@ -19,32 +19,32 @@
 <header><div class="brand">S I N X · ARCADE</div><h1>🃏 SINX HOKM</h1><div class="sub">CLASSIC HOKM · CYBER NEON TABLE</div></header>
 <section class="panel">
  <div class="setup">
-  <div class="field"><label for="target">امتیاز پایان مسابقه</label><select id="target"><option value="7" selected>۷ امتیاز · پیش‌فرض</option><option value="5">۵ امتیاز</option><option value="3">۳ امتیاز</option><option value="1">۱ امتیاز</option></select></div>
+  <div class="field"><label for="roundsPerHand">تعداد راند برای پایان یک دست</label><select id="roundsPerHand"><option value="1">۱ راند</option><option value="3" selected>۳ راند</option><option value="5">۵ راند</option><option value="7">۷ راند</option></select></div>
   <button class="primary" id="newMatch">شروع مسابقه آزمایشی</button>
  </div>
  <div class="online-note" id="onlineNote">حالت آنلاین در معماری نسخه اصلی پیش‌بینی شده است؛ این صفحه فعلاً پیش‌نمایش تعاملی محلی با سه ربات است و هنوز به اتاق‌های Supabase متصل نیست.</div>
  <div class="actions"><button class="secondary" id="showOnline">حالت آنلاین</button><button class="secondary" id="showBots">بازی با ربات‌ها</button></div>
 </section>
 <section class="panel">
- <div class="status"><span class="pill" id="phase">آماده شروع</span><span class="pill" id="round">دست ۱</span></div>
+ <div class="status"><span class="pill" id="phase">آماده شروع</span><span class="pill" id="round">راند ۱ از ۳</span></div>
  <div class="scores">
-  <div class="score"><small>تیم فیروزه‌ای · شمال + جنوب</small><strong class="cyan" id="scoreA">۰</strong></div>
-  <div class="score"><small>تیم بنفش · شرق + غرب</small><strong class="purple" id="scoreB">۰</strong></div>
+  <div class="score"><small>تیم فیروزه‌ای · امتیاز راند / برد راندها: <span id="seriesA">۰</span></small><strong class="cyan" id="scoreA">۰</strong></div>
+  <div class="score"><small>تیم بنفش · امتیاز راند / برد راندها: <span id="seriesB">۰</span></small><strong class="purple" id="scoreB">۰</strong></div>
  </div>
  <div class="table">
-  <div class="seat north" id="seat0"><b>شمال · ربات</b><span class="tag">تیم فیروزه‌ای</span></div>
-  <div class="seat side west" id="seat3"><b>غرب · ربات</b><span class="tag">تیم بنفش</span></div>
-  <div class="seat side east" id="seat1"><b>شرق · ربات</b><span class="tag">تیم بنفش</span></div>
+  <div class="seat north" id="seat0"><b>ربات ۱</b></div>
+  <div class="seat side west" id="seat3"><b>ربات ۳</b></div>
+  <div class="seat side east" id="seat1"><b>ربات ۲</b></div>
   <div class="center">
    <div><div class="trick" id="trick"></div><div class="trump-label" id="trumpLabel">خال حکم: —</div></div>
   </div>
-  <div class="seat south" id="seat2"><b>جنوب · شما</b><span class="tag">تیم فیروزه‌ای</span></div>
+  <div class="seat south" id="seat2"><b id="humanName">شما</b></div>
  </div>
  <div class="hand-wrap"><div class="hand-title"><span>کارت‌های شما</span><span id="handCount">۰ کارت</span></div><div class="hand" id="hand"></div></div>
  <div id="trumpPicker" style="display:none"><div class="feed">شما حاکم هستید؛ خال حکم را انتخاب کنید.</div><div class="trump-choices" id="trumpChoices"></div></div>
  <div class="winner" id="winner"></div>
  <div class="feed" id="feed">برای شروع، مسابقه آزمایشی را بزنید.</div>
- <div class="actions"><button class="secondary" id="nextHand" style="display:none">دست بعدی</button><button class="secondary" id="restart">شروع مجدد</button></div>
+ <div class="actions"><button class="secondary" id="nextHand" style="display:none">راند بعدی</button><button class="secondary" id="restart">شروع مجدد</button></div>
 </section>
 <p class="notice">این نسخه برای نمایش ظاهر و چرخه بازی است. در نسخه آنلاین نهایی، توزیع کارت، نوبت‌ها، امتیازدهی و کارت‌های خصوصی باید سمت سرور و در RPCهای امن اجرا شوند.</p>
 </div>
@@ -55,7 +55,7 @@ const SUITS=["♠","♣","♦","♥"],RED=["♦","♥"],RANKS=["2","3","4","5","
 const VALUE=Object.fromEntries(RANKS.map((r,i)=>[r,i]));
 const NAMES={"♠":"پیک","♣":"گشنیز","♦":"خشت","♥":"دل"};
 const $=id=>document.getElementById(id);
-const state={hands:[[],[],[],[]],scores:[0,0],tricks:[0,0],trick:[],trump:null,turn:0,leader:0,hakem:0,lastHakem:0,round:0,target:7,phase:"idle",human:2,matchOver:false,roundWinner:null};
+const state={hands:[[],[],[],[]],scores:[0,0],seriesWins:[0,0],roundsPerHand:3,tricks:[0,0],trick:[],trump:null,turn:0,leader:0,hakem:0,lastHakem:0,round:0,target:7,phase:"idle",human:2,matchOver:false,roundWinner:null};
 const persian=n=>String(n).replace(/[0-9]/g,d=>"۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function makeDeck(){return shuffle(SUITS.flatMap(s=>RANKS.map(r=>({suit:s,rank:r,id:r+s,value:VALUE[r]}))));}
@@ -63,7 +63,7 @@ function team(seat){return seat%2===0?0:1;}
 function labelTeam(t){return t===0?"تیم فیروزه‌ای":"تیم بنفش";}
 function sortHand(hand){hand.sort((a,b)=>SUITS.indexOf(a.suit)-SUITS.indexOf(b.suit)||b.value-a.value);}
 function startRound(first=false){
- state.round++;state.tricks=[0,0];state.trick=[];state.trump=null;state.matchOver=false;state.roundWinner=null;
+ state.round++;state.scores=[0,0];state.tricks=[0,0];state.trick=[];state.trump=null;state.matchOver=false;state.roundWinner=null;
  const deck=makeDeck();state.hands=[[],[],[],[]];
  if(first){state.hakem=Math.floor(Math.random()*4);state.lastHakem=state.hakem;}
  for(let i=0;i<5;i++)for(let offset=0;offset<4;offset++)state.hands[(state.hakem+offset)%4].push(deck.pop());
@@ -108,7 +108,7 @@ function playCard(seat,cardId){
  if(state.trick.length===4){const win=winnerOfTrick();state._lastTrickWinner=win;state.tricks[team(win)]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win);render();setTimeout(()=>{state.trick=[];if(state.hands.every(h=>h.length===0))finishRound();else{render();scheduleBot();}},850);}
  else scheduleBot();
 }
-function seatName(s){return ["شمال","شرق","جنوب","غرب"][s];}
+function seatName(s){return s===state.human?(window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name||"شما"):"ربات "+(s===0?1:s===1?2:3); }
 function botChoose(seat){
  const legal=legalCards(seat),lead=state.trick[0]?.card?.suit;
  const current=state.trick.length?winnerOfTrick():null;
@@ -134,25 +134,27 @@ function finishRound(){
  if((a===13||b===13)&&loser===hakemTeam){points=3;kind="حاکم‌کوت";}
  else if(a===13||b===13){points=2;kind="کوت";}
  state.scores[winner]+=points;state.roundWinner=winner;state.phase="round-end";
- const won=state.scores[winner]>=state.target;
+ state.seriesWins[winner]++;
+ const won=state.round>=state.roundsPerHand;
  state.matchOver=won;
- $("winner").textContent=(won?"🏆 قهرمان مسابقه: ":"برنده دست: ")+labelTeam(winner)+" · "+kind+" · +"+persian(points)+" امتیاز";
- $("nextHand").style.display=won?"none":"inline-block";$("feed").textContent=won?"مسابقه به امتیاز هدف رسید.":"برای ادامه، دست بعدی را شروع کنید.";
- if(won){$("phase").textContent="پایان مسابقه";}else{$("phase").textContent="پایان دست";}
+ const overallWinner=state.seriesWins[0]>state.seriesWins[1]?0:1;
+ $("winner").textContent=(won?"🏆 برنده کل دست: ":"برنده راند "+persian(state.round)+": ")+labelTeam(won?overallWinner:winner)+" · "+kind+" · +"+persian(points)+" امتیاز؛ نتیجه راندها "+persian(state.seriesWins[0])+" - "+persian(state.seriesWins[1]);
+ $("nextHand").style.display=won?"none":"inline-block";$("feed").textContent=won?"همه راندهای تعیین‌شده تمام شدند.":"برای ادامه، راند بعدی را شروع کنید.";
+ if(won){$("phase").textContent="پایان دست";}else{$("phase").textContent="پایان راند";}
  render();
 }
 function nextRound(){
  if(state.phase!=="round-end"||state.matchOver)return;
  const lastWinner=state.roundWinner;
- // The winner of the final trick is the hakem for the next hand, matching the agreed winner-team rule.
+ // برنده آخرین تریک، در صورت تعلق به تیم برنده راند، حاکم راند بعدی می‌شود.
  const nextHakem=state._lastTrickWinner;
  state.hakem=Number.isInteger(nextHakem)&&team(nextHakem)===lastWinner?nextHakem:(lastWinner===0?0:1);
  state.lastHakem=state.hakem;startRound(false);
 }
 function render(){
- $("scoreA").textContent=persian(state.scores[0]);$("scoreB").textContent=persian(state.scores[1]);
- $("round").textContent="دست "+persian(state.round||1);
- $("phase").textContent=state.phase==="choose"?"انتخاب حکم":state.phase==="play"?"در حال بازی":state.phase==="round-end"?"پایان دست":"آماده شروع";
+ $("scoreA").textContent=persian(state.scores[0]);$("scoreB").textContent=persian(state.scores[1]);$("seriesA").textContent=persian(state.seriesWins[0]);$("seriesB").textContent=persian(state.seriesWins[1]);
+ $("round").textContent="راند "+persian(state.round||1)+" از "+persian(state.roundsPerHand);
+ $("phase").textContent=state.phase==="choose"?"انتخاب حکم":state.phase==="play"?"در حال بازی":state.phase==="round-end"?(state.matchOver?"پایان دست":"پایان راند"):"آماده شروع";
  $("trumpLabel").textContent="خال حکم: "+(state.trump?NAMES[state.trump]+" "+state.trump:"در انتظار انتخاب");
  for(let s=0;s<4;s++){$("seat"+s).classList.toggle("active",state.turn===s&&state.phase==="play");}
  $("trick").innerHTML="";
@@ -163,12 +165,13 @@ function render(){
  $("trumpPicker").style.display=state.phase==="choose"&&state.hakem===state.human?"block":"none";
  $("trumpChoices").innerHTML="";for(const s of SUITS){const b=document.createElement("button");b.className="trump"+(RED.includes(s)?" red":"");b.textContent=s;b.title=NAMES[s];b.onclick=()=>selectTrump(s);$("trumpChoices").append(b);}
  $("nextHand").style.display=state.phase==="round-end"&&!state.matchOver?"inline-block":"none";
- $("newMatch").textContent=state.round?"تنظیم مسابقه جدید":"شروع مسابقه آزمایشی";
+ $("newMatch").textContent=state.round?"شروع دست جدید":"شروع دست آزمایشی";
 }
-function startMatch(){state.scores=[0,0];state.round=0;state.target=Number($("target").value);state._lastTrickWinner=null;state.phase="idle";startRound(true);}
+function startMatch(){state.scores=[0,0];state.seriesWins=[0,0];state.round=0;state.roundsPerHand=Number($("roundsPerHand").value);state.target=7;state._lastTrickWinner=null;state.phase="idle";$("winner").textContent="";startRound(true);}
 $("newMatch").addEventListener("click",startMatch);
 $("restart").addEventListener("click",startMatch);
 $("nextHand").addEventListener("click",nextRound);
+const tgUser=window.Telegram?.WebApp?.initDataUnsafe?.user;if(tgUser?.first_name){$("humanName").textContent=tgUser.first_name;}
 $("showOnline").addEventListener("click",()=>{$("onlineNote").style.display="block";});
 $("showBots").addEventListener("click",()=>{$("onlineNote").style.display="none";});
 
