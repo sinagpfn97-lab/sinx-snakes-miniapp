@@ -97,6 +97,30 @@ function winnerOfCards(items){
  }).seat;
 }
 function winnerOfTrick(){return winnerOfCards(state.trick);}
+function selectTrump(suit){
+ if(state.phase!=="choose"||!SUITS.includes(suit))return;
+ state.trump=suit;
+ const deck=state._deck||null;
+ // The remaining 32 cards are dealt after the first five-card auction.
+ const used=new Set(state.hands.flat().map(c=>c.id));
+ const rest=SUITS.flatMap(s=>RANKS.map(r=>({suit:s,rank:r,id:r+s,value:VALUE[r]}))).filter(c=>!used.has(c.id));
+ shuffle(rest);for(let i=0;i<4;i++)for(let j=0;j<8;j++)state.hands[(state.hakem+i)%4].push(rest.pop());
+ state.hands.forEach(sortHand);state.phase="play";state.turn=state.hakem;state.leader=state.hakem;
+ $("feed").textContent="حکم "+NAMES[suit]+" شد؛ بازی شروع شد.";
+ render();scheduleBot();
+}
+
+function playCard(seat,cardId){
+ if(state.phase!=="play"||state.turn!==seat)return;
+ const hand=state.hands[seat],idx=hand.findIndex(c=>c.id===cardId);if(idx<0)return;
+ const card=hand[idx];if(!legalCards(seat).some(c=>c.id===cardId)){ $("feed").textContent="باید از خال شروع‌شده بازی کنید.";return;}
+ hand.splice(idx,1);state.trick.push({seat,card});state.turn=(seat+1)%4;render();
+ if(state.trick.length===4){const win=winnerOfTrick(),winningTeam=team(win);state._lastTrickWinner=win;state.tricks[winningTeam]++;state.scores[winningTeam]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win)+" · یک امتیاز برای "+labelTeam(winningTeam);render();if(state.scores[winningTeam]>=7){finishRound(winningTeam);}else{setTimeout(()=>{state.trick=[];render();scheduleBot();},850);}}
+ else scheduleBot();
+}
+
+function seatName(s){return s===state.human?(window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name||"شما"):"ربات "+(s===0?1:s===1?2:3); }
+
 function botChoose(seat){
  const legal=legalCards(seat),lead=state.trick[0]?.card?.suit;
  const teamMateWinning=state.trick.length>0&&team(winnerOfTrick())===team(seat);
