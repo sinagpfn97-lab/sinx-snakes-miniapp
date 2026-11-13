@@ -105,7 +105,7 @@ function playCard(seat,cardId){
  const hand=state.hands[seat],idx=hand.findIndex(c=>c.id===cardId);if(idx<0)return;
  const card=hand[idx];if(!legalCards(seat).some(c=>c.id===cardId)){ $("feed").textContent="باید از خال شروع‌شده بازی کنید.";return;}
  hand.splice(idx,1);state.trick.push({seat,card});state.turn=(seat+1)%4;render();
- if(state.trick.length===4){const win=winnerOfTrick();state.tricks[team(win)]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win);render();setTimeout(()=>{state.trick=[];if(state.hands.every(h=>h.length===0))finishRound();else{render();scheduleBot();}},850);}
+ if(state.trick.length===4){const win=winnerOfTrick();state._lastTrickWinner=win;state.tricks[team(win)]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win);render();setTimeout(()=>{state.trick=[];if(state.hands.every(h=>h.length===0))finishRound();else{render();scheduleBot();}},850);}
  else scheduleBot();
 }
 function seatName(s){return ["شمال","شرق","جنوب","غرب"][s];}
@@ -149,7 +149,6 @@ function nextRound(){
  state.hakem=Number.isInteger(nextHakem)&&team(nextHakem)===lastWinner?nextHakem:(lastWinner===0?0:1);
  state.lastHakem=state.hakem;startRound(false);
 }
-const oldPlayCard=playCard;
 function render(){
  $("scoreA").textContent=persian(state.scores[0]);$("scoreB").textContent=persian(state.scores[1]);
  $("round").textContent="دست "+persian(state.round||1);
@@ -160,7 +159,7 @@ function render(){
  const positions=[0,1,2,3];const slots=[0,1,2,3];
  for(let i=0;i<4;i++){const item=state.trick.find(x=>x.seat===i);const el=document.createElement("div");el.className="played"+(item&&RED.includes(item.card.suit)?" red":"")+(item?"":" empty");el.textContent=item?item.card.rank+item.card.suit:"·";$("trick").append(el);}
  const hand=state.hands[state.human]||[];$("handCount").textContent=persian(hand.length)+" کارت";$("hand").innerHTML="";
- hand.forEach(c=>{const btn=document.createElement("button");btn.className="card"+(RED.includes(c.suit)?" red":"");btn.innerHTML="<small>"+c.rank+"</small><span>"+c.suit+"</span>";const legal=state.phase==="play"&&state.turn===state.human&&legalCards(state.human).some(x=>x.id===c.id);btn.disabled=!legal;btn.onclick=()=>playCard(state.human,c.id);$("hand").append(btn);});
+ hand.forEach(c=>{const btn=document.createElement("button");btn.className="card"+(RED.includes(c.suit)?" red":"");btn.innerHTML="<small>"+c.rank+"</small><span>"+c.suit+"</span>";const legal=state.phase==="play"&&state.trick.length<4&&state.turn===state.human&&legalCards(state.human).some(x=>x.id===c.id);btn.disabled=!legal;btn.onclick=()=>playCard(state.human,c.id);$("hand").append(btn);});
  $("trumpPicker").style.display=state.phase==="choose"&&state.hakem===state.human?"block":"none";
  $("trumpChoices").innerHTML="";for(const s of SUITS){const b=document.createElement("button");b.className="trump"+(RED.includes(s)?" red":"");b.textContent=s;b.title=NAMES[s];b.onclick=()=>selectTrump(s);$("trumpChoices").append(b);}
  $("nextHand").style.display=state.phase==="round-end"&&!state.matchOver?"inline-block":"none";
@@ -172,10 +171,7 @@ $("restart").addEventListener("click",startMatch);
 $("nextHand").addEventListener("click",nextRound);
 $("showOnline").addEventListener("click",()=>{$("onlineNote").style.display="block";});
 $("showBots").addEventListener("click",()=>{$("onlineNote").style.display="none";});
-const basePlayCard=playCard;
-// Record final trick winner for the next hand's hakem.
-const play=playCard;
-playCard=function(seat,id){play(seat,id);if(state.trick.length===0&&state.phase==="play")state._lastTrickWinner=state.turn;};
+
 render();
 })();
 </script>
