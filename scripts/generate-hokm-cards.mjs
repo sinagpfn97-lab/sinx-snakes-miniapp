@@ -42,14 +42,14 @@ for(let si=0;si<suits.length;si++) for(let ri=0;ri<ranks.length;ri++){
  <rect x="8" y="8" width="424" height="624" rx="34" fill="none" stroke="url(#rim)" stroke-width="5" filter="url(#glow)"/>
  <rect x="19" y="19" width="402" height="602" rx="26" fill="none" stroke="#efffff" stroke-opacity=".85" stroke-width="2"/>
  <rect x="27" y="27" width="386" height="586" rx="22" fill="none" stroke="${suit.a}" stroke-opacity=".7" stroke-width="1.5"/>
- <path d="M37 72 Q75 25 120 36 M320 36 Q365 25 403 72 M37 568 Q75 615 120 604 M320 604 Q365 615 403 568" fill="none" stroke="${suit.c}" stroke-width="2" opacity=".75"/>
+
  <g font-family="Georgia,serif" font-weight="bold" fill="#f4fdff" stroke="${suit.a}" stroke-width="1.3" paint-order="stroke" filter="url(#spark)">
-  <text x="43" y="92" font-size="54">${rank}</text><text x="45" y="137" font-size="43">${suit.s}</text>
-  <text x="397" y="548" font-size="54" text-anchor="end" transform="rotate(180 397 548)">${rank}</text><text x="397" y="505" font-size="43" text-anchor="end" transform="rotate(180 397 505)">${suit.s}</text>
+  <text x="43" y="92" font-size="68">${rank}</text><text x="45" y="145" font-size="46">${suit.s}</text>
+  <text x="397" y="548" font-size="68" text-anchor="end" transform="rotate(180 397 548)">${rank}</text><text x="397" y="505" font-size="46" text-anchor="end" transform="rotate(180 397 505)">${suit.s}</text>
  </g>
  <text x="220" y="420" text-anchor="middle" font-size="248" font-family="serif" fill="${suit.a}" stroke="#fff" stroke-width="2.5" stroke-opacity=".9" filter="url(#glow)">${suit.s}</text>
  <text x="220" y="420" text-anchor="middle" font-size="248" font-family="serif" fill="${suit.c}" opacity=".3">${suit.s}</text>
- <path d="M55 210 Q220 145 385 210 M55 430 Q220 495 385 430" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="3"/>
+ <path d="M42 174 L120 112 L168 148 M398 466 L320 528 L272 492 M42 466 L108 520 M398 174 L332 120" fill="none" stroke="${suit.c}" stroke-opacity=".32" stroke-width="2"/>
  </svg>`;
  const file=join(tmpdir(),`sinx-${suit.name}-${rank}.svg`);
  await writeFile(file,svg);
