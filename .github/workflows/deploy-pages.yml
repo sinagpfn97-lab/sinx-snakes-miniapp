@@ -26,7 +26,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure Pages
         uses: actions/configure-pages@v5
-      - name: Generate glass card WebP assets\n        run: node scripts/generate-hokm-cards.mjs\n      - name: Upload site artifact
+      - name: Install image tools
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+      - name: Generate glass card WebP assets
+        run: node scripts/generate-hokm-cards.mjs
+      - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
