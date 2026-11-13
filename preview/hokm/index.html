@@ -19,7 +19,7 @@
 <header><div class="brand">S I N X · ARCADE</div><h1>🃏 SINX HOKM</h1><div class="sub">CLASSIC HOKM · CYBER NEON TABLE</div></header>
 <section class="panel">
  <div class="setup">
-  <div class="field"><label for="roundsPerHand">تعداد راند برای پایان یک دست</label><select id="roundsPerHand"><option value="1">۱ راند</option><option value="3" selected>۳ راند</option><option value="5">۵ راند</option><option value="7">۷ راند</option></select></div>
+  <div class="field"><label for="roundsPerHand">تعداد راندهای ۷ امتیازی برای پایان یک دست</label><select id="roundsPerHand"><option value="1">۱ راند</option><option value="3" selected>۳ راند</option><option value="5">۵ راند</option><option value="7">۷ راند</option></select></div>
   <button class="primary" id="newMatch">شروع مسابقه آزمایشی</button>
  </div>
  <div class="online-note" id="onlineNote">حالت آنلاین در معماری نسخه اصلی پیش‌بینی شده است؛ این صفحه فعلاً پیش‌نمایش تعاملی محلی با سه ربات است و هنوز به اتاق‌های Supabase متصل نیست.</div>
@@ -28,8 +28,8 @@
 <section class="panel">
  <div class="status"><span class="pill" id="phase">آماده شروع</span><span class="pill" id="round">راند ۱ از ۳</span></div>
  <div class="scores">
-  <div class="score"><small>تیم فیروزه‌ای · امتیاز راند / برد راندها: <span id="seriesA">۰</span></small><strong class="cyan" id="scoreA">۰</strong></div>
-  <div class="score"><small>تیم بنفش · امتیاز راند / برد راندها: <span id="seriesB">۰</span></small><strong class="purple" id="scoreB">۰</strong></div>
+  <div class="score"><small>تیم فیروزه‌ای · امتیاز راند (هدف ۷) · برد راندها: <span id="seriesA">۰</span></small><strong class="cyan" id="scoreA">۰</strong></div>
+  <div class="score"><small>تیم بنفش · امتیاز راند (هدف ۷) · برد راندها: <span id="seriesB">۰</span></small><strong class="purple" id="scoreB">۰</strong></div>
  </div>
  <div class="table">
   <div class="seat north" id="seat0"><b>ربات ۱</b></div>
@@ -139,7 +139,7 @@ function finishRound(){
  state.matchOver=won;
  const overallWinner=state.seriesWins[0]>state.seriesWins[1]?0:1;
  $("winner").textContent=(won?"🏆 برنده کل دست: ":"برنده راند "+persian(state.round)+": ")+labelTeam(won?overallWinner:winner)+" · "+kind+" · +"+persian(points)+" امتیاز؛ نتیجه راندها "+persian(state.seriesWins[0])+" - "+persian(state.seriesWins[1]);
- $("nextHand").style.display=won?"none":"inline-block";$("feed").textContent=won?"همه راندهای تعیین‌شده تمام شدند.":"برای ادامه، راند بعدی را شروع کنید.";
+ $("nextHand").style.display=won?"none":"inline-block";$("feed").textContent=won?"همه راندهای تعیین‌شده تمام شدند.":"برای ادامه، راند بعدی را آغاز کنید.";
  if(won){$("phase").textContent="پایان دست";}else{$("phase").textContent="پایان راند";}
  render();
 }
