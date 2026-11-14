@@ -45,7 +45,7 @@ for(let si=0;si<suits.length;si++) for(let ri=0;ri<ranks.length;ri++){
 
  <g font-family="Georgia,serif" font-weight="bold" fill="#f4fdff" stroke="${suit.a}" stroke-width="1.3" paint-order="stroke" filter="url(#spark)">
   <text x="43" y="92" font-size="68">${rank}</text><text x="45" y="145" font-size="46">${suit.s}</text>
-  <text x="397" y="560" font-size="72" text-anchor="start" transform="rotate(180 397 560)">${rank}</text><text x="397" y="507" font-size="48" text-anchor="start" transform="rotate(180 397 507)">${suit.s}</text>
+  <g transform="rotate(180 220 320)"><text x="43" y="104" font-size="68">${rank}</text><text x="45" y="157" font-size="46">${suit.s}</text></g>
  </g>
  <text x="220" y="420" text-anchor="middle" font-size="248" font-family="serif" fill="${suit.a}" stroke="#fff" stroke-width="2.5" stroke-opacity=".9" filter="url(#glow)">${suit.s}</text>
  <text x="220" y="420" text-anchor="middle" font-size="248" font-family="serif" fill="${suit.c}" opacity=".3">${suit.s}</text>
