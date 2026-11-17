@@ -114,7 +114,7 @@ function playCard(seat,cardId){
  if(state.phase!=="play"||state.turn!==seat)return;
  const hand=state.hands[seat],idx=hand.findIndex(c=>c.id===cardId);if(idx<0)return;
  const card=hand[idx];if(!legalCards(seat).some(c=>c.id===cardId)){ $("feed").textContent="باید از خال شروع‌شده بازی کنید.";return;}
- hand.splice(idx,1);state.trick.push({seat,card});state.turn=(seat+1)%4;render();
+ hand.splice(idx,1);state.playedCards.push({seat,card});state.trick.push({seat,card});state.turn=(seat+1)%4;render();
  if(state.trick.length===4){const win=winnerOfTrick(),winningTeam=team(win);state._lastTrickWinner=win;state.tricks[winningTeam]++;state.scores[winningTeam]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win)+" · یک امتیاز برای "+labelTeam(winningTeam);render();if(state.scores[winningTeam]>=7){finishRound(winningTeam);}else{setTimeout(()=>{state.trick=[];render();scheduleBot();},850);}}
  else scheduleBot();
 }
@@ -122,34 +122,59 @@ function playCard(seat,cardId){
 function seatName(s){return s===state.human?(window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name||"شما"):"ربات "+(s===0?1:s===1?2:3); }
 
 function botChoose(seat){
- const legal=legalCards(seat),lead=state.trick[0]?.card?.suit;
- const teamMateWinning=state.trick.length>0&&team(winnerOfTrick())===team(seat);
- const strength=c=>c.value+(c.suit===state.trump?15:0);
- const lowest=(cards)=>cards.slice().sort((a,b)=>strength(a)-strength(b))[0];
+ const legal=legalCards(seat);
+ if(!legal.length)return null;
+ const hand=state.hands[seat];
+ const played=new Set(state.playedCards.map(x=>x.card.id));
+ const inTrick=new Set(state.trick.map(x=>x.card.id));
+ const unseenHigher=(card)=>RANKS.some(rank=>VALUE[rank]>card.value&&!played.has(rank+card.suit)&&!inTrick.has(rank+card.suit)&&!hand.some(x=>x.id===rank+card.suit));
+ const cardCost=(card)=>card.value+(card.suit===state.trump?16:0);
+ const lowest=(cards)=>cards.slice().sort((a,b)=>cardCost(a)-cardCost(b))[0];
+
+ // When following, first determine who is currently taking the trick.
  if(state.trick.length){
-  if(teamMateWinning){
+  const currentWinner=winnerOfTrick();
+  const partnerWinning=team(currentWinner)===team(seat);
+  if(partnerWinning){
+   // Don't waste a high card or trump to overtake our teammate.
    const safe=legal.filter(c=>c.suit!==state.trump);
    return lowest(safe.length?safe:legal);
   }
-  const winners=legal.filter(c=>winnerOfCards([...state.trick,{seat,card:c}])===seat);
-  if(winners.length)return winners.sort((a,b)=>strength(a)-strength(b))[0];
-  const cheapNonTrump=legal.filter(c=>c.suit!==state.trump);
-  return lowest(cheapNonTrump.length?cheapNonTrump:legal);
+  // If an opponent is winning, use the cheapest legal card that can overtake.
+  const winningCards=legal.filter(card=>winnerOfCards([...state.trick,{seat,card}])===seat);
+  if(winningCards.length){
+   return winningCards.sort((a,b)=>{
+    const costA=cardCost(a),costB=cardCost(b);
+    return costA-costB||a.value-b.value;
+   })[0];
+  }
+  // The trick cannot be won: discard a low card and preserve trump/high cards.
+  const cheapSide=legal.filter(c=>c.suit!==state.trump);
+  return lowest(cheapSide.length?cheapSide:legal);
  }
- // Lead with a remaining top card where possible; prefer a long side suit.
- const played=new Set(state.playedCards.map(x=>x.card.id));
- const candidates=legal.map(c=>{
-  const same=legal.filter(x=>x.suit===c.suit);
-  const unseenHigher=RANKS.filter(r=>VALUE[r]>c.value).some(r=>!played.has(r+c.suit)&&!state.hands[seat].some(x=>x.id===r+c.suit));
-  const isTop=!unseenHigher;
-  const isAce=c.rank==="A";
-  const trumpPenalty=c.suit===state.trump?5:0;
-  const score=(isTop?18:0)+(isAce?8:0)+same.length*2.2+c.value*.12-trumpPenalty;
-  return {card:c,score};
+
+ // Leading: cash a card only when it is currently the highest unseen card.
+ // Prefer long side suits, and avoid spending trump unnecessarily.
+ const suitCounts=Object.fromEntries(SUITS.map(s=>[s,hand.filter(c=>c.suit===s).length]));
+ const scored=legal.map(card=>{
+  const isTop=!unseenHigher(card);
+  const isAce=card.rank==="A";
+  const isKing=card.rank==="K";
+  const suitLength=suitCounts[card.suit]||0;
+  const trump=card.suit===state.trump;
+  const higherInHand=hand.filter(x=>x.suit===card.suit&&x.value>card.value).length;
+  let score=0;
+  if(isTop)score+=28;
+  if(isAce)score+=9;
+  if(isKing&&!unseenHigher(card))score+=5;
+  score+=suitLength*2.4;
+  score+=card.value*0.18;
+  if(trump)score-=suitLength>=5?1:9;
+  score-=higherInHand*3;
+  return {card,score};
  });
- const bestScore=Math.max(...candidates.map(x=>x.score));
- const best=candidates.filter(x=>x.score===bestScore).map(x=>x.card);
- return best.sort((a,b)=>b.value-a.value)[0];
+ scored.sort((a,b)=>b.score-a.score||b.card.value-a.card.value);
+ return scored[0].card;
 }
 function scheduleBot(){
  if(state.phase==="choose"&&state.hakem!==state.human){setTimeout(()=>{if(state.phase==="choose")selectTrump(chooseBotTrump(state.hands[state.hakem]));},450);return;}
