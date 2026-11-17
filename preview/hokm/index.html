@@ -64,7 +64,7 @@ const SUITS=["♠","♣","♦","♥"],RED=["♦","♥"],RANKS=["2","3","4","5","
 const VALUE=Object.fromEntries(RANKS.map((r,i)=>[r,i]));
 const NAMES={"♠":"پیک","♣":"گشنیز","♦":"خشت","♥":"دل"};
 const $=id=>document.getElementById(id);
-const state={hands:[[],[],[],[]],scores:[0,0],seriesWins:[0,0],roundsPerHand:3,tricks:[0,0],trick:[],trump:null,turn:0,leader:0,hakem:0,lastHakem:0,round:0,target:7,phase:"idle",human:2,matchOver:false,roundWinner:null,dealNo:0,playedCards:[]};
+const state={hands:[[],[],[],[]],scores:[0,0],seriesWins:[0,0],roundsPerHand:3,tricks:[0,0],trick:[],trump:null,turn:0,leader:0,hakem:0,lastHakem:0,round:0,target:7,phase:"idle",human:2,matchOver:false,roundWinner:null,dealNo:0,playedCards:[],lastTrickLeadSuit:null,lastTrickWinnerTeam:null};
 const persian=n=>String(n).replace(/[0-9]/g,d=>"۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function makeDeck(){return shuffle(SUITS.flatMap(s=>RANKS.map(r=>({suit:s,rank:r,id:r+s,value:VALUE[r]}))));}
@@ -72,7 +72,7 @@ function team(seat){return seat%2===0?0:1;}
 function labelTeam(t){return t===0?"تیم فیروزه‌ای":"تیم بنفش";}
 function sortHand(hand){hand.sort((a,b)=>SUITS.indexOf(a.suit)-SUITS.indexOf(b.suit)||b.value-a.value);}
 function startRound(first=false){state.round++;state.scores=[0,0];state.matchOver=false;state.roundWinner=null;state.dealNo=0;if(first){state.hakem=Math.floor(Math.random()*4);state.lastHakem=state.hakem;}startDeal();}
-function startDeal(){state._dealAnim=true;state.dealNo++;state.tricks=[0,0];state.trick=[];state.playedCards=[];state.trump=null;const deck=makeDeck();state.hands=[[],[],[],[]];for(let i=0;i<5;i++)for(let offset=0;offset<4;offset++)state.hands[(state.hakem+offset)%4].push(deck.pop());state.hands.forEach(sortHand);state.turn=state.hakem;state.leader=state.hakem;state.phase="choose";$("feed").textContent="دست جدید؛ "+seatName(state.hakem)+" حاکم است و خال حکم را انتخاب می‌کند.";if(state.hakem!==state.human){const chosen=chooseBotTrump(state.hands[state.hakem]);setTimeout(()=>{if(state.phase==="choose")selectTrump(chosen);},650);}render();}
+function startDeal(){state._dealAnim=true;state.dealNo++;state.tricks=[0,0];state.trick=[];state.playedCards=[];state.lastTrickLeadSuit=null;state.lastTrickWinnerTeam=null;state.trump=null;const deck=makeDeck();state.hands=[[],[],[],[]];for(let i=0;i<5;i++)for(let offset=0;offset<4;offset++)state.hands[(state.hakem+offset)%4].push(deck.pop());state.hands.forEach(sortHand);state.turn=state.hakem;state.leader=state.hakem;state.phase="choose";$("feed").textContent="دست جدید؛ "+seatName(state.hakem)+" حاکم است و خال حکم را انتخاب می‌کند.";if(state.hakem!==state.human){const chosen=chooseBotTrump(state.hands[state.hakem]);setTimeout(()=>{if(state.phase==="choose")selectTrump(chosen);},650);}render();}
 function chooseBotTrump(hand){
  const options=SUITS.map(s=>{
   const cards=hand.filter(c=>c.suit===s).sort((a,b)=>b.value-a.value);
@@ -130,7 +130,7 @@ function playCard(seat,cardId){
  const hand=state.hands[seat],idx=hand.findIndex(c=>c.id===cardId);if(idx<0)return;
  const card=hand[idx];if(!legalCards(seat).some(c=>c.id===cardId)){ $("feed").textContent="باید از خال شروع‌شده بازی کنید.";return;}
  hand.splice(idx,1);state.playedCards.push({seat,card});state.trick.push({seat,card});state.turn=(seat+1)%4;render();
- if(state.trick.length===4){const win=winnerOfTrick(),winningTeam=team(win);state._lastTrickWinner=win;state.tricks[winningTeam]++;state.scores[winningTeam]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win)+" · یک امتیاز برای "+labelTeam(winningTeam);render();if(state.scores[winningTeam]>=7){finishRound(winningTeam);}else{setTimeout(()=>{state.trick=[];render();scheduleBot();},850);}}
+ if(state.trick.length===4){const leadSuit=state.trick[0].card.suit;const win=winnerOfTrick(),winningTeam=team(win);state.lastTrickLeadSuit=leadSuit;state.lastTrickWinnerTeam=winningTeam;state._lastTrickWinner=win;state.tricks[winningTeam]++;state.scores[winningTeam]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win)+" · یک امتیاز برای "+labelTeam(winningTeam);render();if(state.scores[winningTeam]>=7){finishRound(winningTeam);}else{setTimeout(()=>{state.trick=[];render();scheduleBot();},850);}}
  else scheduleBot();
 }
 
@@ -204,6 +204,8 @@ function botChoose(seat){
   score+=card.value*0.18;
   if(trump)score-=suitLength>=5?1:9;
   if(opponentVoid&&!trump)score-=5; // avoid gifting a free ruff
+  // Continue a suit our partner just controlled when we hold enough length.
+  if(state.lastTrickWinnerTeam===team(seat)&&state.lastTrickLeadSuit===card.suit&&suitLength>=2)score+=7;
   score-=higherInHand*3;
   return {card,score};
  });
