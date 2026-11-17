@@ -25,11 +25,47 @@ const pipLayouts={
 };
 function pipMarkup(rank,suit){
  const points=pipLayouts[rank];
- if(points)return points.map(([x,y])=>{const scale=rank==="10" ? .78 : rank==="9" ? .82 : .9;const fs=64*scale;return `<g transform="translate(${x} ${y})"><text text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-family="serif" fill="${suit.a}" stroke="#ffffff" stroke-width="1.3" stroke-opacity=".8" paint-order="stroke" filter="url(#glow)"> ${suit.s}</text><text text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-family="serif" fill="${suit.c}" opacity=".24">${suit.s}</text></g>`;}).join("");
- if(rank==="A")return `<g filter="url(#glow)"><circle cx="220" cy="385" r="132" fill="${suit.base}" fill-opacity=".48" stroke="${suit.a}" stroke-width="4"/><circle cx="220" cy="385" r="113" fill="none" stroke="${suit.c}" stroke-opacity=".62" stroke-width="2" stroke-dasharray="6 8"/><circle cx="220" cy="385" r="96" fill="${suit.b}" fill-opacity=".24"/><text x="220" y="430" text-anchor="middle" font-size="224" font-family="serif" fill="${suit.a}" stroke="#fff" stroke-width="2.5" stroke-opacity=".95" paint-order="stroke">${suit.s}</text></g>`;
- if(rank==="K")return `<g filter="url(#glow)"><path d="M112 300 L145 215 L190 270 L220 190 L250 270 L295 215 L328 300 L310 330 L130 330 Z" fill="${suit.a}" fill-opacity=".88" stroke="${suit.c}" stroke-width="5" stroke-linejoin="round"/><path d="M135 342 H305 L290 375 H150 Z" fill="${suit.b}" stroke="${suit.c}" stroke-width="3"/><circle cx="220" cy="450" r="102" fill="${suit.base}" fill-opacity=".72" stroke="${suit.a}" stroke-width="5"/><circle cx="220" cy="450" r="84" fill="none" stroke="${suit.c}" stroke-opacity=".65" stroke-width="2" stroke-dasharray="5 8"/><text x="220" y="489" text-anchor="middle" font-size="116" font-family="serif" fill="${suit.c}" stroke="${suit.a}" stroke-width="2" paint-order="stroke">${suit.s}</text><path d="M170 545 H270" stroke="${suit.c}" stroke-width="5" stroke-linecap="round"/></g>`;
- if(rank==="Q")return `<g filter="url(#glow)"><path d="M126 300 L150 220 L190 275 L220 190 L250 275 L290 220 L314 300 Q220 345 126 300 Z" fill="${suit.b}" stroke="${suit.c}" stroke-width="5" stroke-linejoin="round"/><circle cx="220" cy="265" r="13" fill="${suit.c}"/><circle cx="150" cy="286" r="9" fill="${suit.c}"/><circle cx="290" cy="286" r="9" fill="${suit.c}"/><path d="M220 330 C310 330 330 405 300 480 C278 535 162 535 140 480 C110 405 130 330 220 330 Z" fill="${suit.base}" fill-opacity=".78" stroke="${suit.a}" stroke-width="5"/><circle cx="220" cy="430" r="77" fill="${suit.b}" fill-opacity=".45" stroke="${suit.c}" stroke-opacity=".8" stroke-width="3"/><text x="220" y="469" text-anchor="middle" font-size="108" font-family="serif" fill="${suit.c}" stroke="${suit.a}" stroke-width="2" paint-order="stroke">${suit.s}</text><path d="M158 510 Q220 550 282 510" fill="none" stroke="${suit.c}" stroke-width="4" stroke-linecap="round"/></g>`;
- return `<g filter="url(#glow)"><path d="M220 195 C145 220 115 285 130 360 L155 405 L285 405 L310 360 C325 285 295 220 220 195 Z" fill="${suit.b}" stroke="${suit.c}" stroke-width="5"/><path d="M220 205 Q160 125 112 180 Q160 180 175 265" fill="none" stroke="${suit.a}" stroke-width="18" stroke-linecap="round"/><path d="M155 330 Q220 285 285 330 L270 450 H170 Z" fill="${suit.base}" stroke="${suit.a}" stroke-width="5"/><path d="M170 360 L220 325 L270 360 L258 425 H182 Z" fill="${suit.b}" stroke="${suit.c}" stroke-width="3"/><text x="220" y="410" text-anchor="middle" font-size="100" font-family="serif" fill="${suit.c}" stroke="${suit.a}" stroke-width="2" paint-order="stroke">${suit.s}</text><path d="M145 470 H295 L270 520 H170 Z" fill="${suit.a}" fill-opacity=".72" stroke="${suit.c}" stroke-width="4"/><path d="M185 535 H255" stroke="${suit.c}" stroke-width="5" stroke-linecap="round"/></g>`;
+ if(points)return points.map(([x,y])=>{y-=65;const scale=rank==="10" ? .78 : rank==="9" ? .82 : .9;const fs=64*scale;return `<g transform="translate(${x} ${y})"><text text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-family="serif" fill="${suit.a}" stroke="#ffffff" stroke-width="1.3" stroke-opacity=".8" paint-order="stroke" filter="url(#glow)">${suit.s}</text><text text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-family="serif" fill="${suit.c}" opacity=".24">${suit.s}</text></g>`;}).join("");
+ if(rank==="A")return `<g filter="url(#glow)"><circle cx="220" cy="320" r="132" fill="${suit.base}" fill-opacity=".48" stroke="${suit.a}" stroke-width="4"/><circle cx="220" cy="320" r="113" fill="none" stroke="${suit.c}" stroke-opacity=".62" stroke-width="2" stroke-dasharray="6 8"/><circle cx="220" cy="320" r="96" fill="${suit.b}" fill-opacity=".24"/><text x="220" y="365" text-anchor="middle" font-size="224" font-family="serif" fill="${suit.a}" stroke="#fff" stroke-width="2.5" stroke-opacity=".95" paint-order="stroke">${suit.s}</text></g>`;
+ if(!["K","Q","J"].includes(rank))return "";
+ const king=rank==="K",queen=rank==="Q";
+ const crown=king
+  ? `<path d="M151 169 L164 111 L194 151 L220 91 L246 151 L276 111 L289 169 L273 188 H167 Z" fill="${suit.a}" stroke="${suit.c}" stroke-width="5" stroke-linejoin="round"/><path d="M165 173 H275" stroke="${suit.c}" stroke-width="5"/><circle cx="164" cy="111" r="7" fill="#fff"/><circle cx="220" cy="91" r="8" fill="#fff"/><circle cx="276" cy="111" r="7" fill="#fff"/>`
+  : queen
+  ? `<path d="M151 170 L166 117 L194 151 L220 96 L246 151 L274 117 L289 170 Q220 195 151 170 Z" fill="${suit.b}" stroke="${suit.c}" stroke-width="5" stroke-linejoin="round"/><circle cx="166" cy="117" r="7" fill="${suit.c}"/><circle cx="220" cy="96" r="8" fill="${suit.c}"/><circle cx="274" cy="117" r="7" fill="${suit.c}"/>`
+  : `<path d="M166 171 Q137 126 165 91 Q193 112 220 76 Q247 112 275 91 Q303 126 274 171 Z" fill="${suit.b}" stroke="${suit.c}" stroke-width="5"/><path d="M220 80 Q236 35 275 42 Q256 70 232 112" fill="none" stroke="${suit.a}" stroke-width="11" stroke-linecap="round"/><path d="M220 80 Q205 39 174 47 Q190 73 208 112" fill="none" stroke="${suit.c}" stroke-width="7" stroke-linecap="round"/>`;
+ const hair=queen
+  ? `<path d="M153 186 Q133 205 145 270 L165 300 L176 257 L264 257 L275 300 L295 270 Q307 205 287 186 L270 220 H170 Z" fill="${suit.b}" stroke="${suit.a}" stroke-width="5"/>`
+  : king
+  ? `<path d="M157 192 Q165 155 220 153 Q275 155 283 192 L267 226 H173 Z" fill="${suit.b}" stroke="${suit.a}" stroke-width="5"/>`
+  : `<path d="M158 186 Q172 150 220 151 Q268 150 282 186 L267 222 H173 Z" fill="${suit.b}" stroke="${suit.a}" stroke-width="5"/>`;
+ const beard=king
+  ? `<path d="M174 242 Q220 263 266 242 L255 284 L220 304 L185 284 Z" fill="${suit.b}" stroke="${suit.c}" stroke-width="3"/>`
+  : "";
+ const weapon=king
+  ? `<path d="M116 205 L137 184 L151 199 L130 220 L128 288" fill="none" stroke="${suit.c}" stroke-width="7" stroke-linecap="round"/><path d="M111 201 L145 167" stroke="${suit.a}" stroke-width="9" stroke-linecap="round"/>`
+  : queen
+  ? `<path d="M300 219 Q330 190 342 218 Q327 245 300 244 Z" fill="${suit.a}" stroke="${suit.c}" stroke-width="3"/><path d="M300 235 Q280 265 300 280" fill="none" stroke="${suit.c}" stroke-width="4"/>`
+  : `<path d="M300 186 L321 164 L342 186 L321 208 Z" fill="${suit.a}" stroke="${suit.c}" stroke-width="4"/><path d="M321 208 L321 295" stroke="${suit.c}" stroke-width="6"/>`;
+ const portrait=`<g stroke-linejoin="round">
+  ${weapon}
+  <path d="M143 316 Q146 270 173 257 L190 247 H250 L267 257 Q294 270 297 316 Z" fill="${suit.b}" stroke="${suit.a}" stroke-width="6"/>
+  <path d="M175 263 L220 294 L265 263 L254 316 H186 Z" fill="${suit.base}" stroke="${suit.c}" stroke-width="3"/>
+  <path d="M194 248 L220 274 L246 248" fill="none" stroke="${suit.c}" stroke-width="4"/>
+  <path d="M208 250 L220 269 L232 250" fill="${suit.a}" stroke="${suit.c}" stroke-width="2"/>
+  ${hair}
+  <ellipse cx="220" cy="213" rx="57" ry="67" fill="${suit.c}" stroke="${suit.a}" stroke-width="5"/>
+  <path d="M171 198 Q187 173 220 174 Q253 173 269 198 L260 178 Q220 151 180 178 Z" fill="${suit.b}" stroke="${suit.a}" stroke-width="4"/>
+  <path d="M191 211 Q201 204 210 211 M230 211 Q239 204 249 211" fill="none" stroke="${suit.base}" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="202" cy="214" r="4" fill="${suit.base}"/><circle cx="238" cy="214" r="4" fill="${suit.base}"/>
+  <path d="M220 216 L214 236 L224 238" fill="none" stroke="${suit.b}" stroke-width="3" stroke-linecap="round"/>
+  <path d="M205 249 Q220 258 235 249" fill="none" stroke="${suit.base}" stroke-width="3" stroke-linecap="round"/>
+  ${beard}
+  ${crown}
+  <path d="M220 286 L236 302 L220 318 L204 302 Z" fill="${suit.a}" stroke="${suit.c}" stroke-width="3"/>
+  <text x="220" y="309" text-anchor="middle" font-size="21" font-family="serif" fill="#fff">${suit.s}</text>
+ </g>`;
+ return `<g filter="url(#glow)"><g>${portrait}</g><g transform="rotate(180 220 320)">${portrait}</g><path d="M95 320 H345" stroke="${suit.c}" stroke-opacity=".35" stroke-width="2" stroke-dasharray="5 10"/></g>`;
 }
 
 function rng(seed){let x=seed>>>0;return()=>{x=(x*1664525+1013904223)>>>0;return x/4294967296;};}
@@ -65,7 +101,7 @@ for(let si=0;si<suits.length;si++) for(let ri=0;ri<ranks.length;ri++){
 
  <g font-family="Georgia,serif" font-weight="bold" fill="#f4fdff" stroke="${suit.a}" stroke-width="1.3" paint-order="stroke" filter="url(#spark)">
   <text x="43" y="92" font-size="68">${rank}</text><text x="45" y="145" font-size="46">${suit.s}</text>
-  <g transform="rotate(180 240 392)"><text x="43" y="92" font-size="60">${rank}</text><text x="45" y="145" font-size="40">${suit.s}</text></g>
+  <g transform="rotate(180 220 320)"><text x="43" y="92" font-size="60">${rank}</text><text x="45" y="145" font-size="40">${suit.s}</text></g>
  </g>
  ${pipMarkup(rank,suit)}
  <path d="M42 174 L120 112 L168 148 M398 466 L320 528 L272 492 M42 466 L108 520 M398 174 L332 120" fill="none" stroke="${suit.c}" stroke-opacity=".32" stroke-width="2"/>
