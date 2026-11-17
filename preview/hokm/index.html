@@ -188,32 +188,52 @@ function botChoose(seat){
   return false;
  };
  const opponents=[(seat+1)%4,(seat+3)%4];
+ // Estimate where unseen higher cards could still be. Only hand sizes and
+ // public play history are used; opponents' private card identities are never read.
+ const unseenPool=SUITS.flatMap(s=>RANKS.map(rank=>({suit:s,rank,id:rank+s,value:VALUE[rank]})))
+  .filter(c=>!played.has(c.id)&&!hand.some(x=>x.id===c.id));
+ const higherRisk=(card)=>{
+  const higher=unseenPool.filter(c=>c.suit===card.suit&&c.value>card.value).length;
+  if(!higher)return 0;
+  const poolSize=Math.max(1,unseenPool.length);
+  let risk=0;
+  for(const opponent of opponents){
+   if(voidIn(opponent,card.suit))continue;
+   const slots=state.hands[opponent]?.length||0;
+   if(!slots)continue;
+   const noHigher=Math.pow(Math.max(0,1-higher/poolSize),slots);
+   risk+=1-noHigher;
+  }
+  return Math.min(1,risk);
+ };
  const scored=legal.map(card=>{
-  const isTop=!unseenHigher(card);
+  const top=!unseenHigher(card);
   const isAce=card.rank==="A";
   const isKing=card.rank==="K";
   const suitLength=suitCounts[card.suit]||0;
   const trump=card.suit===state.trump;
   const higherInHand=hand.filter(x=>x.suit===card.suit&&x.value>card.value).length;
   const opponentVoid=opponents.some(p=>voidIn(p,card.suit));
+  const risk=higherRisk(card);
   let score=0;
-  if(isTop)score+=28;
+  if(top)score+=28;
   if(isAce)score+=9;
-  if(isKing&&!unseenHigher(card))score+=5;
+  if(isKing&&top)score+=5;
   score+=suitLength*2.8;
   score+=card.value*0.18;
+  // A nominally high card loses value when unseen higher cards are likely
+  // to be held by an opponent; a known void removes that opponent from risk.
+  score-=risk*24;
   if(trump)score-=suitLength>=5?1:9;
-  // Trump-drawing plan: with a long trump suit and a secure top card,
-  // lead trump to reduce opponents' ability to ruff our side-suit winners.
-  if(trump&&suitLength>=4&&isTop){
+  // Draw opposing trumps only when the lead is likely to retain control.
+  if(trump&&suitLength>=4&&top){
    score+=suitLength>=5?19:14;
    if(isAce||isKing)score+=4;
   }
-  if(opponentVoid&&!trump)score-=5; // avoid gifting a free ruff
-  // Continue a suit our partner just controlled when we hold enough length.
+  if(opponentVoid&&!trump)score-=5;
   if(state.lastTrickWinnerTeam===team(seat)&&state.lastTrickLeadSuit===card.suit&&suitLength>=2)score+=7;
   score-=higherInHand*3;
-  return {card,score};
+  return {card,score,risk};
  });
  scored.sort((a,b)=>b.score-a.score||b.card.value-a.card.value);
  return scored[0].card;
