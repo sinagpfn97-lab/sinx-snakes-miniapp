@@ -75,10 +75,25 @@ function startRound(first=false){state.round++;state.scores=[0,0];state.matchOve
 function startDeal(){state._dealAnim=true;state.dealNo++;state.tricks=[0,0];state.trick=[];state.playedCards=[];state.trump=null;const deck=makeDeck();state.hands=[[],[],[],[]];for(let i=0;i<5;i++)for(let offset=0;offset<4;offset++)state.hands[(state.hakem+offset)%4].push(deck.pop());state.hands.forEach(sortHand);state.turn=state.hakem;state.leader=state.hakem;state.phase="choose";$("feed").textContent="دست جدید؛ "+seatName(state.hakem)+" حاکم است و خال حکم را انتخاب می‌کند.";if(state.hakem!==state.human){const chosen=chooseBotTrump(state.hands[state.hakem]);setTimeout(()=>{if(state.phase==="choose")selectTrump(chosen);},650);}render();}
 function chooseBotTrump(hand){
  const options=SUITS.map(s=>{
-  const cards=hand.filter(c=>c.suit===s);
-  const honors=cards.reduce((n,c)=>n+({A:9,K:6,Q:4,J:2,10:1}[c.rank]||0),0);
-  const top=cards.filter(c=>c.rank==="A"||c.rank==="K"||c.rank==="Q").length;
-  return {s,score:cards.length*4.2+honors+top*1.4+(cards.length>=5?3:0)};
+  const cards=hand.filter(c=>c.suit===s).sort((a,b)=>b.value-a.value);
+  const count=cards.length;
+  const honors=cards.reduce((n,c)=>n+({A:8,K:5,Q:3,J:1,10:.5}[c.rank]||0),0);
+  const ace=cards.some(c=>c.rank==="A");
+  const king=cards.some(c=>c.rank==="K");
+  const aceKing=ace&&king;
+  const topCount=cards.filter(c=>["A","K","Q"].includes(c.rank)).length;
+  const singletonAce=count===1&&ace;
+  const voids=SUITS.filter(other=>other!==s&&!hand.some(c=>c.suit===other)).length;
+  // A long suit with top control is strongest; a singleton/void can help later,
+  // but a short, weak trump suit should not be selected just for its honors.
+  let score=count*5.2+honors+topCount*2.2;
+  if(count>=5)score+=5;
+  if(count>=6)score+=3;
+  if(aceKing)score+=5;
+  if(singletonAce)score+=2;
+  if(count<=1&&!ace)score-=4;
+  score+=Math.min(voids,2)*.8;
+  return {s,score};
  });
  return options.sort((a,b)=>b.score-a.score)[0].s;
 }
@@ -136,9 +151,12 @@ function botChoose(seat){
   const currentWinner=winnerOfTrick();
   const partnerWinning=team(currentWinner)===team(seat);
   if(partnerWinning){
-   // Don't waste a high card or trump to overtake our teammate.
-   const safe=legal.filter(c=>c.suit!==state.trump);
-   return lowest(safe.length?safe:legal);
+   // Keep the teammate in front, but shed useful point cards when safe.
+   const safe=legal.filter(card=>winnerOfCards([...state.trick,{seat,card}])===currentWinner);
+   const candidates=safe.length?safe:legal.filter(c=>c.suit!==state.trump);
+   const pool=candidates.length?candidates:legal;
+   const points={A:4,K:3,Q:2,J:1};
+   return pool.slice().sort((a,b)=>(points[b.rank]||0)-(points[a.rank]||0)||cardCost(a)-cardCost(b))[0];
   }
   // If an opponent is winning, use the cheapest legal card that can overtake.
   const winningCards=legal.filter(card=>winnerOfCards([...state.trick,{seat,card}])===seat);
@@ -156,6 +174,20 @@ function botChoose(seat){
  // Leading: cash a card only when it is currently the highest unseen card.
  // Prefer long side suits, and avoid spending trump unnecessarily.
  const suitCounts=Object.fromEntries(SUITS.map(s=>[s,hand.filter(c=>c.suit===s).length]));
+ // Infer only public void information: a player failed to follow the led suit.
+ const voidIn=(player,suit)=>{
+  const history=state.playedCards;
+  for(let i=0;i+3<history.length;i+=4){
+   const leadSuit=history[i].card.suit;
+   for(let j=1;j<4;j++)if(history[i+j].seat===player&&history[i+j].card.suit!==leadSuit&&leadSuit===suit)return true;
+  }
+  if(state.trick.length){
+   const leadSuit=state.trick[0].card.suit;
+   if(leadSuit===suit&&state.trick.some(x=>x.seat===player&&x.card.suit!==suit))return true;
+  }
+  return false;
+ };
+ const opponents=[(seat+1)%4,(seat+3)%4];
  const scored=legal.map(card=>{
   const isTop=!unseenHigher(card);
   const isAce=card.rank==="A";
@@ -163,13 +195,15 @@ function botChoose(seat){
   const suitLength=suitCounts[card.suit]||0;
   const trump=card.suit===state.trump;
   const higherInHand=hand.filter(x=>x.suit===card.suit&&x.value>card.value).length;
+  const opponentVoid=opponents.some(p=>voidIn(p,card.suit));
   let score=0;
   if(isTop)score+=28;
   if(isAce)score+=9;
   if(isKing&&!unseenHigher(card))score+=5;
-  score+=suitLength*2.4;
+  score+=suitLength*2.8;
   score+=card.value*0.18;
   if(trump)score-=suitLength>=5?1:9;
+  if(opponentVoid&&!trump)score-=5; // avoid gifting a free ruff
   score-=higherInHand*3;
   return {card,score};
  });
