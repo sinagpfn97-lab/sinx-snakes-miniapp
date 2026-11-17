@@ -151,7 +151,35 @@ function botChoose(seat){
   const currentWinner=winnerOfTrick();
   const partnerWinning=team(currentWinner)===team(seat);
   if(partnerWinning){
-   // Keep the teammate in front, but shed useful point cards when safe.
+   // Estimate whether an opponent still to act can overtake our partner.
+   const leadSuit=state.trick[0].card.suit;
+   const currentCard=state.trick.find(x=>x.seat===currentWinner)?.card;
+   const remaining=[];
+   let next=(seat+1)%4;
+   while(next!==state.trick[0].seat&&remaining.length<3){
+    if(!state.trick.some(x=>x.seat===next))remaining.push(next);
+    next=(next+1)%4;
+   }
+   const unseen=SUITS.flatMap(s=>RANKS.map(rank=>({suit:s,rank,id:rank+s,value:VALUE[rank]})))
+    .filter(c=>!played.has(c.id)&&!inTrick.has(c.id)&&!hand.some(x=>x.id===c.id));
+   const canOvertake=unseen.filter(c=>{
+    if(!currentCard)return false;
+    if(c.suit===state.trump&&currentCard.suit!==state.trump)return true;
+    return c.suit===currentCard.suit&&c.value>currentCard.value;
+   }).length;
+   let threat=0;
+   for(const opponent of remaining){
+    if(team(opponent)===team(seat)||!state.hands[opponent]?.length)continue;
+    const slots=state.hands[opponent].length;
+    const pool=Math.max(1,unseen.length);
+    threat+=1-Math.pow(Math.max(0,1-canOvertake/pool),slots);
+   }
+   const winningCards=legal.filter(card=>winnerOfCards([...state.trick,{seat,card}])===seat);
+   if(threat>=0.38&&winningCards.length){
+    // Spend the smallest card that secures the trick when partner is exposed.
+    return winningCards.sort((a,b)=>cardCost(a)-cardCost(b))[0];
+   }
+   // Otherwise preserve partner's lead and shed a point card if possible.
    const safe=legal.filter(card=>winnerOfCards([...state.trick,{seat,card}])===currentWinner);
    const candidates=safe.length?safe:legal.filter(c=>c.suit!==state.trump);
    const pool=candidates.length?candidates:legal;
