@@ -203,6 +203,12 @@ function botChoose(seat){
   score+=suitLength*2.8;
   score+=card.value*0.18;
   if(trump)score-=suitLength>=5?1:9;
+  // Trump-drawing plan: with a long trump suit and a secure top card,
+  // lead trump to reduce opponents' ability to ruff our side-suit winners.
+  if(trump&&suitLength>=4&&isTop){
+   score+=suitLength>=5?19:14;
+   if(isAce||isKing)score+=4;
+  }
   if(opponentVoid&&!trump)score-=5; // avoid gifting a free ruff
   // Continue a suit our partner just controlled when we hold enough length.
   if(state.lastTrickWinnerTeam===team(seat)&&state.lastTrickLeadSuit===card.suit&&suitLength>=2)score+=7;
