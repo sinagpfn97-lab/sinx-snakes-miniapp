@@ -16,7 +16,7 @@
 .card.deal-in{animation:cardDealIn .48s cubic-bezier(.2,.8,.2,1) both}
 .played.play-in{animation:cardPlayIn .38s cubic-bezier(.18,.85,.25,1) both}
 .table.card-action{animation:tablePulse .48s ease-out}
-@media(prefers-reduced-motion:reduce){.card.deal-in,.played.play-in,.table.card-action{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.card.deal-in,.played.play-in,.table.card-action{animation:none!important}}.flight-card{position:fixed;z-index:9999;width:58px;height:102px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 0 14px #43e8ffbb);will-change:transform,opacity}.table.trick-win{animation:trickWin .72s ease-out}.table.big-win{animation:bigWin 1.15s ease-out}.table.match-win{animation:matchWin 1.6s ease-out}@keyframes trickWin{0%{filter:brightness(1)}35%{filter:brightness(1.65) drop-shadow(0 0 18px #43e8ff)}100%{filter:brightness(1)}}@keyframes bigWin{0%,100%{transform:translateX(0);filter:brightness(1)}15%,45%,75%{transform:translateX(-2px);filter:brightness(1.8) drop-shadow(0 0 20px #ffd45a)}30%,60%,90%{transform:translateX(2px)}}@keyframes matchWin{0%{filter:brightness(1)}25%,65%{filter:brightness(2) drop-shadow(0 0 28px #ffe28a)}100%{filter:brightness(1)}}@media(prefers-reduced-motion:reduce){.flight-card{display:none!important}.table.trick-win,.table.big-win,.table.match-win{animation:none!important}}
 .card small{position:relative;z-index:1;font-size:12px}.card span{position:relative;z-index:1;font-size:11px;line-height:1}.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}.trump-choices{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0}.trump{width:54px;height:48px;border:1px solid #3b5e7a;border-radius:12px;background:#132238;color:white;font-size:25px}.trump.red{color:#ff6b91}.trump.selected{outline:2px solid var(--cyan);box-shadow:0 0 15px #43e8ff55}.feed{font-size:11px;color:#b5c4d8;text-align:center;min-height:22px;margin-top:10px}.notice{font-size:10px;line-height:1.9;color:#90a2ba;text-align:center;margin-top:12px}.online-note{display:none;margin-top:10px;padding:10px;border:1px dashed #49617a;border-radius:12px;color:#a8bad0;font-size:10px;line-height:1.9}.winner{font-size:13px;font-weight:900;color:#ffe28a;text-align:center;margin:10px 0}
 @media(max-width:520px){body{padding:16px 9px 28px}.panel{padding:11px}.setup{grid-template-columns:1fr}.seat.side{width:58px;font-size:9px}.center{margin:4px 48px;min-height:205px}.trick{grid-template-columns:48px 48px 48px;grid-template-rows:68px 68px 68px;gap:4px}.played{width:48px;height:84px;font-size:18px}.played .by{display:none!important}.card{width:48px;height:88px}.back{position:static;display:inline-block;margin-bottom:10px}}
 </style>
@@ -53,7 +53,7 @@
  <div id="trumpPicker" style="display:none"><div class="feed">شما حاکم هستید؛ خال حکم را انتخاب کنید.</div><div class="trump-choices" id="trumpChoices"></div></div>
  <div class="winner" id="winner"></div>
  <div class="feed" id="feed">برای شروع، مسابقه آزمایشی را بزنید.</div>
- <div class="actions"><button class="secondary" id="nextHand" style="display:none">راند بعدی</button><button class="secondary" id="restart">شروع مجدد</button></div>
+ <div class="actions"><button class="secondary" id="soundToggle" aria-pressed="true">🔊 صدا روشن</button><button class="secondary" id="nextHand" style="display:none">راند بعدی</button><button class="secondary" id="restart">شروع مجدد</button></div>
 </section>
 <p class="notice">این نسخه برای نمایش ظاهر و چرخه بازی است. در نسخه آنلاین نهایی، توزیع کارت، نوبت‌ها، امتیازدهی و کارت‌های خصوصی باید سمت سرور و در RPCهای امن اجرا شوند.</p>
 </div>
@@ -111,10 +111,15 @@ function winnerOfCards(items){
   return best;
  }).seat;
 }
+let soundEnabled=true,audioCtx=null;
+function tone(freq,duration=.11,type="sine",volume=.045,delay=0){if(!soundEnabled)return;try{const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;audioCtx=audioCtx||new Ctx();if(audioCtx.state==="suspended")audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,audioCtx.currentTime+delay);g.gain.setValueAtTime(.0001,audioCtx.currentTime+delay);g.gain.exponentialRampToValueAtTime(volume,audioCtx.currentTime+delay+.012);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+delay+duration);o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime+delay);o.stop(audioCtx.currentTime+delay+duration+.02);}catch(e){}}
+function playSfx(kind){if(!soundEnabled)return;const notes={card:[[520,.07],[680,.08]],trump:[[392,.12],[523,.13],[659,.18]],trick:[[523,.12],[659,.14],[784,.2]],kot:[[523,.12],[659,.12],[784,.16],[1046,.32]],hakemkot:[[392,.13],[523,.13],[659,.13],[784,.18],[1046,.4]],champion:[[523,.14],[659,.14],[784,.14],[1046,.18],[1318,.55]]};(notes[kind]||[]).forEach((n,i)=>tone(n[0],n[1],"sine",kind==="card"?.025:.05,i*.085));}
+function tableEffect(kind){const el=document.querySelector(".table");if(!el)return;el.classList.remove("trick-win","big-win","match-win");void el.offsetWidth;el.classList.add(kind);if(kind==="trick-win"||kind==="big-win"||kind==="match-win"){if(navigator.vibrate)navigator.vibrate(kind==="trick-win"?35:kind==="big-win"?[45,35,65]:[60,40,90,40,130]);}setTimeout(()=>el.classList.remove(kind),1800);}
+function animateCardFlight(seat,card){const handBtn=[...$("hand").querySelectorAll(".card")].find(b=>b.querySelector("img")?.alt===card.id);const source=handBtn||$("seat"+seat);const target=$("trick").querySelector(".played.seat-"+seat);if(!source||!target||!source.getBoundingClientRect)return;const a=source.getBoundingClientRect(),b=target.getBoundingClientRect();const img=document.createElement("img");img.className="flight-card";img.src="assets/cards/"+encodeURIComponent(card.suit)+"-"+card.rank+".webp?v=21";img.style.left=a.left+"px";img.style.top=a.top+"px";document.body.append(img);const dx=b.left+b.width/2-(a.left+a.width/2),dy=b.top+b.height/2-(a.top+a.height/2);const anim=img.animate([{transform:"translate(0,0) scale(1) rotate(0)",opacity:1},{transform:"translate("+dx+"px,"+dy+"px) scale(.78) rotate(5deg)",opacity:.92}],{duration:420,easing:"cubic-bezier(.2,.8,.25,1)"});anim.onfinish=()=>img.remove();setTimeout(()=>img.remove(),600);}
 function winnerOfTrick(){return winnerOfCards(state.trick);}
 function selectTrump(suit){
  if(state.phase!=="choose"||!SUITS.includes(suit))return;
- state.trump=suit;
+ state.trump=suit;playSfx("trump");
  const deck=state._deck||null;
  // The remaining 32 cards are dealt after the first five-card auction.
  const used=new Set(state.hands.flat().map(c=>c.id));
@@ -129,8 +134,8 @@ function playCard(seat,cardId){
  if(state.phase!=="play"||state.turn!==seat)return;
  const hand=state.hands[seat],idx=hand.findIndex(c=>c.id===cardId);if(idx<0)return;
  const card=hand[idx];if(!legalCards(seat).some(c=>c.id===cardId)){ $("feed").textContent="باید از خال شروع‌شده بازی کنید.";return;}
- hand.splice(idx,1);state.playedCards.push({seat,card});state.trick.push({seat,card});state.turn=(seat+1)%4;render();
- if(state.trick.length===4){const leadSuit=state.trick[0].card.suit;const win=winnerOfTrick(),winningTeam=team(win);state.lastTrickLeadSuit=leadSuit;state.lastTrickWinnerTeam=winningTeam;state._lastTrickWinner=win;state.tricks[winningTeam]++;state.scores[winningTeam]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win)+" · یک امتیاز برای "+labelTeam(winningTeam);render();if(state.scores[winningTeam]>=7){finishRound(winningTeam);}else{setTimeout(()=>{state.trick=[];render();scheduleBot();},850);}}
+ animateCardFlight(seat,card);playSfx("card");hand.splice(idx,1);state.playedCards.push({seat,card});state.trick.push({seat,card});state.turn=(seat+1)%4;render();
+ if(state.trick.length===4){const leadSuit=state.trick[0].card.suit;const win=winnerOfTrick(),winningTeam=team(win);state.lastTrickLeadSuit=leadSuit;state.lastTrickWinnerTeam=winningTeam;state._lastTrickWinner=win;state.tricks[winningTeam]++;state.scores[winningTeam]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win)+" · یک امتیاز برای "+labelTeam(winningTeam);playSfx("trick");tableEffect("trick-win");render();if(state.scores[winningTeam]>=7){finishRound(winningTeam);}else{setTimeout(()=>{state.trick=[];render();scheduleBot();},850);}}
  else scheduleBot();
 }
 
@@ -272,7 +277,7 @@ function scheduleBot(){
  const seat=state.turn;setTimeout(()=>{if(state.phase==="play"&&state.turn===seat){const c=botChoose(seat);playCard(seat,c.id);}},450);
 }
 function finishDeal(){const winner=state.scores[0]>state.scores[1]?0:1;finishRound(winner);}
-function finishRound(winner){const hakemTeam=team(state.hakem);const loser=1-winner;const isKot=state.scores[winner]===7&&state.scores[loser]===0;const points=isKot?(winner===hakemTeam?2:3):1;const bonusName=points===3?"حاکم‌کوت":points===2?"کوت":"";state.seriesWins[winner]+=points;state.phase="round-end";state.matchOver=state.seriesWins[winner]>=state.roundsPerHand;$("winner").textContent=(state.matchOver?"🏆 برنده کل مسابقه: ":"🏆 برنده راند "+persian(state.round)+": ")+labelTeam(winner);$("feed").textContent=(bonusName?bonusName+"؛ ":"")+"این تیم "+persian(points)+" راند به راندهای برده‌شده‌اش اضافه کرد."+(state.matchOver?" قهرمانی قطعی شد.":" راند بعدی تا لحظاتی دیگر خودکار آغاز می‌شود.");render();if(!state.matchOver){const lastWinner=state._lastTrickWinner;state.hakem=Number.isInteger(lastWinner)&&team(lastWinner)===winner?lastWinner:(winner===0?0:1);state.lastHakem=state.hakem;setTimeout(()=>{if(state.phase==="round-end"&&!state.matchOver)startRound(false);},2200);}}
+function finishRound(winner){const hakemTeam=team(state.hakem);const loser=1-winner;const isKot=state.scores[winner]===7&&state.scores[loser]===0;const points=isKot?(winner===hakemTeam?2:3):1;const bonusName=points===3?"حاکم‌کوت":points===2?"کوت":"";state.seriesWins[winner]+=points;state.phase="round-end";state.matchOver=state.seriesWins[winner]>=state.roundsPerHand;$("winner").textContent=(state.matchOver?"🏆 برنده کل مسابقه: ":"🏆 برنده راند "+persian(state.round)+": ")+labelTeam(winner);$("feed").textContent=(bonusName?bonusName+"؛ ":"")+"این تیم "+persian(points)+" راند به راندهای برده‌شده‌اش اضافه کرد."+(state.matchOver?" قهرمانی قطعی شد.":" راند بعدی تا لحظاتی دیگر خودکار آغاز می‌شود.");render();if(points===3){playSfx("hakemkot");tableEffect("big-win");}else if(points===2){playSfx("kot");tableEffect("big-win");}if(state.matchOver){playSfx("champion");tableEffect("match-win");}if(!state.matchOver){const lastWinner=state._lastTrickWinner;state.hakem=Number.isInteger(lastWinner)&&team(lastWinner)===winner?lastWinner:(winner===0?0:1);state.lastHakem=state.hakem;setTimeout(()=>{if(state.phase==="round-end"&&!state.matchOver)startRound(false);},2200);}}
 function render(){
  $("seriesA").textContent=persian(state.seriesWins[0]);$("seriesB").textContent=persian(state.seriesWins[1]);$("membersA").textContent=seatName(0)+" و "+seatName(2);$("membersB").textContent=seatName(1)+" و "+seatName(3);for(let t=0;t<2;t++){const host=$("lights"+(t===0?"A":"B"));host.innerHTML="";for(let i=0;i<7;i++){const light=document.createElement("span");light.className="score-light"+(i<Math.min(7,state.scores[t])?" on "+(t===0?"cyan":"purple"):"");host.append(light);}}
  $("round").textContent="راند "+persian(state.round||1)+" · هدف قهرمانی "+persian(state.roundsPerHand)+" راند";
@@ -291,6 +296,7 @@ function render(){
  $("newMatch").textContent=state.round?"شروع دست جدید":"شروع دست آزمایشی";
 }
 function startMatch(){state.scores=[0,0];state.seriesWins=[0,0];state.round=0;state.roundsPerHand=Number($("roundsPerHand").value);state.target=7;state._lastTrickWinner=null;state.phase="idle";$("winner").textContent="";startRound(true);}
+$("soundToggle").addEventListener("click",()=>{soundEnabled=!soundEnabled;$("soundToggle").textContent=soundEnabled?"🔊 صدا روشن":"🔇 صدا خاموش";$("soundToggle").setAttribute("aria-pressed",String(soundEnabled));if(soundEnabled)playSfx("card");});
 $("newMatch").addEventListener("click",startMatch);
 $("restart").addEventListener("click",startMatch);
 const tgUser=window.Telegram?.WebApp?.initDataUnsafe?.user;if(tgUser?.first_name){$("humanName").textContent=tgUser.first_name;}
