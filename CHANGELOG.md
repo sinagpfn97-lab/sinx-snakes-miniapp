@@ -1,3 +1,9 @@
+## 1.0.58 — 2026-11-22
+- Added original synthesized background music across the main app and all games, with autoplay-safe start after the first user interaction.
+- Added game sound effects for dice rolls, token movement, snakes, ladders, card plays, trump selection, and match events.
+- Restored separate music, sound-effects, and vibration toggles with independent volume controls and persistent device settings.
+- Added haptic feedback where supported by the device and browser.
+
 ## 1.0.57 — 2026-11-22
 - Added persistent Dark and Light themes shared across the main dashboard, Snakes, Ludo, and Hokm.
 - Removed non-functional sound, music, and vibration controls because no corresponding audio or haptic engine exists yet.
