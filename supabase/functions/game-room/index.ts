@@ -18,9 +18,9 @@ const authClient = createClient(SUPABASE_URL, ANON_KEY, {
   },
 });
 
-const APP_VERSION = "1.0.58";
-const MIN_SUPPORTED_APP_VERSION = "1.0.58";
-const RELEASE_NOTES = "افزودن موسیقی پس‌زمینه تولیدشده، افکت‌های صوتی بازی، کنترل بلندی صدا و بازخورد لرزشی قابل تنظیم در همه بازی‌ها.";
+const APP_VERSION = "1.0.59";
+const MIN_SUPPORTED_APP_VERSION = "1.0.59";
+const RELEASE_NOTES = "افزودن گفتگوی خصوصی دوطرفه میان دوستان و دعوت مستقیم به اتاق بازی با پذیرش و ورود امن.";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -297,6 +297,116 @@ async function loginAccount(body: any) {
    const id=String(body.friendshipId||"");
    const {error}=await supabase.from("friendships").delete().eq("id",id).eq("status","accepted").or("requester_id.eq."+userId+",addressee_id.eq."+userId);
    if(error)throw error;return {success:true};
+ }
+
+
+ // =========================================
+ // گفتگوی خصوصی دوستان و دعوت به اتاق
+ // =========================================
+ async function requireAcceptedFriend(userId:string, friendId:string){
+   const {data,error}=await supabase.from("friendships").select("id").eq("status","accepted")
+     .or("and(requester_id.eq."+userId+",addressee_id.eq."+friendId+"),and(requester_id.eq."+friendId+",addressee_id.eq."+userId+")").maybeSingle();
+   if(error)throw error;
+   if(!data)throw new Error("گفتگو فقط میان دوستان پذیرفته‌شده امکان‌پذیر است");
+ }
+ async function ensureConversation(userId:string, friendId:string){
+   if(userId===friendId)throw new Error("گفتگو با حساب خودت امکان‌پذیر نیست");
+   await requireAcceptedFriend(userId,friendId);
+   const [userA,userB]=[userId,friendId].sort();
+   const {data,error}=await supabase.from("conversations").upsert({user_a:userA,user_b:userB},{onConflict:"user_a,user_b",ignoreDuplicates:true}).select("id").maybeSingle();
+   if(error)throw error;
+   if(data?.id)return data.id;
+   const {data:existing,error:readError}=await supabase.from("conversations").select("id").eq("user_a",userA).eq("user_b",userB).single();
+   if(readError)throw readError;
+   return existing.id;
+ }
+ async function chatList(userId:string){
+   const {data:conversations,error}=await supabase.from("conversations").select("id,user_a,user_b,created_at")
+     .or("user_a.eq."+userId+",user_b.eq."+userId).order("created_at",{ascending:false});
+   if(error)throw error;
+   const rows=conversations||[];
+   if(!rows.length)return {success:true,conversations:[]};
+   const ids=rows.map((r:any)=>r.id), friendIds=rows.map((r:any)=>r.user_a===userId?r.user_b:r.user_a);
+   const [{data:profiles,error:pe},{data:messages,error:me}]=await Promise.all([
+     supabase.from("profiles").select("user_id,username").in("user_id",friendIds),
+     supabase.from("messages").select("id,conversation_id,sender_id,recipient_id,message_type,body,metadata,created_at,read_at")
+       .in("conversation_id",ids).order("created_at",{ascending:false}).limit(300)
+   ]);
+   if(pe)throw pe;if(me)throw me;
+   const names=new Map((profiles||[]).map((p:any)=>[p.user_id,p.username]));
+   const latest=new Map<string,any>(),unread=new Map<string,number>();
+   for(const m of messages||[]){if(!latest.has(m.conversation_id))latest.set(m.conversation_id,m);if(m.recipient_id===userId&&!m.read_at)unread.set(m.conversation_id,(unread.get(m.conversation_id)||0)+1);}
+   return {success:true,conversations:rows.map((r:any)=>({id:r.id,friendId:r.user_a===userId?r.user_b:r.user_a,username:names.get(r.user_a===userId?r.user_b:r.user_a)||"کاربر",lastMessage:latest.get(r.id)||null,unreadCount:unread.get(r.id)||0}))};
+ }
+ async function chatMessages(userId:string,body:any){
+   const id=String(body.conversationId||"");
+   if(!/^[0-9a-f-]{36}$/i.test(id))throw new Error("گفتگو معتبر نیست");
+   const {data:conversation,error:ce}=await supabase.from("conversations").select("id,user_a,user_b").eq("id",id)
+     .or("user_a.eq."+userId+",user_b.eq."+userId).maybeSingle();
+   if(ce)throw ce;if(!conversation)throw new Error("گفتگو پیدا نشد");
+   const friendId=conversation.user_a===userId?conversation.user_b:conversation.user_a;
+   const {data:messages,error}=await supabase.from("messages").select("id,conversation_id,sender_id,recipient_id,message_type,body,metadata,created_at,read_at")
+     .eq("conversation_id",id).order("created_at",{ascending:true}).limit(100);
+   if(error)throw error;
+   const {error:updateError}=await supabase.from("messages").update({read_at:new Date().toISOString()}).eq("conversation_id",id).eq("recipient_id",userId).is("read_at",null);
+   if(updateError)throw updateError;
+   return {success:true,conversationId:id,friendId,messages:messages||[]};
+ }
+ async function chatSend(userId:string,body:any){
+   const id=String(body.conversationId||""),message=String(body.text||"").trim();
+   if(!/^[0-9a-f-]{36}$/i.test(id)||!message||message.length>1000)throw new Error("متن پیام باید بین ۱ تا ۱۰۰۰ نویسه باشد");
+   const {data:c,error:ce}=await supabase.from("conversations").select("id,user_a,user_b").eq("id",id)
+     .or("user_a.eq."+userId+",user_b.eq."+userId).maybeSingle();
+   if(ce)throw ce;if(!c)throw new Error("گفتگو پیدا نشد");
+   const friendId=c.user_a===userId?c.user_b:c.user_a;
+   await requireAcceptedFriend(userId,friendId);
+   const {data,error}=await supabase.from("messages").insert({conversation_id:id,sender_id:userId,recipient_id:friendId,message_type:"text",body:message})
+     .select("id,conversation_id,sender_id,recipient_id,message_type,body,metadata,created_at,read_at").single();
+   if(error)throw error;
+   return {success:true,message:data};
+ }
+ async function sendRoomInvite(userId:string,body:any){
+   const friendUsername=normalizeUsername(body.username).replace(/^@/,"");
+   if(!validUsername(friendUsername))throw new Error("شناسه دوست معتبر نیست");
+   const {data:friend,error:fe}=await supabase.from("profiles").select("user_id,username").eq("username",friendUsername).maybeSingle();
+   if(fe)throw fe;if(!friend)throw new Error("دوست پیدا نشد");
+   const conversationId=await ensureConversation(userId,friend.user_id);
+   const code=String(body.roomCode||"").trim().toUpperCase();
+   if(!/^[A-Z0-9]{6}$/.test(code))throw new Error("کد اتاق معتبر نیست");
+   const {data:room,error:re}=await supabase.from("rooms").select("id,code,status,game_state,max_players").eq("code",code).maybeSingle();
+   if(re)throw re;if(!room||room.status!=="waiting")throw new Error("اتاق پیدا نشد یا دیگر در انتظار بازیکن نیست");
+   const {data:host,error:he}=await supabase.from("players").select("id,is_host").eq("room_id",room.id).eq("auth_user_id",userId).maybeSingle();
+   if(he)throw he;if(!host?.is_host)throw new Error("فقط سازنده اتاق می‌تواند دعوت بفرستد");
+   const gameType=room.game_state?.game_type||"snakes";
+   const {data:message,error}=await supabase.from("messages").insert({
+     conversation_id:conversationId,sender_id:userId,recipient_id:friend.user_id,message_type:"room_invite",
+     body:"دعوتت کرده‌ام به اتاق "+(gameType==="ludo"?"منچ":gameType==="hokm"?"حکم":"مار و پله"),
+     metadata:{room_code:room.code,game_type:gameType,status:"pending"}
+   }).select("id").single();
+   if(error)throw error;
+   return {success:true,messageId:message.id,username:friend.username};
+ }
+ async function authenticateUserName(userId:string){
+   const {data,error}=await supabase.from("profiles").select("username").eq("user_id",userId).single();
+   if(error)throw error;return data.username;
+ }
+ async function respondRoomInvite(userId:string,body:any,decision:"accept"|"reject"){
+   const id=String(body.messageId||"");
+   if(!/^[0-9a-f-]{36}$/i.test(id))throw new Error("دعوت معتبر نیست");
+   const {data:message,error}=await supabase.from("messages").select("*").eq("id",id).eq("recipient_id",userId).eq("message_type","room_invite").maybeSingle();
+   if(error)throw error;if(!message)throw new Error("دعوت پیدا نشد");
+   if(message.metadata?.status!=="pending")throw new Error("این دعوت قبلاً بررسی شده است");
+   if(decision==="reject"){
+     const {error:updateError}=await supabase.from("messages").update({metadata:{...message.metadata,status:"rejected"}}).eq("id",id).eq("recipient_id",userId);
+     if(updateError)throw updateError;
+     return {success:true,rejected:true};
+   }
+   const code=String(message.metadata?.room_code||"");
+   const expectedGameType=String(message.metadata?.game_type||"");
+   const joined=await joinRoom({roomCode:code,expectedGameType},userId,await authenticateUserName(userId));
+   const {error:updateError}=await supabase.from("messages").update({metadata:{...message.metadata,status:"accepted"}}).eq("id",id).eq("recipient_id",userId);
+   if(updateError)throw updateError;
+   return {success:true,joined};
  }
 
 // =========================================
@@ -826,6 +936,18 @@ Deno.serve(async (req: Request) => {
         return response(await friendRespond(userId, body));
       case "friend_remove":
         return response(await friendRemove(userId, body));
+      case "chat_list":
+        return response(await chatList(userId));
+      case "chat_messages":
+        return response(await chatMessages(userId, body));
+      case "chat_send":
+        return response(await chatSend(userId, body));
+      case "room_invite_send":
+        return response(await sendRoomInvite(userId, body));
+      case "room_invite_accept":
+        return response(await respondRoomInvite(userId, body, "accept"));
+      case "room_invite_reject":
+        return response(await respondRoomInvite(userId, body, "reject"));
 
       case "create":
         return response(
