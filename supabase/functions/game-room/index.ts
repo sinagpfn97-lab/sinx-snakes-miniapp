@@ -354,11 +354,11 @@ async function loginAccount(body: any) {
    if(ce)throw ce;if(!conversation)throw new Error("گفتگو پیدا نشد");
    const friendId=conversation.user_a===userId?conversation.user_b:conversation.user_a;
    const {data:messages,error}=await supabase.from("messages").select("id,conversation_id,sender_id,recipient_id,message_type,body,metadata,created_at,read_at")
-     .eq("conversation_id",id).order("created_at",{ascending:true}).limit(100);
+     .eq("conversation_id",id).order("created_at",{ascending:false}).limit(100);
    if(error)throw error;
    const {error:updateError}=await supabase.from("messages").update({read_at:new Date().toISOString()}).eq("conversation_id",id).eq("recipient_id",userId).is("read_at",null);
    if(updateError)throw updateError;
-   return {success:true,conversationId:id,friendId,messages:messages||[]};
+   return {success:true,conversationId:id,friendId,messages:(messages||[]).reverse()};
  }
  async function chatSend(userId:string,body:any){
    const id=String(body.conversationId||""),message=String(body.text||"").trim();
