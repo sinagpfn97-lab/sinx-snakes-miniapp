@@ -400,6 +400,68 @@ body.theme-light #gameView .board-wrap{box-shadow:0 0 20px #7352ad20}
 .hub-audio-level{margin-top:12px}.hub-audio-level label{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted,#aaa4c9);margin-bottom:8px}.hub-audio-level label b{color:#a879ff;font-variant-numeric:tabular-nums}.hub-audio-level input[type=range]{width:100%;accent-color:#8c55ed;cursor:pointer}.hub-audio-card .hub-btn{margin-top:10px}
 body.theme-light .hub-audio-level label{color:#68718a}
 
+
+/* Messenger-style conversation hub */
+.chat-shell{display:grid;grid-template-columns:minmax(190px, .78fr) minmax(0,1.5fr);gap:12px;min-height:420px;margin-top:10px}
+.chat-sidebar,.chat-thread{border:1px solid #39354f;border-radius:17px;background:#151a2b;padding:12px;min-width:0}
+.chat-sidebar{max-height:70vh;overflow:auto}
+.chat-sidebar-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px;border-radius:12px;background:#101426}
+.chat-sidebar-tabs button{border:0;border-radius:9px;background:transparent;color:#a9a2c8;padding:9px 5px;font:inherit;font-size:11px}
+.chat-sidebar-tabs button.active{background:#713de0;color:white}
+.chat-global-entry{width:100%;display:flex;align-items:center;gap:9px;text-align:right;border:1px solid #57437e;border-radius:13px;background:#25203a;color:#fff;padding:11px;margin:10px 0;font:inherit}
+.chat-global-entry>span:first-child{font-size:22px}.chat-global-entry>span:nth-child(2){display:grid;gap:3px;flex:1}.chat-global-entry strong{font-size:12px}.chat-global-entry small{font-size:9px;color:#bdb2d6}.chat-global-entry b{font-size:20px}
+.chat-sidebar-title{font-size:10px;color:#aaa4c9;margin:12px 4px 7px}
+.chat-thread{display:flex;flex-direction:column;min-height:420px}
+.chat-thread-header{display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid #39354f}
+.chat-thread-header h3{font-size:13px;margin:0}.chat-thread-header small{display:block;color:#a9a2c8;font-size:9px;margin-top:4px}
+.chat-back{display:none;border:0;border-radius:9px;background:#302b43;color:white;font-size:23px;width:34px;height:34px}
+.chat-conversation{display:flex;align-items:center;gap:8px;padding:10px;border-radius:12px;background:#1b2033;margin:7px 0;border:1px solid #34334a;color:inherit;font:inherit;width:100%;text-align:right}
+.chat-conversation.active{border-color:#9b75ef;background:#292044}
+.chat-conversation strong{font-size:11px;flex:1;direction:ltr;text-align:right}
+.chat-conversation small{font-size:9px;color:#a9a2c8;max-width:105px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-unread{min-width:19px;height:19px;border-radius:20px;background:#7949d2;color:#fff;font-size:10px;display:grid;place-items:center}
+.chat-messages{display:flex;flex-direction:column;gap:8px;overflow:auto;flex:1;max-height:54vh;min-height:230px;padding:10px 2px}
+.chat-bubble{max-width:88%;padding:9px 11px;border-radius:13px;background:#242943;color:#f4f0ff;font-size:11px;line-height:1.9;white-space:pre-wrap;overflow-wrap:anywhere;align-self:flex-start}
+.chat-bubble.own{align-self:flex-end;background:#493276}
+.chat-bubble time{display:block;font-size:8px;opacity:.65;text-align:left;direction:ltr}
+.chat-global-bubble{max-width:94%;display:flex;flex-direction:column;gap:2px}.chat-global-bubble strong{font-size:9px;color:#c4a8ff}.chat-global-bubble.own strong{color:#e1d3ff}
+.chat-invite{width:100%;border:1px solid #7056a7;border-radius:13px;padding:11px;background:#292044;color:#fff;font-family:inherit;text-align:right}
+.chat-invite strong{display:block;font-size:12px}.chat-invite small{display:block;color:#c7b9e5;font-size:10px;margin:5px 0}
+.chat-invite-actions{display:flex;gap:7px;margin-top:8px}.chat-invite-actions button{flex:1;border:0;border-radius:9px;padding:8px;font:inherit;font-size:10px;background:#713de0;color:#fff}.chat-invite-actions button.subtle{background:#3a354c}
+.chat-compose{display:flex;gap:6px;margin-top:10px;align-items:center}
+.chat-compose input{flex:1;min-width:0;padding:11px;border-radius:11px;background:#10152b;color:#fff;border:1px solid #45416b;font-family:inherit;font-size:11px}
+.chat-compose button{padding:10px 12px;border:0;border-radius:11px;background:#713de0;color:#fff;font-family:inherit;font-size:10px;white-space:nowrap}
+.chat-compose .chat-game-menu-btn{background:#3c315a;border:1px solid #7254a6}
+.chat-feedback{font-size:10px}
+body.theme-light .chat-sidebar,body.theme-light .chat-thread{background:#fff;border-color:#dce0ec;color:#24243a}
+body.theme-light .chat-sidebar-tabs{background:#f0f1f8}
+body.theme-light .chat-sidebar-tabs button{color:#68718a}
+body.theme-light .chat-sidebar-tabs button.active{color:white}
+body.theme-light .chat-global-entry{background:#f2edfb;color:#34264c;border-color:#c9b7ea}
+body.theme-light .chat-global-entry small{color:#665b7c}
+body.theme-light .chat-conversation{background:#f3f4fa;border-color:#dce0ec;color:#24243a}
+body.theme-light .chat-conversation.active{background:#eee8fb;border-color:#8655df}
+body.theme-light .chat-bubble{background:#edf0f8;color:#24243a}
+body.theme-light .chat-bubble.own{background:#e8ddfb;color:#35244e}
+body.theme-light .chat-invite{background:#f2edfb;color:#34264c;border-color:#c9b7ea}
+body.theme-light .chat-invite small{color:#665b7c}
+body.theme-light .chat-thread-header{border-color:#e0e3ed}
+body.theme-light .chat-thread-header small{color:#737b91}
+body.theme-light .chat-back{background:#eceef6;color:#34394d}
+body.theme-light .chat-compose input{background:#fff;color:#24243a;border-color:#cdd3e3}
+@media(max-width:620px){
+ .chat-shell{display:block;min-height:400px}
+ .chat-sidebar{max-height:65vh}
+ .chat-thread{display:none;min-height:60vh}
+ .chat-shell.chat-open .chat-sidebar{display:none}
+ .chat-shell.chat-open .chat-thread{display:flex}
+ .chat-back{display:block}
+ .chat-messages{max-height:none;min-height:35vh}
+ .chat-compose{flex-wrap:nowrap}
+ .chat-compose input{min-width:0}
+ .chat-compose button{padding:10px 9px}
+}
+
 /* Private friend chat */
 .chat-layout{display:grid;gap:12px;margin-top:10px}
 .chat-conversations,.chat-thread{border:1px solid #39354f;border-radius:17px;background:#151a2b;padding:12px;min-width:0}
@@ -453,10 +515,31 @@ body.theme-light .chat-compose input{background:#fff;color:#24243a;border-color:
     <div class="hub-section-head"><strong>درخواست‌های ارسالی</strong></div><div id="outgoingFriends" class="hub-stack"><div class="hub-empty">درخواستی ارسال نشده است.</div></div>
   </section>
   <section class="hub-page" id="hubPage-chat">
-    <div class="hub-page-title"><span>💬</span><div><strong>گفتگوی دوستان</strong><small>پیام خصوصی و دعوت به بازی میان دوستان</small></div></div>
-    <div class="chat-layout">
-      <div class="chat-conversations"><h3>گفتگوها</h3><div id="chatConversationList"><div class="hub-empty">در حال بارگذاری گفتگوها...</div></div></div>
-      <div class="chat-thread"><h3 id="chatThreadTitle">یک گفتگو را انتخاب کن</h3><div id="chatMessages" class="chat-messages"><div class="hub-empty">از فهرست دوستان، گفتگو را باز کن.</div></div><div class="chat-compose"><input id="chatMessageInput" maxlength="1000" placeholder="پیام بنویس..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMessage();}"><button type="button" onclick="sendChatMessage()">ارسال</button></div><p id="chatFeedback" class="hub-feedback"></p></div>
+    <div class="hub-page-title"><span>💬</span><div><strong>گفتگوها</strong><small>چت خصوصی دوستان و گفتگوی سراسری SINX</small></div></div>
+    <div class="chat-shell" id="chatShell">
+      <aside class="chat-sidebar" id="chatSidebar">
+        <div class="chat-sidebar-tabs">
+          <button class="active" id="chatTabConversations" onclick="openChatSidebarTab('conversations')">گفتگوها</button>
+          <button id="chatTabFriends" onclick="openChatSidebarTab('friends')">دوستان</button>
+        </div>
+        <button class="chat-global-entry" onclick="openGlobalChat()"><span>🌐</span><span><strong>چت سراسری</strong><small>گفتگوی همه کاربران</small></span><b>›</b></button>
+        <div id="chatSidebarTitle" class="chat-sidebar-title">گفتگوهای اخیر</div>
+        <div id="chatConversationList"><div class="hub-empty">در حال بارگذاری...</div></div>
+      </aside>
+      <section class="chat-thread" id="chatThreadPanel">
+        <div class="chat-thread-header"><button id="chatBackButton" class="chat-back" onclick="chatBackToList()">‹</button><div><h3 id="chatThreadTitle">یک گفتگو را انتخاب کن</h3><small id="chatThreadSubtitle">پیام‌ها و دعوت‌های بازی اینجا نمایش داده می‌شوند</small></div></div>
+        <div id="chatMessages" class="chat-messages"><div class="hub-empty">از فهرست گفتگوها یا چت سراسری یک مورد را انتخاب کن.</div></div>
+        <div class="chat-compose" id="privateChatComposer" style="display:none">
+          <input id="chatMessageInput" maxlength="1000" placeholder="پیام بنویس..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMessage();}">
+          <button type="button" onclick="sendChatMessage()">ارسال</button>
+          <button type="button" class="chat-game-menu-btn" onclick="openChatGameMenu()">🎮 منو بازی</button>
+        </div>
+        <div class="chat-compose" id="globalChatComposer" style="display:none">
+          <input id="globalChatMessageInput" maxlength="500" placeholder="پیام عمومی بنویس..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();sendGlobalChatMessage();}">
+          <button type="button" onclick="sendGlobalChatMessage()">ارسال</button>
+        </div>
+        <p id="chatFeedback" class="hub-feedback"></p>
+      </section>
     </div>
   </section>
   <section class="hub-page" id="hubPage-profile">
@@ -550,6 +633,7 @@ body.theme-light .chat-compose input{background:#fff;color:#24243a;border-color:
 <div class="overlay" id="setupOverlay"><div class="dialog"><h2>ورود به بازی</h2><p>برای ساخت یا پیوستن به اتاق، ابتدا وارد حساب شو.</p><button class="primary" onclick="showProfile()">👤 ورود / ثبت‌نام</button><button class="secondary" onclick="closeSetup()">بستن</button></div></div>
 <div class="overlay" id="gamePickerOverlay"><div class="dialog"><h2>🎮 انتخاب بازی</h2><p>بازی موردنظرت را برای ساخت اتاق انتخاب کن.</p><button class="primary" onclick="chooseGame('snakes')">🐍 مار و پله نئونی</button><button class="secondary" onclick="chooseGame('ludo')">🎲 منچ چهار نفره</button><button class="secondary" onclick="closeGamePicker()">انصراف</button></div></div>
 <div class="overlay" id="friendInviteOverlay"><div class="dialog"><h2>👥 دعوت دوستان</h2><p>دوستانی را انتخاب کن تا دعوت اتاق در گفتگوی خصوصی برایشان ارسال شود.</p><div id="roomInviteFriendsList" style="max-height:45vh;overflow:auto;text-align:right"><div class="hub-empty">در حال دریافت فهرست دوستان...</div></div><button class="secondary" onclick="closeRoomInvitePicker()">بستن</button></div></div>
+<div class="overlay" id="chatGameOverlay"><div class="dialog"><h2>🎮 منو بازی</h2><p>یک بازی انتخاب کن تا اتاق ساخته و کارت ورود در همین گفتگو برای دوستت ارسال شود.</p><button class="primary" onclick="createRoomFromChat('snakes')">🐍 ساخت اتاق مار و پله</button><button class="secondary" onclick="createRoomFromChat('ludo')">🎲 ساخت اتاق منچ</button><button class="secondary" onclick="createRoomFromChat('hokm')">🂡 ساخت اتاق حکم</button><button class="secondary" onclick="closeChatGameMenu()">انصراف</button></div></div>
 <div class="overlay" id="profileOverlay"><div class="dialog"><h2>👤 حساب کاربری SINX</h2><p id="accountStatus">برای ذخیره حساب و ورود به اتاق‌ها وارد شو.</p><input id="playerNameInput" maxlength="20" autocomplete="username" placeholder="نام کاربری انگلیسی (۳ تا ۲۰ حرف)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:8px 0"><input id="passwordInput" type="password" minlength="8" autocomplete="new-password" placeholder="رمز عبور (حداقل ۸ کاراکتر)" style="width:100%;padding:12px;border-radius:10px;background:#10152b;color:white;border:1px solid #514879;font-family:inherit;margin:0 0 8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="primary" id="registerBtn" onclick="accountAction('register')">ثبت‌نام</button><button class="secondary" id="loginBtn" onclick="accountAction('login')">ورود</button></div><button class="secondary" onclick="closeProfile()">بستن</button></div></div>
 
 <div class="overlay" id="winOverlay">
@@ -714,7 +798,7 @@ function openHubTab(tab){
  document.querySelectorAll(".hub-page").forEach(el=>el.classList.toggle("active",el.id==="hubPage-"+tab));
  document.querySelectorAll(".hub-nav-item").forEach(el=>el.classList.toggle("active",el.dataset.tab===tab));
  if(tab==="friends")loadFriends();
- if(tab==="chat")loadChatList();
+ if(tab==="chat"){chatBackToList();openChatSidebarTab("conversations");}
  if(tab==="profile")refreshProfile();
 }
 function getHubTheme(){try{return localStorage.getItem("sinx_theme")==="light"?"light":"dark"}catch{return "dark"}}
@@ -747,7 +831,7 @@ async function refreshProfile(){
  document.getElementById("profileLogoutButton").style.display=signed?"block":"none";
 }
 async function copyProfileHandle(){const value=document.getElementById("profileHandle").textContent;if(value==="—")return;try{await navigator.clipboard.writeText(value);document.getElementById("profileStatus").textContent="شناسه کپی شد";}catch{document.getElementById("profileStatus").textContent="کپی شناسه ممکن نشد";}}
-async function logoutAccount(){if(!sb)return;if(chatRealtimeChannel){await sb.removeChannel(chatRealtimeChannel);chatRealtimeChannel=null;}if(chatListRealtimeChannel){await sb.removeChannel(chatListRealtimeChannel);chatListRealtimeChannel=null;}activeChatId="";activeChatUsername="";const {error}=await sb.auth.signOut();if(error){alert(error.message);return;}accountFeedback("از حساب خارج شدی.");await refreshProfile();openHubTab("games");}
+async function logoutAccount(){if(!sb)return;if(chatRealtimeChannel){await sb.removeChannel(chatRealtimeChannel);chatRealtimeChannel=null;}if(chatListRealtimeChannel){await sb.removeChannel(chatListRealtimeChannel);chatListRealtimeChannel=null;}if(globalChatRealtimeChannel){await sb.removeChannel(globalChatRealtimeChannel);globalChatRealtimeChannel=null;}activeChatId="";activeChatUsername="";const {error}=await sb.auth.signOut();if(error){alert(error.message);return;}accountFeedback("از حساب خارج شدی.");await refreshProfile();openHubTab("games");}
 async function loadFriends(){
  if(!sb)return;const {data:{session}}=await sb.auth.getSession();if(!session){document.getElementById("incomingFriends").innerHTML='<div class="hub-empty">برای مدیریت دوستان ابتدا وارد حساب شو.</div>';document.getElementById("friendsList").innerHTML="";document.getElementById("outgoingFriends").innerHTML="";return;}
  try{const d=await api("friends_list");renderFriendGroup("incomingFriends",d.incoming||[],"incoming");renderFriendGroup("friendsList",d.friends||[],"friends");renderFriendGroup("outgoingFriends",d.outgoing||[],"outgoing");document.getElementById("incomingCount").textContent=String((d.incoming||[]).length);document.getElementById("friendsCount").textContent=String((d.friends||[]).length);}catch(e){document.getElementById("incomingFriends").textContent=e.message;}
@@ -757,24 +841,49 @@ async function searchFriend(){const username=document.getElementById("friendUser
 async function respondFriend(id,decision){try{await api("friend_respond",{requestId:id,decision});await loadFriends();}catch(e){alert(e.message);}}
 async function removeFriend(id){if(!confirm("این دوست از فهرست حذف شود؟"))return;try{await api("friend_remove",{friendshipId:id});await loadFriends();}catch(e){alert(e.message);}}
 
-let activeChatId="",activeChatUsername="",chatRealtimeChannel=null,chatListRealtimeChannel=null,chatRefreshBusy=false,currentUserId="";
+let activeChatId="",activeChatUsername="",chatRealtimeChannel=null,chatListRealtimeChannel=null,globalChatRealtimeChannel=null,chatRefreshBusy=false,currentUserId="",chatSidebarMode="conversations",chatMode="";
 function chatFeedback(message){const el=document.getElementById("chatFeedback");if(el)el.textContent=message||"";}
+function chatBackToList(){document.getElementById("chatShell")?.classList.remove("chat-open");}
+function openChatSidebarTab(mode){
+ chatSidebarMode=mode;
+ document.getElementById("chatTabConversations").classList.toggle("active",mode==="conversations");
+ document.getElementById("chatTabFriends").classList.toggle("active",mode==="friends");
+ document.getElementById("chatSidebarTitle").textContent=mode==="friends"?"دوستان تأییدشده":"گفتگوهای اخیر";
+ loadChatSidebar();
+}
 async function openConversationWithUsername(username){
- try{const d=await api("chat_open",{username});openHubTab("chat");await loadChatList();await openChatConversation(d.conversationId,d.username);}
+ try{const d=await api("chat_open",{username});openHubTab("chat");await openChatConversation(d.conversationId,d.username);}
  catch(e){alert(e.message);}
 }
-async function loadChatList(){
+async function loadChatSidebar(){
  const box=document.getElementById("chatConversationList");if(!box)return;
- if(sb&&currentUserId&&!chatListRealtimeChannel){chatListRealtimeChannel=sb.channel("sinx-chat-list-"+currentUserId).on("postgres_changes",{event:"*",schema:"public",table:"messages",filter:"recipient_id=eq."+currentUserId},()=>{loadChatList();if(activeChatId)loadChatMessages();}).subscribe();}
+ if(!currentUserId){box.innerHTML='<div class="hub-empty">برای استفاده از گفتگو وارد حساب شو.</div>';return;}
+ if(sb&&!chatListRealtimeChannel){
+  chatListRealtimeChannel=sb.channel("sinx-chat-list-"+currentUserId)
+   .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"recipient_id=eq."+currentUserId},()=>{loadChatSidebar();if(chatMode==="private"&&activeChatId)loadChatMessages();})
+   .subscribe();
+ }
+ box.innerHTML='<div class="hub-empty">در حال بارگذاری...</div>';
  try{
-  const d=await api("chat_list");box.replaceChildren();
-  if(!(d.conversations||[]).length){box.innerHTML='<div class="hub-empty">هنوز گفتگویی نداری. از بخش دوستان روی «گفتگو» بزن.</div>';return;}
-  d.conversations.forEach(c=>{
-   const b=document.createElement("button");b.className="chat-conversation"+(c.id===activeChatId?" active":"");b.onclick=()=>openChatConversation(c.id,c.username);
-   const name=document.createElement("strong");name.textContent="@"+c.username;
-   const preview=document.createElement("small");preview.textContent=c.lastMessage?.body||"گفتگو را شروع کن";
-   b.append(name,preview);if(c.unreadCount){const badge=document.createElement("span");badge.className="chat-unread";badge.textContent=String(c.unreadCount);b.append(badge);}box.append(b);
-  });
+  if(chatSidebarMode==="friends"){
+   const d=await api("friends_list");box.replaceChildren();
+   if(!(d.friends||[]).length){box.innerHTML='<div class="hub-empty">هنوز دوستی نداری. از بخش دوستان کاربر جدید اضافه کن.</div>';return;}
+   d.friends.forEach(friend=>{
+    const b=document.createElement("button");b.className="chat-conversation";b.onclick=()=>openConversationWithUsername(friend.username);
+    const name=document.createElement("strong");name.textContent="@"+friend.username;
+    const hint=document.createElement("small");hint.textContent="باز کردن گفتگوی خصوصی";
+    b.append(name,hint);box.append(b);
+   });
+  }else{
+   const d=await api("chat_list");box.replaceChildren();
+   if(!(d.conversations||[]).length){box.innerHTML='<div class="hub-empty">هنوز گفتگوی خصوصی نداری. از زبانه دوستان، یک دوست را انتخاب کن.</div>';return;}
+   d.conversations.forEach(c=>{
+    const b=document.createElement("button");b.className="chat-conversation"+(c.id===activeChatId?" active":"");b.onclick=()=>openChatConversation(c.id,c.username);
+    const name=document.createElement("strong");name.textContent="@"+c.username;
+    const preview=document.createElement("small");preview.textContent=c.lastMessage?.body||"گفتگو را شروع کن";
+    b.append(name,preview);if(c.unreadCount){const badge=document.createElement("span");badge.className="chat-unread";badge.textContent=String(c.unreadCount);b.append(badge);}box.append(b);
+   });
+  }
  }catch(e){box.textContent=e.message;}
 }
 function renderChatMessages(items){
@@ -786,25 +895,45 @@ function renderChatMessages(items){
    const title=document.createElement("strong");title.textContent=m.body||"دعوت به بازی";
    const detail=document.createElement("small");const game=m.metadata?.game_type;detail.textContent=(game==="ludo"?"منچ":game==="hokm"?"حکم":"مار و پله")+" · کد اتاق "+(m.metadata?.room_code||"");
    bubble.className="chat-invite"+(m.sender_id===currentUserId?" own":"");bubble.append(title,detail);
-   const state=document.createElement("small");const status=m.metadata?.status||"pending";state.textContent=status==="accepted"?"دعوت پذیرفته شد":status==="rejected"?"دعوت رد شد":"منتظر پاسخ";
+   const state=document.createElement("small");const status=m.metadata?.status||"pending";state.textContent=status==="accepted"?"دعوت پذیرفته شد":status==="rejected"?"دعوت رد شد":"منتظر پاسخ دوست";
    bubble.append(state);
-   if(m.recipient_id===currentUserId&&status==="pending"){
-    const actions=document.createElement("div");actions.className="chat-invite-actions";
-    const accept=document.createElement("button");accept.textContent="پذیرش و ورود";accept.onclick=()=>acceptRoomInvite(m.id);
+   const actions=document.createElement("div");actions.className="chat-invite-actions";
+   if(m.sender_id===currentUserId){
+    const hostBtn=document.createElement("button");hostBtn.textContent="ورود به اتاق";hostBtn.onclick=()=>openOwnChatRoom(m.metadata?.room_code,game);actions.append(hostBtn);
+   }else if(m.recipient_id===currentUserId&&status==="pending"){
+    const accept=document.createElement("button");accept.textContent="ورود به بازی";accept.onclick=()=>acceptRoomInvite(m.id);
     const reject=document.createElement("button");reject.className="subtle";reject.textContent="رد دعوت";reject.onclick=()=>rejectRoomInvite(m.id);
-    actions.append(accept,reject);bubble.append(actions);
+    actions.append(accept,reject);
    }
+   if(actions.childElementCount)bubble.append(actions);
   }else{bubble.textContent=m.body||"";}
   const time=document.createElement("time");time.textContent=new Date(m.created_at).toLocaleTimeString("fa-IR",{hour:"2-digit",minute:"2-digit"});bubble.append(time);box.append(bubble);
  });
  box.scrollTop=box.scrollHeight;
 }
+function renderGlobalChatMessages(items){
+ const box=document.getElementById("chatMessages");box.replaceChildren();
+ if(!items.length){const empty=document.createElement("div");empty.className="hub-empty";empty.textContent="اولین پیام چت سراسری را ارسال کن.";box.append(empty);return;}
+ items.forEach(m=>{
+  const bubble=document.createElement("div");bubble.className="chat-bubble chat-global-bubble"+(m.sender_id===currentUserId?" own":"");
+  const name=document.createElement("strong");name.textContent="@"+(m.sender_username||"کاربر");
+  const body=document.createElement("span");body.textContent=m.body||"";
+  const time=document.createElement("time");time.textContent=new Date(m.created_at).toLocaleTimeString("fa-IR",{hour:"2-digit",minute:"2-digit"});
+  bubble.append(name,body,time);box.append(bubble);
+ });
+ box.scrollTop=box.scrollHeight;
+}
 async function openChatConversation(id,username){
- activeChatId=id;activeChatUsername=username;document.getElementById("chatThreadTitle").textContent="@"+username;
+ chatMode="private";activeChatId=id;activeChatUsername=username;
+ document.getElementById("chatThreadTitle").textContent="@"+username;
+ document.getElementById("chatThreadSubtitle").textContent="گفتگوی خصوصی";
+ document.getElementById("privateChatComposer").style.display="flex";
+ document.getElementById("globalChatComposer").style.display="none";
+ document.getElementById("chatShell").classList.add("chat-open");
+ if(globalChatRealtimeChannel&&sb){await sb.removeChannel(globalChatRealtimeChannel);globalChatRealtimeChannel=null;}
+ if(chatRealtimeChannel&&sb){await sb.removeChannel(chatRealtimeChannel);chatRealtimeChannel=null;}
  await loadChatMessages();
- await loadChatList();
- if(chatRealtimeChannel&&sb){try{await sb.removeChannel(chatRealtimeChannel);}catch{}}
- if(sb){chatRealtimeChannel=sb.channel("sinx-chat-"+id).on("postgres_changes",{event:"*",schema:"public",table:"messages",filter:"conversation_id=eq."+id},()=>{if(activeChatId===id&&!chatRefreshBusy){loadChatMessages();loadChatList();}}).subscribe();}
+ if(sb){chatRealtimeChannel=sb.channel("sinx-chat-"+id).on("postgres_changes",{event:"*",schema:"public",table:"messages",filter:"conversation_id=eq."+id},()=>{if(activeChatId===id&&chatMode==="private"&&!chatRefreshBusy){loadChatMessages();loadChatSidebar();}}).subscribe();}
 }
 async function loadChatMessages(){
  if(!activeChatId||chatRefreshBusy)return;chatRefreshBusy=true;
@@ -812,18 +941,63 @@ async function loadChatMessages(){
  catch(e){chatFeedback(e.message);}finally{chatRefreshBusy=false;}
 }
 async function sendChatMessage(){
- const input=document.getElementById("chatMessageInput"),value=input.value.trim();if(!activeChatId){chatFeedback("ابتدا یک گفتگو را انتخاب کن.");return;}if(!value)return;
- input.disabled=true;try{await api("chat_send",{conversationId:activeChatId,text:value});input.value="";chatFeedback("");await loadChatMessages();await loadChatList();}
+ const input=document.getElementById("chatMessageInput"),value=input.value.trim();if(!activeChatId){chatFeedback("ابتدا یک گفتگوی خصوصی را انتخاب کن.");return;}if(!value)return;
+ input.disabled=true;try{await api("chat_send",{conversationId:activeChatId,text:value});input.value="";chatFeedback("");await loadChatMessages();await loadChatSidebar();}
  catch(e){chatFeedback(e.message);}finally{input.disabled=false;input.focus();}
+}
+async function openGlobalChat(){
+ if(!currentUserId){chatFeedback("برای ورود به چت سراسری ابتدا وارد حساب شو.");return;}
+ chatMode="global";activeChatId="";activeChatUsername="";
+ document.getElementById("chatThreadTitle").textContent="🌐 چت سراسری";
+ document.getElementById("chatThreadSubtitle").textContent="پیام‌ها برای همه کاربران ثبت‌نام‌شده قابل مشاهده است · فقط ۶ پیام آخر";
+ document.getElementById("privateChatComposer").style.display="none";
+ document.getElementById("globalChatComposer").style.display="flex";
+ document.getElementById("chatShell").classList.add("chat-open");
+ if(chatRealtimeChannel&&sb){await sb.removeChannel(chatRealtimeChannel);chatRealtimeChannel=null;}
+ await loadGlobalChatMessages();
+ if(sb&&!globalChatRealtimeChannel){globalChatRealtimeChannel=sb.channel("sinx-global-chat").on("postgres_changes",{event:"INSERT",schema:"public",table:"global_chat_messages"},()=>{if(chatMode==="global")loadGlobalChatMessages();}).subscribe();}
+}
+async function loadGlobalChatMessages(){
+ try{const d=await api("global_chat_list");renderGlobalChatMessages(d.messages||[]);}
+ catch(e){chatFeedback(e.message);}
+}
+async function sendGlobalChatMessage(){
+ const input=document.getElementById("globalChatMessageInput"),value=input.value.trim();if(!value)return;
+ input.disabled=true;try{await api("global_chat_send",{text:value});input.value="";chatFeedback("");await loadGlobalChatMessages();}
+ catch(e){chatFeedback(e.message);}finally{input.disabled=false;input.focus();}
+}
+function openChatGameMenu(){
+ if(chatMode!=="private"||!activeChatUsername){chatFeedback("ابتدا گفتگوی یکی از دوستان را باز کن.");return;}
+ document.getElementById("chatGameOverlay").style.display="flex";
+}
+function closeChatGameMenu(){document.getElementById("chatGameOverlay").style.display="none";}
+async function createRoomFromChat(gameType){
+ if(!activeChatUsername||chatMode!=="private")return;
+ const buttons=[...document.querySelectorAll("#chatGameOverlay button")];buttons.forEach(b=>b.disabled=true);
+ try{
+  chatFeedback("در حال ساخت اتاق و ارسال دعوت...");
+  const d=await api("chat_game_create",{username:activeChatUsername,gameType});
+  roomCode=d.roomCode;playerToken=d.room?.playerToken||"";mySeat=d.room?.mySeat;applyState(d.room);
+  closeChatGameMenu();chatFeedback("اتاق "+d.roomCode+" ساخته شد و کارت ورود برای @"+activeChatUsername+" ارسال شد.");
+  await loadChatMessages();await loadChatSidebar();
+ }catch(e){chatFeedback(e.message);}
+ finally{buttons.forEach(b=>b.disabled=false);}
+}
+async function openOwnChatRoom(code,gameType){
+ try{
+  const joined=await api("join",{roomCode:code,expectedGameType:gameType});
+  roomCode=joined.roomCode||code;playerToken=joined.playerToken||playerToken||"";mySeat=joined.mySeat;applyState(joined);
+  showGame();document.getElementById("gameView").classList.remove("lobby-mode");document.getElementById("message").textContent="به اتاق ساخته‌شده برگشتی.";closeSetup();startPolling();
+ }catch(e){chatFeedback(e.message);}
 }
 async function acceptRoomInvite(messageId){
  try{chatFeedback("در حال ورود به اتاق...");const d=await api("room_invite_accept",{messageId});const joined=d.joined;
   roomCode=joined.roomCode||joined.room_code||"";playerToken=joined.playerToken||"";mySeat=joined.mySeat;applyState(joined);
   showGame();document.getElementById("gameView").classList.remove("lobby-mode");document.getElementById("message").textContent="دعوت پذیرفته شد؛ وارد اتاق شدی.";
-  document.getElementById("friendInviteOverlay").style.display="none";closeSetup();startPolling();
+  closeSetup();startPolling();
  }catch(e){chatFeedback(e.message);await loadChatMessages();}
 }
-async function rejectRoomInvite(messageId){try{await api("room_invite_reject",{messageId});await loadChatMessages();await loadChatList();}catch(e){chatFeedback(e.message);}}
+async function rejectRoomInvite(messageId){try{await api("room_invite_reject",{messageId});await loadChatMessages();await loadChatSidebar();}catch(e){chatFeedback(e.message);}}
 async function openRoomInvitePicker(){
  const layer=document.getElementById("friendInviteOverlay"),box=document.getElementById("roomInviteFriendsList");layer.style.display="flex";box.innerHTML='<div class="hub-empty">در حال دریافت فهرست دوستان...</div>';
  try{const d=await api("friends_list");box.replaceChildren();if(!(d.friends||[]).length){box.innerHTML='<div class="hub-empty">برای دعوت مستقیم، ابتدا دوست اضافه کن.</div>';return;}
@@ -836,8 +1010,7 @@ async function sendRoomInviteTo(username,button){
  try{await api("room_invite_send",{username,roomCode});button.textContent="ارسال شد";button.style.background="#23845c";}
  catch(e){button.disabled=false;button.textContent="ارسال دعوت";alert(e.message);}
 }
-
-function showHub(){stopPolling();document.getElementById("inviteFriendsBtn").style.display="none";openHubTab("games");document.getElementById("roomCodeDisplay").classList.remove("visible");document.getElementById("connectionStatus").textContent="";document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("friendInviteOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
+function showHub(){stopPolling();document.getElementById("inviteFriendsBtn").style.display="none";openHubTab("games");document.getElementById("roomCodeDisplay").classList.remove("visible");document.getElementById("connectionStatus").textContent="";document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("friendInviteOverlay").style.display="none";document.getElementById("chatGameOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
 function showGame(){document.getElementById("hubView").style.display="none";document.getElementById("gameView").style.display="block";document.getElementById("gameView").classList.add("lobby-mode");}
 function launchSnakes(){selectedGameType="snakes";roomGameType="snakes";renderedGameType="snakes";showGame();closeSetup();document.getElementById("lobbyGameTitle").textContent="🐍 اتاق مار و پله";document.getElementById("createRoomBtn").textContent="＋ ساخت اتاق مار و پله";document.querySelector("#gameView h1").textContent="🐍 مار و پله";document.querySelector("#gameView .subtitle").textContent="مسابقه نئونی تا خانه ۱۰۰";createBoard();render();}
 function launchHokm(){window.location.href="./preview/hokm/";}
