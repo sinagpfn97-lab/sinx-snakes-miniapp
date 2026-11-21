@@ -18,9 +18,9 @@ const authClient = createClient(SUPABASE_URL, ANON_KEY, {
   },
 });
 
-const APP_VERSION = "1.0.59";
-const MIN_SUPPORTED_APP_VERSION = "1.0.59";
-const RELEASE_NOTES = "افزودن گفتگوی خصوصی دوطرفه میان دوستان و دعوت مستقیم به اتاق بازی با پذیرش و ورود امن.";
+const APP_VERSION = "1.0.60";
+const MIN_SUPPORTED_APP_VERSION = "1.0.60";
+const RELEASE_NOTES = "بازطراحی گفتگوها به سبک پیام‌رسان، افزودن چت سراسری با نگهداری شش پیام آخر و منوی ساخت بازی در چت خصوصی.";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -393,6 +393,44 @@ async function loginAccount(body: any) {
    }).select("id").single();
    if(error)throw error;
    return {success:true,messageId:message.id,username:friend.username};
+ }
+ async function globalChatList(){
+   const {data,error}=await supabase.from("global_chat_messages")
+     .select("id,sender_id,sender_username,body,created_at")
+     .order("created_at",{ascending:false}).order("id",{ascending:false}).limit(6);
+   if(error)throw error;
+   return {success:true,messages:(data||[]).reverse()};
+ }
+ async function globalChatSend(userId:string,username:string,body:any){
+   const message=String(body.text||"").trim();
+   if(!message||message.length>500)throw new Error("پیام چت سراسری باید بین ۱ تا ۵۰۰ نویسه باشد");
+   const {data:last,error:le}=await supabase.from("global_chat_messages")
+     .select("created_at").eq("sender_id",userId).order("created_at",{ascending:false}).limit(1).maybeSingle();
+   if(le)throw le;
+   if(last&&Date.now()-new Date(last.created_at).getTime()<1200)throw new Error("برای ارسال پیام بعدی کمی صبر کن");
+   const {data,error}=await supabase.from("global_chat_messages")
+     .insert({sender_id:userId,sender_username:username,body:message})
+     .select("id,sender_id,sender_username,body,created_at").single();
+   if(error)throw error;
+   return {success:true,message:data};
+ }
+ async function chatGameCreate(userId:string,username:string,body:any){
+   const friendUsername=normalizeUsername(body.username).replace(/^@/,"");
+   const gameType=String(body.gameType||"");
+   if(!validUsername(friendUsername))throw new Error("دوست گفتگو معتبر نیست");
+   if(!["snakes","ludo","hokm"].includes(gameType))throw new Error("بازی انتخاب‌شده معتبر نیست");
+   const {data:friend,error:fe}=await supabase.from("profiles").select("user_id,username").eq("username",friendUsername).maybeSingle();
+   if(fe)throw fe;if(!friend)throw new Error("کاربر پیدا نشد");
+   const conversationId=await ensureConversation(userId,friend.user_id);
+   const created=await createRoom({gameType,roundsToWin:3},userId,username);
+   try{
+     const invite=await sendRoomInvite(userId,{username:friend.username,roomCode:created.roomCode});
+     return {success:true,conversationId,friendUsername:friend.username,gameType,roomCode:created.roomCode,messageId:invite.messageId,room:created};
+   }catch(error){
+     const {data:room}=await supabase.from("rooms").select("id").eq("code",created.roomCode).maybeSingle();
+     if(room){await supabase.from("players").delete().eq("room_id",room.id);await supabase.from("rooms").delete().eq("id",room.id);}
+     throw error;
+   }
  }
  async function authenticateUserName(userId:string){
    const {data,error}=await supabase.from("profiles").select("username").eq("user_id",userId).single();
@@ -952,6 +990,12 @@ Deno.serve(async (req: Request) => {
         return response(await chatMessages(userId, body));
       case "chat_send":
         return response(await chatSend(userId, body));
+      case "global_chat_list":
+        return response(await globalChatList());
+      case "global_chat_send":
+        return response(await globalChatSend(userId, username, body));
+      case "chat_game_create":
+        return response(await chatGameCreate(userId, username, body));
       case "room_invite_send":
         return response(await sendRoomInvite(userId, body));
       case "room_invite_accept":
