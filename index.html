@@ -453,7 +453,7 @@ const COLORS=["red","blue","green","yellow"];
 const ICONS=["🔴","🔵","🟢","🟡"];
 const DICE=["⚀","⚁","⚂","⚃","⚄","⚅"];
 let players=[],turn=0,playing=false,locked=false,pollFailureCount=0;
-let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false,roomGameType="snakes",selectedGameType="snakes",ludoTokens={},selectedLudoToken=null,ludoRulesVersion=2;
+let roomCode="",playerToken="",mySeat=-1,roomStatus="waiting",pollHandle=null,host=false,roomGameType="snakes",selectedGameType="snakes",invitedGameType="",ludoTokens={},selectedLudoToken=null,ludoRulesVersion=2;
 let pendingMove=null,lastRoll=null,lastSeenRollId="",lastSeenMoveId="",stateEventsReady=false,moving=false,remoteAnimating=false,remoteAnimationQueue=Promise.resolve(),pollInFlight=false,autoCallInFlight=false,localRollInFlight=false;
 
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
@@ -538,13 +538,13 @@ async function syncState(){const d=await api("state");applyState(d);return d;}
 function stopPolling(){if(pollHandle){clearInterval(pollHandle);pollHandle=null;}pollInFlight=false;}
 function startPolling(){stopPolling();pollFailureCount=0;pollHandle=setInterval(async()=>{if(!roomCode||moving||remoteAnimating||pollInFlight||document.getElementById("gameView").style.display==="none")return;pollInFlight=true;try{await api("heartbeat");await syncState();pollFailureCount=0;const connectionStatus=document.getElementById("connectionStatus");if(connectionStatus)connectionStatus.textContent="";if(playing&&!autoCallInFlight){autoCallInFlight=true;try{const bot=await api("auto");if(bot.bot){document.getElementById("message").textContent="⏱️ زمان نوبت تمام شد؛ ربات حرکت را انجام داد.";await syncState();}}finally{autoCallInFlight=false;}}}catch(e){pollFailureCount++;if(pollFailureCount>=3){const status=document.getElementById("connectionStatus");if(status)status.textContent="اتصال ناپایدار؛ در حال تلاش مجدد";}}finally{pollInFlight=false;}},500);}
 function setLobbyBusy(v){["createRoomBtn","joinRoomBtn","registerBtn","loginBtn"].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=v;});}
-function getInviteRoomCode(){const params=new URLSearchParams(location.search);const direct=params.get("room");const start=params.get("startapp")||params.get("tgWebAppStartParam")||window.Telegram?.WebApp?.initDataUnsafe?.start_param||"";if(direct)return direct.trim().toUpperCase();const match=start.match(/^(snakes|ludo|hokm)_([A-Za-z0-9_-]+)$/i);if(match){const game=match[1].toLowerCase();if(game==="hokm"){window.location.replace("./preview/hokm/?room="+encodeURIComponent(match[2]));return "";}selectedGameType=game;roomGameType=game;return match[2].trim().toUpperCase();}const value=start.startsWith("room_")?start.slice(5):"";return value.trim().toUpperCase();}
+function getInviteRoomCode(){const params=new URLSearchParams(location.search);const direct=params.get("room");const start=params.get("startapp")||params.get("tgWebAppStartParam")||window.Telegram?.WebApp?.initDataUnsafe?.start_param||"";if(direct)return direct.trim().toUpperCase();const match=start.match(/^(snakes|ludo|hokm)_([A-Za-z0-9_-]+)$/i);if(match){const game=match[1].toLowerCase();if(game==="hokm"){window.location.replace("./preview/hokm/?room="+encodeURIComponent(match[2]));return "";}selectedGameType=game;roomGameType=game;invitedGameType=game;return match[2].trim().toUpperCase();}const value=start.startsWith("room_")?start.slice(5):"";return value.trim().toUpperCase();}
 async function continueInviteIfReady(){
  const invited=(getInviteRoomCode()||document.getElementById("roomCodeInput").value||"").trim().toUpperCase();
  if(!invited)return;
  roomCode=invited;
  try{
-  const d=await api("join",{roomCode:invited});
+  const d=await api("join",{roomCode:invited,expectedGameType:invitedGameType||undefined});
   applyState(d);showGame();document.getElementById("gameView").classList.remove("lobby-mode");document.getElementById("message").textContent="با لینک دعوت وارد اتاق شدی: "+invited;
   closeSetup();startPolling();
  }catch(e){feedback(e.message);}
@@ -571,7 +571,7 @@ async function joinOnlineRoom(){
  if(!code){feedback("کد اتاق را وارد کن.");return;}
  try{
   locked=true;setLobbyBusy(true);roomCode=code;
-  const d=await api("join",{roomCode:code});
+  const d=await api("join",{roomCode:code,expectedGameType:invitedGameType||undefined});
   playerToken=d.playerToken||"";mySeat=d.mySeat;applyState(d);
   document.getElementById("message").textContent="وارد اتاق شدی. بازیکنان را در صفحه بازی می‌بینی.";
   feedback("وارد اتاق شدی. منتظر شروع میزبان بمان.");
