@@ -320,6 +320,14 @@ async function loginAccount(body: any) {
    if(readError)throw readError;
    return existing.id;
  }
+ async function chatOpen(userId:string,body:any){
+   const username=normalizeUsername(body.username).replace(/^@/,"");
+   if(!validUsername(username))throw new Error("شناسه دوست معتبر نیست");
+   const {data:friend,error}=await supabase.from("profiles").select("user_id,username").eq("username",username).maybeSingle();
+   if(error)throw error;if(!friend)throw new Error("کاربر پیدا نشد");
+   const conversationId=await ensureConversation(userId,friend.user_id);
+   return {success:true,conversationId,friendId:friend.user_id,username:friend.username};
+ }
  async function chatList(userId:string){
    const {data:conversations,error}=await supabase.from("conversations").select("id,user_a,user_b,created_at")
      .or("user_a.eq."+userId+",user_b.eq."+userId).order("created_at",{ascending:false});
@@ -936,6 +944,8 @@ Deno.serve(async (req: Request) => {
         return response(await friendRespond(userId, body));
       case "friend_remove":
         return response(await friendRemove(userId, body));
+      case "chat_open":
+        return response(await chatOpen(userId, body));
       case "chat_list":
         return response(await chatList(userId));
       case "chat_messages":
