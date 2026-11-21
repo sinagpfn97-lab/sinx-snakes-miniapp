@@ -84,7 +84,7 @@ async function createRoom(){
  catch(e){say("menuFeedback",e.message);}finally{setBusy(false);}
 }
 async function joinRoom(code){
- try{setBusy(true);roomCode=code.trim().toUpperCase();const d=await api("join",{roomCode});acceptSnapshot(d);history.replaceState(null,"","?room="+encodeURIComponent(roomCode));if(room.status==="playing")showGame();else showLobby();startPolling();}
+ try{setBusy(true);roomCode=code.trim().toUpperCase();const d=await api("join",{roomCode,expectedGameType:"hokm"});acceptSnapshot(d);history.replaceState(null,"","?room="+encodeURIComponent(roomCode));if(room.status==="playing")showGame();else showLobby();startPolling();}
  catch(e){say("menuFeedback",e.message);roomCode="";}finally{setBusy(false);}
 }
 function acceptSnapshot(d){
