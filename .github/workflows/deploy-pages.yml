@@ -30,6 +30,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y imagemagick
       - name: Generate glass card WebP assets
         run: node scripts/generate-hokm-cards.mjs
+      - name: Stamp build version into app assets
+        run: |
+          VERSION="${GITHUB_SHA::12}"
+          find . -type f -name '*.html' -not -path './.git/*' -exec sed -i "s/__BUILD_VERSION__/${VERSION}/g" {} +
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
