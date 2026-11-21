@@ -803,7 +803,7 @@ async function openChatConversation(id,username){
  await loadChatMessages();
  await loadChatList();
  if(chatRealtimeChannel&&sb){try{await sb.removeChannel(chatRealtimeChannel);}catch{}}
- if(sb){chatRealtimeChannel=sb.channel("sinx-chat-"+id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"conversation_id=eq."+id},()=>{if(activeChatId===id&&!chatRefreshBusy)loadChatMessages();}).subscribe();}
+ if(sb){chatRealtimeChannel=sb.channel("sinx-chat-"+id).on("postgres_changes",{event:"*",schema:"public",table:"messages",filter:"conversation_id=eq."+id},()=>{if(activeChatId===id&&!chatRefreshBusy){loadChatMessages();loadChatList();}}).subscribe();}
 }
 async function loadChatMessages(){
  if(!activeChatId||chatRefreshBusy)return;chatRefreshBusy=true;
@@ -836,7 +836,7 @@ async function sendRoomInviteTo(username,button){
  catch(e){button.disabled=false;button.textContent="ارسال دعوت";alert(e.message);}
 }
 
-function showHub(){stopPolling();openHubTab("games");document.getElementById("roomCodeDisplay").classList.remove("visible");document.getElementById("connectionStatus").textContent="";document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("friendInviteOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
+function showHub(){stopPolling();document.getElementById("inviteFriendsBtn").style.display="none";openHubTab("games");document.getElementById("roomCodeDisplay").classList.remove("visible");document.getElementById("connectionStatus").textContent="";document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("friendInviteOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
 function showGame(){document.getElementById("hubView").style.display="none";document.getElementById("gameView").style.display="block";document.getElementById("gameView").classList.add("lobby-mode");}
 function launchSnakes(){selectedGameType="snakes";roomGameType="snakes";renderedGameType="snakes";showGame();closeSetup();document.getElementById("lobbyGameTitle").textContent="🐍 اتاق مار و پله";document.getElementById("createRoomBtn").textContent="＋ ساخت اتاق مار و پله";document.querySelector("#gameView h1").textContent="🐍 مار و پله";document.querySelector("#gameView .subtitle").textContent="مسابقه نئونی تا خانه ۱۰۰";createBoard();render();}
 function launchHokm(){window.location.href="./preview/hokm/";}
