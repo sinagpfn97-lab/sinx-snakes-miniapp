@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#091321">
+<meta name="sinx-app-version" content="__APP_VERSION__">
 <meta name="sinx-build-version" content="__BUILD_VERSION__"><title>SINX | حکم چهار نفره</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -16,7 +17,8 @@
 @media(max-width:520px){body{padding:10px 7px 22px}.panel{padding:12px}.table{min-height:370px;padding:7px;grid-template-rows:58px 1fr 58px}.trick{gap:4px}.seat{font-size:9px}.seat b{font-size:10px}.buttons,.room-actions{grid-template-columns:1fr}.seat-list{gap:6px}.seat-card{padding:9px;min-height:55px}}
 </style>
 </head>
-<body><main class="app">
+<body>
+<div id="sinxBuildVersion" style="position:fixed;right:8px;bottom:7px;z-index:99999;padding:5px 9px;border:1px solid #ffffff40;border-radius:999px;background:#091321e8;color:#fff;font:600 10px/1.2 system-ui,sans-serif;direction:ltr;pointer-events:none">SINX · v__APP_VERSION__ · build __BUILD_VERSION__</div><main class="app">
 <div class="top"><a class="back" href="../../">← گیم‌روم</a><div class="brand">S I N X · ARCADE</div><span class="pill">حکم ۴ نفره</span></div>
 <h1>🃏 حکم چهار نفره</h1><div class="sub">CLASSIC HOKM · ONLINE ROOM</div>
 
@@ -63,11 +65,17 @@ const $=id=>document.getElementById(id),SUITS=["♠","♣","♦","♥"],RANKS=["
 let roomCode="",room=null,players=[],mySeat=-1,myHand=[],poll=null,busy=false,host=false,roomState=null,lastNotice="";
 const persian=n=>String(n).replace(/[0-9]/g,d=>"۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 function say(id,msg){$(id).textContent=msg||"";}
+const APP_VERSION="__APP_VERSION__";
+let updateOverlayShown=false;
+function compareVersion(a,b){const x=String(a||"0").split(".").map(Number),y=String(b||"0").split(".").map(Number);for(let i=0;i<3;i++){if((x[i]||0)!==(y[i]||0))return (x[i]||0)>(y[i]||0)?1:-1;}return 0;}
+function requireUpdate(policy){if(updateOverlayShown)return;updateOverlayShown=true;const layer=document.createElement("div");layer.style.cssText="position:fixed;inset:0;z-index:1000000;background:rgba(5,7,20,.96);display:grid;place-items:center;padding:24px;direction:rtl";const panel=document.createElement("div");panel.style.cssText="width:min(100%,420px);padding:26px;border:1px solid #7c6bff;border-radius:22px;background:#15142b;color:#fff;text-align:center";panel.innerHTML='<div style="font-size:42px">⬆️</div><h2>به‌روزرسانی SINX لازم است</h2><p style="line-height:1.9;color:#d7d2ef">نسخه فعلی با سرور سازگار نیست. برای ورود به بازی جدید، نسخه را به‌روزرسانی کن.</p><p style="font-size:12px;color:#aaa">نسخه نصب‌شده: '+APP_VERSION+' · حداقل نسخه: '+policy.minimumSupportedVersion+'</p><button id="sinxUpdateButton" style="margin-top:12px;width:100%;padding:14px;border:0;border-radius:12px;background:#8b70ff;color:#fff;font-weight:800">بارگذاری نسخه جدید</button>';layer.append(panel);document.body.append(layer);document.getElementById("sinxUpdateButton").onclick=()=>{const u=new URL(location.href);u.searchParams.set("sinx_refresh",String(Date.now()));location.replace(u.toString());};}
+async function checkForUpdate(){try{const p=await api("version");if(compareVersion(APP_VERSION,p.minimumSupportedVersion)<0)requireUpdate(p);}catch(e){console.warn("SINX version check:",e.message);}}
 async function api(action,extra={}){
  if(!sb)throw new Error("اتصال آنلاین برقرار نیست.");
  const {data:{session}}=await sb.auth.getSession();
- if(!session?.access_token)throw new Error("ابتدا در گیم‌روم SINX وارد حساب شو و دوباره به حکم برگرد.");
- const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":PUBLIC_KEY,"Authorization":"Bearer "+session.access_token},body:JSON.stringify({action,roomCode,...extra})});
+ if(action!=="version"&&!session?.access_token)throw new Error("ابتدا در گیم‌روم SINX وارد حساب شو و دوباره به حکم برگرد.");
+ const headers={"Content-Type":"application/json","apikey":PUBLIC_KEY};if(action!=="version")headers.Authorization="Bearer "+session.access_token;
+ const res=await fetch(API_URL,{method:"POST",headers,body:JSON.stringify({action,roomCode,...extra,appVersion:APP_VERSION})});
  const data=await res.json();if(!res.ok||data.success===false)throw new Error(data.error||"خطای ارتباط با سرور");return data;
 }
 function setBusy(v){busy=v;$("createBtn").disabled=v;$("joinBtn").disabled=v;$("startBtn").disabled=v||!host||players.length!==4||room?.status!=="waiting";}
@@ -138,6 +146,6 @@ $("joinBtn").addEventListener("click",()=>{const c=$("joinCode").value.trim().to
 $("joinCode").addEventListener("keydown",e=>{if(e.key==="Enter")$("joinBtn").click();});
 $("startBtn").addEventListener("click",startGame);
 $("copyLinkBtn").addEventListener("click",copyInvite);$("copyGameLink").addEventListener("click",copyInvite);
-const invite=getInviteCode();if(invite){$("joinCode").value=invite;joinRoom(invite);}else showMenu();
+const invite=getInviteCode();checkForUpdate().finally(()=>{if(invite){$("joinCode").value=invite;joinRoom(invite);}else showMenu();});setInterval(checkForUpdate,60000);
 })();
 </script></body></html>
