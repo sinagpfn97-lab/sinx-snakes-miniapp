@@ -494,7 +494,7 @@ async function hokmAction(roomCode:string,userId:string,action:string,payload:an
  if(action==="trump")hokmApplyTrump(gs,player.seat,String(payload.suit||""));
  else if(action==="play")hokmApplyPlay(gs,player.seat,String(payload.cardId||""));
  else throw new Error("حرکت حکم نامعتبر است");
- const {data:updated,error:ue}=await supabase.from("rooms").update({game_state:gs,current_turn:gs.turn,updated_at:new Date().toISOString()}).eq("id",room.id).eq("updated_at",room.updated_at).select("id").maybeSingle();
+ const {data:updated,error:ue}=await supabase.from("rooms").update({game_state:gs,current_turn:gs.turn,status:gs.phase==="finished"?"finished":"playing",updated_at:new Date().toISOString()}).eq("id",room.id).eq("updated_at",room.updated_at).select("id").maybeSingle();
  if(ue)throw ue;
  if(!updated)throw new Error("نوبت هم‌زمان تغییر کرد؛ وضعیت را تازه‌سازی کنید");
  return await getRoomSnapshot(code,userId);
