@@ -979,12 +979,14 @@ async function createRoomFromChat(gameType){
   const d=await api("chat_game_create",{username:activeChatUsername,gameType});
   roomCode=d.roomCode;playerToken=d.room?.playerToken||"";mySeat=d.room?.mySeat;applyState(d.room);
   closeChatGameMenu();chatFeedback("اتاق "+d.roomCode+" ساخته شد و کارت ورود برای @"+activeChatUsername+" ارسال شد.");
+  if(gameType!=="hokm")applyState(d.room);else{roomGameType="hokm";selectedGameType="hokm";}
   await loadChatMessages();await loadChatSidebar();
  }catch(e){chatFeedback(e.message);}
  finally{buttons.forEach(b=>b.disabled=false);}
 }
 async function openOwnChatRoom(code,gameType){
  try{
+  if(gameType==="hokm"){location.href="./preview/hokm/?room="+encodeURIComponent(code);return;}
   const joined=await api("join",{roomCode:code,expectedGameType:gameType});
   roomCode=joined.roomCode||code;playerToken=joined.playerToken||playerToken||"";mySeat=joined.mySeat;applyState(joined);
   showGame();document.getElementById("gameView").classList.remove("lobby-mode");document.getElementById("message").textContent="به اتاق ساخته‌شده برگشتی.";closeSetup();startPolling();
@@ -992,7 +994,9 @@ async function openOwnChatRoom(code,gameType){
 }
 async function acceptRoomInvite(messageId){
  try{chatFeedback("در حال ورود به اتاق...");const d=await api("room_invite_accept",{messageId});const joined=d.joined;
-  roomCode=joined.roomCode||joined.room_code||"";playerToken=joined.playerToken||"";mySeat=joined.mySeat;applyState(joined);
+  roomCode=joined.roomCode||joined.room_code||"";playerToken=joined.playerToken||"";mySeat=joined.mySeat;
+  if(joined.room?.game_state?.game_type==="hokm"){location.href="./preview/hokm/?room="+encodeURIComponent(roomCode);return;}
+  applyState(joined);
   showGame();document.getElementById("gameView").classList.remove("lobby-mode");document.getElementById("message").textContent="دعوت پذیرفته شد؛ وارد اتاق شدی.";
   closeSetup();startPolling();
  }catch(e){chatFeedback(e.message);await loadChatMessages();}
