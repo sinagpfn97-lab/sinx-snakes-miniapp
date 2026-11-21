@@ -18,9 +18,9 @@ const authClient = createClient(SUPABASE_URL, ANON_KEY, {
   },
 });
 
-const APP_VERSION = "1.0.57";
-const MIN_SUPPORTED_APP_VERSION = "1.0.57";
-const RELEASE_NOTES = "پوسته روشن و تیره سراسری در داشبورد و بازی‌ها؛ حذف کنترل‌های بی‌اثر صدا و انتقال نمایش نسخه به تنظیمات.";
+const APP_VERSION = "1.0.58";
+const MIN_SUPPORTED_APP_VERSION = "1.0.58";
+const RELEASE_NOTES = "افزودن موسیقی پس‌زمینه تولیدشده، افکت‌های صوتی بازی، کنترل بلندی صدا و بازخورد لرزشی قابل تنظیم در همه بازی‌ها.";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
