@@ -18,6 +18,10 @@ const authClient = createClient(SUPABASE_URL, ANON_KEY, {
   },
 });
 
+const APP_VERSION = "1.0.53";
+const MIN_SUPPORTED_APP_VERSION = "1.0.53";
+const RELEASE_NOTES = "نسخه‌بندی رسمی، بررسی سازگاری و به‌روزرسانی اجباری هوشمند؛ اتاق‌های در حال بازی تا پایان قابل ادامه هستند.";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -698,6 +702,36 @@ async function autoPlayRoom(roomCode: string, userId: string) {
 // ورودی اصلی Edge Function
 // =========================================
 
+function compareVersions(a: string, b: string): number {
+  const left = String(a || "0").split(".").map(Number);
+  const right = String(b || "0").split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    const x = left[i] || 0, y = right[i] || 0;
+    if (x !== y) return x > y ? 1 : -1;
+  }
+  return 0;
+}
+
+async function enforceClientVersion(body: any, action: string, roomCode: string, userId: string) {
+  const clientVersion = String(body.appVersion || "0.0.0");
+  if (compareVersions(clientVersion, MIN_SUPPORTED_APP_VERSION) >= 0) return;
+  if (["state", "heartbeat", "auto", "leave"].includes(action)) return;
+
+  // Allow an already seated player to finish a match that is already in progress.
+  if (roomCode && ["join", "roll", "move", "hokm_trump", "hokm_play"].includes(action)) {
+    const { data: room, error } = await supabase.from("rooms")
+      .select("id, status").eq("code", roomCode.trim().toUpperCase()).maybeSingle();
+    if (error) throw error;
+    if (room?.status === "playing") {
+      const { data: member, error: memberError } = await supabase.from("players")
+        .select("id").eq("room_id", room.id).eq("auth_user_id", userId).maybeSingle();
+      if (memberError) throw memberError;
+      if (member) return;
+    }
+  }
+  throw new Error("نسخه بازی شما قدیمی است. برای ورود به بازی جدید، SINX را به‌روزرسانی کنید.");
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -710,6 +744,10 @@ Deno.serve(async (req: Request) => {
   try {
     const body = await req.json();
     const action = String(body.action || "");
+
+    if (action === "version") {
+      return response({ success: true, currentVersion: APP_VERSION, minimumSupportedVersion: MIN_SUPPORTED_APP_VERSION, releaseNotes: RELEASE_NOTES });
+    }
 
     // ثبت‌نام و ورود قبل از احراز هویت نشست
     if (action === "register" || action === "signup") {
@@ -724,6 +762,7 @@ Deno.serve(async (req: Request) => {
     const { userId, username } = await authenticate(req);
 
     const roomCode = String(body.roomCode || "");
+    await enforceClientVersion(body, action, roomCode, userId);
 
     switch (action) {
       case "create":
