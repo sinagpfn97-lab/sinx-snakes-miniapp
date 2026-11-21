@@ -489,6 +489,7 @@ body.theme-light .chat-compose input{background:#fff;color:#24243a;border-color:
   <h1>🐍 مار و پله</h1>
   <div class="subtitle">مسابقه نئونی تا خانه ۱۰۰</div>
   <button class="room-meta" id="roomCodeDisplay" type="button" onclick="copyRoomCode()" title="برای کپی کد اتاق کلیک کنید"><small>کد اتاق</small><span id="roomCodeValue">—</span> ⧉</button>
+  <button class="secondary" id="inviteFriendsBtn" style="display:none;margin:8px auto" onclick="openRoomInvitePicker()">👥 دعوت مستقیم دوستان</button>
   <div id="connectionStatus" style="font-size:9px;color:#aaa4c9;margin-top:5px"></div>
 </header>
 <section class="panel">
@@ -496,7 +497,7 @@ body.theme-light .chat-compose input{background:#fff;color:#24243a;border-color:
     <div id="lobbyGameTitle" style="font-size:15px;font-weight:900;text-align:center">🎮 ساخت اتاق بازی</div>
     <button class="primary" id="createRoomBtn" onclick="createOnlineRoom()">＋ ساخت اتاق مار و پله</button>
     <button class="secondary" id="copyRoomLinkBtn" style="display:none;width:100%;margin-top:8px" onclick="copyRoomLink()">🔗 کپی کردن لینک اتاق</button>
-    <button class="primary" id="inviteFriendsBtn" style="display:none;width:100%;margin-top:8px" onclick="openRoomInvitePicker()">👥 دعوت مستقیم دوستان</button>
+    
     <button class="primary" id="startOnlineBtn" onclick="startGame()" style="display:none" disabled>▶ شروع بازی</button>
     <label for="roomCodeInput">کد اتاق برای ورود</label>
     <input id="roomCodeInput" maxlength="8" placeholder="کد اتاق">
