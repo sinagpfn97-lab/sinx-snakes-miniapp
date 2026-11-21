@@ -19,6 +19,44 @@
 @media(prefers-reduced-motion:reduce){.card.deal-in,.played.play-in,.table.card-action{animation:none!important}}.flight-card{position:fixed;z-index:9999;width:58px;height:102px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 0 14px #43e8ffbb);will-change:transform,opacity}.table.trick-win{animation:trickWin .72s ease-out}.table.big-win{animation:bigWin 1.15s ease-out}.table.match-win{animation:matchWin 1.6s ease-out}@keyframes trickWin{0%{filter:brightness(1)}35%{filter:brightness(1.65) drop-shadow(0 0 18px #43e8ff)}100%{filter:brightness(1)}}@keyframes bigWin{0%,100%{transform:translateX(0);filter:brightness(1)}15%,45%,75%{transform:translateX(-2px);filter:brightness(1.8) drop-shadow(0 0 20px #ffd45a)}30%,60%,90%{transform:translateX(2px)}}@keyframes matchWin{0%{filter:brightness(1)}25%,65%{filter:brightness(2) drop-shadow(0 0 28px #ffe28a)}100%{filter:brightness(1)}}@media(prefers-reduced-motion:reduce){.flight-card{display:none!important}.table.trick-win,.table.big-win,.table.match-win{animation:none!important}}
 .card small{position:relative;z-index:1;font-size:12px}.card span{position:relative;z-index:1;font-size:11px;line-height:1}.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}.trump-choices{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0}.trump{width:54px;height:48px;border:1px solid #3b5e7a;border-radius:12px;background:#132238;color:white;font-size:25px}.trump.red{color:#ff6b91}.trump.selected{outline:2px solid var(--cyan);box-shadow:0 0 15px #43e8ff55}.feed{font-size:11px;color:#b5c4d8;text-align:center;min-height:22px;margin-top:10px}.notice{font-size:10px;line-height:1.9;color:#90a2ba;text-align:center;margin-top:12px}.online-note{display:none;margin-top:10px;padding:10px;border:1px dashed #49617a;border-radius:12px;color:#a8bad0;font-size:10px;line-height:1.9}.winner{font-size:13px;font-weight:900;color:#ffe28a;text-align:center;margin:10px 0}
 @media(max-width:520px){body{padding:16px 9px 28px}.panel{padding:11px}.setup{grid-template-columns:1fr}.seat.side{width:58px;font-size:9px}.center{margin:4px 48px;min-height:205px}.trick{grid-template-columns:48px 48px 48px;grid-template-rows:68px 68px 68px;gap:4px}.played{width:48px;height:84px;font-size:18px}.played .by{display:none!important}.card{width:48px;height:88px}.back{position:static;display:inline-block;margin-bottom:10px}}
+
+/* Card polish: keep neon illumination inside each card's own bounds. */
+.card,.card.red,.card:not(:disabled):hover{
+  filter:none!important;
+  overflow:hidden;
+  border:1px solid #43e8ff55;
+  box-shadow:inset 0 0 5px #43e8ff18!important;
+}
+.card.red{
+  border-color:#ff5caa88;
+  box-shadow:inset 0 0 6px #ff5caa22!important;
+}
+.card:not(:disabled):hover{
+  transform:translateY(-4px);
+  box-shadow:inset 0 0 8px #43e8ff33!important;
+}
+.played,.played.red{
+  filter:none!important;
+  overflow:hidden;
+  border:1px solid #43e8ff66;
+  box-shadow:inset 0 0 5px #43e8ff18!important;
+}
+.played.red{
+  border-color:#ff5caa88;
+  box-shadow:inset 0 0 6px #ff5caa22!important;
+}
+.flight-card{filter:none!important}
+@keyframes cardDealIn{
+  0%{opacity:0;transform:translateY(18px) rotate(3deg) scale(.9)}
+  70%{opacity:1;transform:translateY(-4px) rotate(-1deg) scale(1.02)}
+  100%{opacity:1;transform:translateY(0) rotate(0) scale(1)}
+}
+@keyframes cardPlayIn{
+  0%{opacity:0;transform:translateY(24px) scale(.88) rotate(-4deg)}
+  65%{opacity:1;transform:translateY(-4px) scale(1.03) rotate(1deg)}
+  100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}
+}
+
 </style>
 </head>
 <body>
@@ -61,7 +99,7 @@
 (()=> {
 "use strict";
 const SUITS=["♠","♣","♦","♥"],RED=["♦","♥"],RANKS=["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
-function cardImageUrl(card){const suitFile={"♠":"spades","♣":"clubs","♦":"diamonds","♥":"hearts"}[card.suit];return "../../assets/cards/"+suitFile+"-"+card.rank+".webp?v=25";}
+function cardImageUrl(card){const suitFile={"♠":"spades","♣":"clubs","♦":"diamonds","♥":"hearts"}[card.suit];return "../../assets/cards/"+suitFile+"-"+card.rank+".webp?v=26";}
 const VALUE=Object.fromEntries(RANKS.map((r,i)=>[r,i]));
 const NAMES={"♠":"پیک","♣":"گشنیز","♦":"خشت","♥":"دل"};
 const $=id=>document.getElementById(id);
