@@ -144,12 +144,14 @@ async function getRoomSnapshot(roomCode: string, userId: string) {
   }));
 
   const gameState = room.game_state || {};
+  const { hands: privateHands, ...publicGameState } = gameState;
 
   return {
     success: true,
-    room,
+    room: { ...room, game_state: publicGameState },
     players: safePlayers,
     mySeat: myPlayer.seat,
+    myHand: Array.isArray(privateHands) ? (privateHands[myPlayer.seat] || []) : [],
     pendingMove: gameState.pending_move || null,
     lastRoll: gameState.last_roll || null,
     lastMove: gameState.last_move || null,
@@ -252,7 +254,8 @@ async function createRoom(
   username: string,
 ) {
   const maxPlayers = 4;
-  const gameType = body.gameType === "ludo" ? "ludo" : "snakes";
+  const gameType = ["ludo", "hokm"].includes(body.gameType) ? body.gameType : "snakes";
+  const roundsToWin = [1, 3, 5, 7].includes(Number(body.roundsToWin)) ? Number(body.roundsToWin) : 3;
 
   if (![2, 3, 4].includes(maxPlayers)) {
     throw new Error("ظرفیت اتاق باید ۲، ۳ یا ۴ نفر باشد");
@@ -273,7 +276,7 @@ async function createRoom(
         status: "waiting",
         max_players: maxPlayers,
         current_turn: 0,
-        game_state: gameType === "ludo" ? { game_type: "ludo", ludo_rules_version: 2, ludo_tokens: { "0":[0,0,0,0], "1":[0,0,0,0], "2":[0,0,0,0], "3":[0,0,0,0] } } : { game_type: "snakes" },
+        game_state: gameType === "ludo" ? { game_type: "ludo", ludo_rules_version: 2, ludo_tokens: { "0":[0,0,0,0], "1":[0,0,0,0], "2":[0,0,0,0], "3":[0,0,0,0] } } : gameType === "hokm" ? { game_type: "hokm", rounds_to_win: roundsToWin, series_points: [0,0], round_no: 1, phase: "waiting" } : { game_type: "snakes" },
       })
       .select("*")
       .single();
@@ -422,6 +425,105 @@ async function joinRoom(
   };
 }
 
+
+const HOKM_SUITS = ["♠", "♣", "♦", "♥"];
+const HOKM_RANKS = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
+const HOKM_VALUE: Record<string, number> = Object.fromEntries(HOKM_RANKS.map((r,i)=>[r,i+2]));
+const HOKM_RED = ["♦","♥"];
+function hokmShuffle<T>(items:T[]):T[]{ for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];} return items; }
+function hokmStartHand(previous:any, hakem:number, roundNo:number){
+  const deck=hokmShuffle(HOKM_SUITS.flatMap(s=>HOKM_RANKS.map(r=>({suit:s,rank:r,id:r+s,value:HOKM_VALUE[r]}))));
+  const hands=[[],[],[],[]] as any[][];
+  for(let i=0;i<5;i++) for(let k=0;k<4;k++) hands[(hakem+k)%4].push(deck.pop());
+  hands.forEach(hand=>hand.sort((a,b)=>HOKM_SUITS.indexOf(a.suit)-HOKM_SUITS.indexOf(b.suit)||b.value-a.value));
+  return {...previous, game_type:"hokm", phase:"choose", round_no:roundNo, hakem, turn:hakem, leader:hakem, trump:null, hands, trick:[], tricks:[0,0], turn_started_at:Date.now(), last_action_at:Date.now(), last_trick_winner:null};
+}
+function hokmLegalCards(gs:any, seat:number){
+ const hand=gs.hands?.[seat]||[], lead=gs.trick?.[0]?.card?.suit;
+ if(!lead)return hand;
+ const follow=hand.filter((card:any)=>card.suit===lead);
+ return follow.length?follow:hand;
+}
+function hokmChooseTrump(hand:any[]){
+ return HOKM_SUITS.map(s=>({s,count:hand.filter(c=>c.suit===s).length,top:hand.filter(c=>c.suit===s).reduce((n,c)=>n+(c.value>=12?c.value:0),0)})).sort((a,b)=>b.count-a.count||b.top-a.top)[0].s;
+}
+function hokmApplyTrump(gs:any, seat:number, suit:string){
+ if(gs.phase!=="choose"||seat!==gs.hakem)throw new Error("فقط حاکم می‌تواند خال حکم را انتخاب کند");
+ if(!HOKM_SUITS.includes(suit))throw new Error("خال حکم نامعتبر است");
+ const used=new Set(gs.hands.flat().map((c:any)=>c.id));
+ const rest=hokmShuffle(HOKM_SUITS.flatMap(s=>HOKM_RANKS.map(r=>({suit:s,rank:r,id:r+s,value:HOKM_VALUE[r]}))).filter(c=>!used.has(c.id)));
+ for(let k=0;k<4;k++)for(let i=0;i<8;i++)gs.hands[(gs.hakem+k)%4].push(rest.pop());
+ gs.hands.forEach((hand:any[])=>hand.sort((a,b)=>HOKM_SUITS.indexOf(a.suit)-HOKM_SUITS.indexOf(b.suit)||b.value-a.value));
+ gs.trump=suit;gs.phase="play";gs.turn=gs.hakem;gs.leader=gs.hakem;gs.turn_started_at=Date.now();gs.last_action_at=Date.now();
+}
+function hokmApplyPlay(gs:any, seat:number, cardId:string){
+ if(gs.phase!=="play"||seat!==gs.turn)throw new Error("الان نوبت شما نیست");
+ const hand=gs.hands[seat]||[], card=hand.find((c:any)=>c.id===cardId);
+ if(!card)throw new Error("این کارت در دست شما نیست");
+ if(!hokmLegalCards(gs,seat).some((c:any)=>c.id===cardId))throw new Error("باید از خال شروع‌شده کارت بدهید");
+ gs.hands[seat]=hand.filter((c:any)=>c.id!==cardId);
+ gs.trick=[...(gs.trick||[]),{seat,card}];
+ gs.last_action_at=Date.now();
+ if(gs.trick.length<4){gs.turn=(seat+1)%4;gs.turn_started_at=Date.now();return;}
+ const lead=gs.trick[0].card.suit;
+ const winner=gs.trick.reduce((best:any,item:any)=>{
+   const a=item.card,b=best.card;
+   const strength=(c:any)=>c.suit===gs.trump?100+c.value:c.suit===lead?50+c.value:c.value;
+   return strength(a)>strength(b)?item:best;
+ }).seat;
+ const winningTeam=winner%2===0?0:1;
+ gs.tricks[winningTeam]=(gs.tricks[winningTeam]||0)+1;
+ gs.last_trick_winner=winner;gs.trick=[];
+ if(gs.tricks[winningTeam]>=7){
+   const losingTeam=1-winningTeam, kot=gs.tricks[losingTeam]===0;
+   const points=kot?(winningTeam===(gs.hakem%2)?2:3):1;
+   gs.series_points[winningTeam]=(gs.series_points[winningTeam]||0)+points;
+   gs.last_hand={winner_team:winningTeam,points,kot, tricks:[...gs.tricks]};
+   gs.phase=gs.series_points[winningTeam]>=Number(gs.rounds_to_win||3)?"finished":"round_end";
+   gs.match_winner=gs.phase==="finished"?winningTeam:null;
+   gs.turn_started_at=Date.now();
+ }else{gs.turn=winner;gs.leader=winner;gs.turn_started_at=Date.now();}
+}
+async function hokmAction(roomCode:string,userId:string,action:string,payload:any={}){
+ const code=roomCode.trim().toUpperCase();
+ const {data:room,error}=await supabase.from("rooms").select("*").eq("code",code).single();
+ if(error||!room||room.status!=="playing"||room.game_state?.game_type!=="hokm")throw new Error("اتاق حکم فعال نیست");
+ const {data:player,error:pe}=await supabase.from("players").select("seat").eq("room_id",room.id).eq("auth_user_id",userId).single();
+ if(pe||!player)throw new Error("شما عضو این اتاق نیستید");
+ const gs=structuredClone(room.game_state);
+ if(action==="trump")hokmApplyTrump(gs,player.seat,String(payload.suit||""));
+ else if(action==="play")hokmApplyPlay(gs,player.seat,String(payload.cardId||""));
+ else throw new Error("حرکت حکم نامعتبر است");
+ const {error:ue}=await supabase.from("rooms").update({game_state:gs,current_turn:gs.turn,updated_at:new Date().toISOString()}).eq("id",room.id);
+ if(ue)throw ue;
+ return await getRoomSnapshot(code,userId);
+}
+async function hokmAuto(room:any){
+ const gs=structuredClone(room.game_state||{});
+ if(gs.phase==="round_end"&&Date.now()-Number(gs.turn_started_at||Date.now())>=2200){
+   const winner=Number(gs.last_hand?.winner_team??0), last=Number(gs.last_trick_winner??winner);
+   const hakem=(last%2===(winner%2))?last:(winner===0?0:1);
+   const next=hokmStartHand(gs,hakem,Number(gs.round_no||1)+1);
+   const {error}=await supabase.from("rooms").update({game_state:next,current_turn:hakem,updated_at:new Date().toISOString()}).eq("id",room.id);
+   if(error)throw error;
+   return {success:true,bot:false,newHand:true};
+ }
+ if(!["choose","play"].includes(gs.phase)||Date.now()-Number(gs.turn_started_at||Date.now())<15000)return {success:false,skipped:true};
+ const seat=Number(gs.turn);
+ if(gs.phase==="choose")hokmApplyTrump(gs,seat,hokmChooseTrump(gs.hands[seat]||[]));
+ else {
+   const legal=hokmLegalCards(gs,seat);
+   if(!legal.length)return {success:false,skipped:true};
+   // Conservative automatic play: lowest legal card, retaining high cards when possible.
+   const card=[...legal].sort((a,b)=>a.value-b.value)[0];
+   hokmApplyPlay(gs,seat,card.id);
+ }
+ gs.last_bot_action_at=Date.now();
+ const {error}=await supabase.from("rooms").update({game_state:gs,current_turn:gs.turn,updated_at:new Date().toISOString()}).eq("id",room.id);
+ if(error)throw error;
+ return {success:true,bot:true,seat};
+}
+
 // =========================================
 // شروع بازی
 // =========================================
@@ -464,20 +566,22 @@ async function startGame(
 
   if (playersError) throw playersError;
 
-  if ((players || []).length < 2) {
-    throw new Error("برای شروع بازی حداقل دو بازیکن لازم است");
+  const gameType = room.game_state?.game_type || "snakes";
+  const requiredPlayers = gameType === "hokm" ? 4 : 2;
+  if ((players || []).length !== (gameType === "hokm" ? 4 : (players || []).length) || (players || []).length < requiredPlayers) {
+    throw new Error(gameType === "hokm" ? "برای شروع حکم باید هر چهار صندلی پر باشد" : "برای شروع بازی حداقل دو بازیکن لازم است");
   }
-
-  const firstSeat = Math.min(
-    ...(players || []).map((p: any) => Number(p.seat)),
-  );
+  const firstSeat = gameType === "hokm" ? 0 : Math.min(...(players || []).map((p: any) => Number(p.seat)));
+  const initialState = gameType === "hokm"
+    ? hokmStartHand(room.game_state, Math.floor(Math.random()*4), 1)
+    : (room.game_state || { game_type: "snakes" });
 
   const { error: updateError } = await supabase
     .from("rooms")
     .update({
       status: "playing",
-      current_turn: firstSeat,
-      game_state: room.game_state || { game_type: "snakes" },
+      current_turn: gameType === "hokm" ? initialState.turn : firstSeat,
+      game_state: initialState,
       updated_at: new Date().toISOString(),
     })
     .eq("id", room.id);
@@ -571,7 +675,8 @@ async function heartbeatRoom(roomCode: string, userId: string) {
 async function autoPlayRoom(roomCode: string, userId: string) {
   // Require the caller to be an actual room member before allowing idle-turn processing.
   await getRoomSnapshot(roomCode, userId);
-  const { data: room } = await supabase.from("rooms").select("game_state").eq("code", roomCode.trim().toUpperCase()).maybeSingle();
+  const { data: room } = await supabase.from("rooms").select("*").eq("code", roomCode.trim().toUpperCase()).maybeSingle();
+  if (room?.game_state?.game_type === "hokm") return await hokmAuto(room);
   const { data, error } = await supabase.rpc(room?.game_state?.game_type === "ludo" ? "auto_play_ludo_room" : "auto_play_game_room", {
     p_room_code: roomCode.trim().toUpperCase(),
   });
@@ -633,6 +738,12 @@ Deno.serve(async (req: Request) => {
         return response(await heartbeatRoom(roomCode, userId));
       case "auto":
         return response(await autoPlayRoom(roomCode, userId));
+
+      case "hokm_trump":
+        return response(await hokmAction(roomCode, userId, "trump", body));
+
+      case "hokm_play":
+        return response(await hokmAction(roomCode, userId, "play", body));
 
       case "start":
         return response(
