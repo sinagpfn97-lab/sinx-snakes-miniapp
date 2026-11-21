@@ -18,9 +18,9 @@ const authClient = createClient(SUPABASE_URL, ANON_KEY, {
   },
 });
 
-const APP_VERSION = "1.0.55";
-const MIN_SUPPORTED_APP_VERSION = "1.0.55";
-const RELEASE_NOTES = "تفکیک قطعی لینک‌های دعوت مار و پله و منچ؛ اعتبارسنجی نوع بازی هنگام ورود از لینک.";
+const APP_VERSION = "1.0.56";
+const MIN_SUPPORTED_APP_VERSION = "1.0.56";
+const RELEASE_NOTES = "داشبورد پنج‌بخشی SINX، مدیریت حساب و تنظیمات، و سیستم درخواست دوستی با شناسه اختصاصی.";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
