@@ -32,8 +32,10 @@ jobs:
         run: node scripts/generate-hokm-cards.mjs
       - name: Stamp build version into app assets
         run: |
-          VERSION="${GITHUB_SHA::12}"
-          find . -type f -name '*.html' -not -path './.git/*' -exec sed -i "s/__BUILD_VERSION__/${VERSION}/g" {} +
+          APP_VERSION="$(cat VERSION)"
+          BUILD_VERSION="${GITHUB_SHA::12}"
+          find . -type f -name '*.html' -not -path './.git/*' -exec sed -i -e "s/__APP_VERSION__/${APP_VERSION}/g" -e "s/__BUILD_VERSION__/${BUILD_VERSION}/g" {} +
+          printf '{"version":"%s","build":"%s","minimumSupportedVersion":"%s"}\n' "$APP_VERSION" "$BUILD_VERSION" "$APP_VERSION" > version.json
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
