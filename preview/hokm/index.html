@@ -69,7 +69,7 @@ const APP_VERSION="__APP_VERSION__";
 let updateOverlayShown=false;
 function compareVersion(a,b){const x=String(a||"0").split(".").map(Number),y=String(b||"0").split(".").map(Number);for(let i=0;i<3;i++){if((x[i]||0)!==(y[i]||0))return (x[i]||0)>(y[i]||0)?1:-1;}return 0;}
 function requireUpdate(policy){if(updateOverlayShown)return;updateOverlayShown=true;const layer=document.createElement("div");layer.style.cssText="position:fixed;inset:0;z-index:1000000;background:rgba(5,7,20,.96);display:grid;place-items:center;padding:24px;direction:rtl";const panel=document.createElement("div");panel.style.cssText="width:min(100%,420px);padding:26px;border:1px solid #7c6bff;border-radius:22px;background:#15142b;color:#fff;text-align:center";panel.innerHTML='<div style="font-size:42px">⬆️</div><h2>به‌روزرسانی SINX لازم است</h2><p style="line-height:1.9;color:#d7d2ef">نسخه فعلی با سرور سازگار نیست. برای ورود به بازی جدید، نسخه را به‌روزرسانی کن.</p><p style="font-size:12px;color:#aaa">نسخه نصب‌شده: '+APP_VERSION+' · حداقل نسخه: '+policy.minimumSupportedVersion+'</p><button id="sinxUpdateButton" style="margin-top:12px;width:100%;padding:14px;border:0;border-radius:12px;background:#8b70ff;color:#fff;font-weight:800">بارگذاری نسخه جدید</button>';layer.append(panel);document.body.append(layer);document.getElementById("sinxUpdateButton").onclick=()=>{const u=new URL(location.href);u.searchParams.set("sinx_refresh",String(Date.now()));location.replace(u.toString());};}
-async function checkForUpdate(){try{const u=new URL("../../version.json",location.href);u.searchParams.set("_",String(Date.now()));const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error("manifest unavailable");const p=await r.json();if(compareVersion(APP_VERSION,p.minimumSupportedVersion)<0)requireUpdate(p);}catch(e){console.warn("SINX version check:",e.message);}}
+async function checkForUpdate(){try{const u=new URL("../../version.json",location.href);u.searchParams.set("_",String(Date.now()));const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error("manifest unavailable");const p=await r.json();if(compareVersion(APP_VERSION,p.minimumSupportedVersion)<0&&room?.status!=="playing")requireUpdate(p);}catch(e){console.warn("SINX version check:",e.message);}}
 async function api(action,extra={}){
  if(!sb)throw new Error("اتصال آنلاین برقرار نیست.");
  const {data:{session}}=await sb.auth.getSession();
@@ -93,7 +93,7 @@ async function createRoom(){
 }
 async function joinRoom(code){
  try{setBusy(true);roomCode=code.trim().toUpperCase();const d=await api("join",{roomCode,expectedGameType:"hokm"});acceptSnapshot(d);history.replaceState(null,"","?room="+encodeURIComponent(roomCode));if(room.status==="playing")showGame();else showLobby();startPolling();}
- catch(e){say("menuFeedback",e.message);roomCode="";}finally{setBusy(false);}
+ catch(e){say("menuFeedback",e.message);roomCode="";if(String(e.message).includes("نسخه بازی"))await checkForUpdate();}finally{setBusy(false);}
 }
 function acceptSnapshot(d){
  room=d.room;roomCode=room.code;players=(d.players||[]).map(p=>({seat:Number(p.seat),name:p.player_name,isHost:!!p.is_host}));mySeat=Number(d.mySeat);myHand=d.myHand||[];roomState=room.game_state||{};host=players.some(p=>p.seat===mySeat&&p.isHost);
@@ -146,6 +146,6 @@ $("joinBtn").addEventListener("click",()=>{const c=$("joinCode").value.trim().to
 $("joinCode").addEventListener("keydown",e=>{if(e.key==="Enter")$("joinBtn").click();});
 $("startBtn").addEventListener("click",startGame);
 $("copyLinkBtn").addEventListener("click",copyInvite);$("copyGameLink").addEventListener("click",copyInvite);
-const invite=getInviteCode();checkForUpdate().finally(()=>{if(invite){$("joinCode").value=invite;joinRoom(invite);}else showMenu();});setInterval(checkForUpdate,60000);
+const invite=getInviteCode();if(invite){$("joinCode").value=invite;joinRoom(invite).then(()=>checkForUpdate());}else{showMenu();checkForUpdate();}setInterval(checkForUpdate,60000);
 })();
 </script></body></html>
