@@ -1,3 +1,9 @@
+## 1.0.57 — 2026-11-22
+- Added persistent Dark and Light themes shared across the main dashboard, Snakes, Ludo, and Hokm.
+- Removed non-functional sound, music, and vibration controls because no corresponding audio or haptic engine exists yet.
+- Removed the floating build/version badge from game screens; the app version remains in Settings.
+- Added light-theme styling for the Hokm standalone game page and the shared game interface.
+
 ## 1.0.56 — 2026-11-22
 - Added a five-section main dashboard with persistent bottom navigation.
 - Added account profile controls and device-saved preferences.
