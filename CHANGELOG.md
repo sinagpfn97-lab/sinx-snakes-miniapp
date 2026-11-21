@@ -1,3 +1,9 @@
+## 1.0.56 — 2026-11-22
+- Added a five-section main dashboard with persistent bottom navigation.
+- Added account profile controls and device-saved preferences.
+- Added authenticated friend requests, acceptance, rejection, and removal using unique SINX usernames.
+- Preserved existing game entry points and game rules.
+
 ## 1.0.55 — 2026-11-21
 - رفع ناهماهنگی صفحهٔ بازی هنگام ورود با لینک دعوت منچ؛ صفحهٔ بازی اکنون بر اساس نوع واقعی اتاق دریافتی از سرور رندر می‌شود.
 
