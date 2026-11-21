@@ -18,9 +18,9 @@ const authClient = createClient(SUPABASE_URL, ANON_KEY, {
   },
 });
 
-const APP_VERSION = "1.0.53";
-const MIN_SUPPORTED_APP_VERSION = "1.0.53";
-const RELEASE_NOTES = "نسخه‌بندی رسمی، بررسی سازگاری و به‌روزرسانی اجباری هوشمند؛ اتاق‌های در حال بازی تا پایان قابل ادامه هستند.";
+const APP_VERSION = "1.0.54";
+const MIN_SUPPORTED_APP_VERSION = "1.0.54";
+const RELEASE_NOTES = "تفکیک قطعی لینک‌های دعوت مار و پله و منچ؛ اعتبارسنجی نوع بازی هنگام ورود از لینک.";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -320,7 +320,7 @@ async function createRoom(
     ...snapshot,
     roomCode: room.code,
     playerToken: randomToken,
-    inviteLink: `${INVITE_BASE}?room=${room.code}`,
+    inviteLink: `${INVITE_BASE}?game=${room.game_state?.game_type || body.gameType || "snakes"}&room=${room.code}`,
   };
 }
 
