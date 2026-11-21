@@ -588,13 +588,13 @@ function applyState(data){
   const isNew=!!lastSeenRollId||!firstSnapshot;lastSeenRollId=lastRoll.id;
   const die=Number(lastRoll.dice);
   if(die>=1&&die<=6){
-   if(isNew&&Number(lastRoll.seat)!==mySeat&&!localRollInFlight)remoteAnimationQueue=remoteAnimationQueue.then(()=>animateDice(die,360)).catch(()=>{});
+   if(isNew&&Number(lastRoll.seat)!==mySeat&&!localRollInFlight){sinxPlayEffect("dice");sinxHaptic("dice");remoteAnimationQueue=remoteAnimationQueue.then(()=>animateDice(die,360)).catch(()=>{});}
    else if(!isNew){const el=document.getElementById("dice");el.classList.remove("rolling");el.dataset.value=String(die);el.setAttribute("aria-label","تاس، عدد "+die);document.getElementById("diceCaption").textContent="عدد تاس: "+die;}
   }
  }
  if(incomingMove?.id&&incomingMove.id!==lastSeenMoveId){
   const isNew=!!lastSeenMoveId||!firstSnapshot;lastSeenMoveId=incomingMove.id;
-  if(isNew){if(roomGameType==="ludo")remoteAnimationQueue=remoteAnimationQueue.then(()=>animateLudoMove(incomingMove)).catch(()=>{});else if(Number(incomingMove.seat)!==mySeat)remoteAnimationQueue=remoteAnimationQueue.then(()=>animateRemoteMove(incomingMove)).catch(()=>{});}
+  if(isNew){if(Number(incomingMove.seat)!==mySeat){sinxPlayEffect("move");sinxHaptic("move");}if(roomGameType==="ludo")remoteAnimationQueue=remoteAnimationQueue.then(()=>animateLudoMove(incomingMove)).catch(()=>{});else if(Number(incomingMove.seat)!==mySeat)remoteAnimationQueue=remoteAnimationQueue.then(()=>animateRemoteMove(incomingMove)).catch(()=>{});}
  }
  host=players.some(p=>p.seat===mySeat&&p.isHost);
  if(host&&roomStatus==="waiting")document.querySelector("#gameView .game-lobby").classList.add("room-created");
@@ -664,7 +664,7 @@ async function joinOnlineRoom(){
 }
 async function startGame(){
  if(!roomCode){showSetup();return;}
- try{locked=true;render();const d=await api("start");applyState(d);document.getElementById("message").textContent="مسابقه شروع شد!";closeSetup();startPolling();}
+ try{locked=true;render();const d=await api("start");applyState(d);sinxPlayEffect("confirm");sinxHaptic("success");document.getElementById("message").textContent="مسابقه شروع شد!";closeSetup();startPolling();}
  catch(e){document.getElementById("message").textContent=e.message;}
  finally{locked=false;render();}
 }
@@ -903,7 +903,7 @@ async function animateLudoMove(move){
   ludoAnimationOverride={seat:seat,tokenIndex:tokenIndex,progress:from};
   drawLudoTokens();await sleep(75);
   for(const progress of path){
-   ludoAnimationOverride.progress=progress;
+   ludoAnimationOverride.progress=progress;sinxPlayEffect("step");
    drawLudoTokens();await sleep(115);
   }
  }finally{
@@ -917,6 +917,7 @@ async function chooseLudoToken(index){
  selectedLudoToken=index;locked=true;
  try{
   const d=await api("move",{tokenIndex:index});
+  sinxPlayEffect("move");sinxHaptic("move");
   applyState(d);
   document.getElementById("message").textContent="مهره "+(index+1)+" حرکت کرد.";
  }catch(e){document.getElementById("message").textContent=e.message;}
@@ -976,6 +977,7 @@ async function rollDice(){
  locked=true;localRollInFlight=true;render();
  try{
   const d=await api("roll");
+  sinxPlayEffect("dice");sinxHaptic("dice");
   const finalValue=Number(d.dice);
   await animateDice(finalValue,1800);
   document.getElementById("diceCaption").textContent="عدد تاس: "+finalValue;
@@ -999,8 +1001,9 @@ async function movePlayerNow(){
   if(me){
    lastSeenMoveId=d.rollId||d.room?.game_state?.last_move?.id||lastSeenMoveId;
    const path=Array.isArray(d.path)?d.path:[];
-   for(const step of path){me.pos=Number(step);renderTokens();await sleep(190);}
+   for(const step of path){me.pos=Number(step);renderTokens();sinxPlayEffect("step");sinxHaptic("light");await sleep(190);}
    if(d.event==="snake"||d.event==="ladder"){
+    sinxPlayEffect(d.event);sinxHaptic(d.event==="snake"?"move":"success");
     document.getElementById("message").textContent=d.event==="snake"?"🐍 مار! مهره پایین می‌رود...":"🪜 نردبان! مهره بالا می‌رود...";
     await sleep(350);me.pos=Number(d.finalPosition);renderTokens();await sleep(450);
    }
