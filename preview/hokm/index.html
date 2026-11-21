@@ -75,11 +75,11 @@ function showLobby(){ $("menuPanel").style.display="none";$("roomLobby").style.d
 function showGame(){ $("menuPanel").style.display="none";$("roomLobby").style.display="none";$("gamePanel").style.display="block";}
 function stopPolling(){if(poll){clearInterval(poll);poll=null;}}
 async function copyText(text){try{await navigator.clipboard.writeText(text);return true;}catch{const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();const ok=document.execCommand("copy");t.remove();return ok;}}
-function inviteUrl(){return "https://t.me/SInsdownloaderbot?startapp="+encodeURIComponent("room_"+roomCode);}
-async function copyInvite(){if(!roomCode)return;const ok=await copyText(inviteUrl());say(room?.status==="waiting"?"lobbyFeedback":"gameFeed",ok?"لینک مینی‌اپ تلگرام کپی شد؛ برای دوستانت بفرست.":"کپی خودکار انجام نشد.");}
+function inviteUrl(){if(!roomCode)return "";return "https://t.me/SInsdownloaderbot?startapp="+encodeURIComponent("room_"+roomCode);}
+async function copyInvite(){if(!roomCode){say(room?.status==="waiting"?"lobbyFeedback":"gameFeed","کد اتاق هنوز آماده نیست؛ دوباره تلاش کن.");return;}const link=inviteUrl();const ok=await copyText(link);say(room?.status==="waiting"?"lobbyFeedback":"gameFeed",ok?"لینک بات تلگرام کپی شد: "+link:"کپی خودکار انجام نشد؛ لینک: "+link);}
 function getInviteCode(){const q=new URLSearchParams(location.search);const start=window.Telegram?.WebApp?.initDataUnsafe?.start_param||q.get("startapp")||"";const match=start.match(/^room_([A-Za-z0-9_-]+)$/i);return (q.get("room")||(match?match[1]:"")).trim().toUpperCase();}
 async function createRoom(){
- try{setBusy(true);const d=await api("create",{gameType:"hokm",maxPlayers:4,roundsToWin:Number($("roundsSelect").value)});acceptSnapshot(d);history.replaceState(null,"",inviteUrl());showLobby();say("lobbyFeedback","اتاق ساخته شد؛ لینک دعوت را برای سه نفر دیگر بفرست.");startPolling();}
+ try{setBusy(true);const d=await api("create",{gameType:"hokm",maxPlayers:4,roundsToWin:Number($("roundsSelect").value)});acceptSnapshot(d);history.replaceState(null,"","?room="+encodeURIComponent(roomCode));showLobby();say("lobbyFeedback","اتاق ساخته شد؛ لینک دعوت را برای سه نفر دیگر بفرست.");startPolling();}
  catch(e){say("menuFeedback",e.message);}finally{setBusy(false);}
 }
 async function joinRoom(code){
@@ -109,7 +109,7 @@ function renderLobby(){
  $("startBtn").style.display=host?"block":"none";$("startBtn").disabled=busy||!host||players.length!==4||room?.status!=="waiting";
  $("lobbyNote").textContent=players.length===4?(host?"هر چهار بازیکن حاضرند؛ می‌توانی بازی را شروع کنی.":"هر چهار بازیکن حاضرند؛ منتظر شروع میزبان بمان."):"برای شروع، "+persian(4-players.length)+" بازیکن دیگر باید وارد شوند.";
 }
-function cardUrl(card){const map={"♠":"spades","♣":"clubs","♦":"diamonds","♥":"hearts"};return "../../assets/cards/"+map[card.suit]+"-"+card.rank+".webp?v=29";}
+function cardUrl(card){const map={"♠":"spades","♣":"clubs","♦":"diamonds","♥":"hearts"};return "../../assets/cards/"+map[card.suit]+"-"+card.rank+".webp?v=__BUILD_VERSION__";}
 function renderGame(){
  const gs=roomState||{},names=players.reduce((o,p)=>(o[p.seat]=p.name,o),{});
  $("roundLabel").textContent="راند "+persian(gs.round_no||1)+" · هدف "+persian(gs.rounds_to_win||3);
