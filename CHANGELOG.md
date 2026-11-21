@@ -1,3 +1,10 @@
+## 1.0.59 — 2026-11-22
+- Added persistent one-to-one private conversations for accepted SINX friends.
+- Added authenticated text messaging with per-conversation message history, read receipts, and live updates through Supabase Realtime.
+- Added direct room invitations inside private chats, with recipient accept/reject actions and server-validated room joining.
+- Added friend-to-chat shortcuts and a room lobby friend invitation picker.
+- Added database tables, participant-scoped RLS read policies, indexes, and Realtime publication for private messages.
+
 ## 1.0.58 — 2026-11-22
 - Added original synthesized background music across the main app and all games, with autoplay-safe start after the first user interaction.
 - Added game sound effects for dice rolls, token movement, snakes, ladders, card plays, trump selection, and match events.
