@@ -76,6 +76,19 @@ const $=id=>document.getElementById(id),SUITS=["♠","♣","♦","♥"],RANKS=["
 let roomCode="",room=null,players=[],mySeat=-1,myHand=[],poll=null,busy=false,host=false,roomState=null,lastNotice="";
 const persian=n=>String(n).replace(/[0-9]/g,d=>"۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 function say(id,msg){$(id).textContent=msg||"";}
+const SINX_AUDIO_DEFAULTS={music:true,sound:true,vibration:false,musicVolume:35,soundVolume:70};
+function getSinxAudioSettings(){try{return {...SINX_AUDIO_DEFAULTS,...JSON.parse(localStorage.getItem("sinx_audio_settings")||"{}")};}catch{return {...SINX_AUDIO_DEFAULTS};}}
+let sinxAudioContext=null,sinxMusicTimer=null,sinxMusicStep=0,sinxAudioGestureReady=false,lastHokmAudioKey="";
+function sinxAudio(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;if(!sinxAudioContext)sinxAudioContext=new AC();if(sinxAudioContext.state==="suspended")sinxAudioContext.resume().catch(()=>{});return sinxAudioContext;}
+function sinxTone(freq,duration=.12,wave="sine",volume=.12,delay=0){const c=sinxAudio();if(!c)return;const set=getSinxAudioSettings(),level=Math.max(0,Math.min(1,volume*(set.soundVolume/70)));if(!set.sound||level<=0)return;const now=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type=wave;o.frequency.setValueAtTime(freq,now);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(level,now+.012);g.gain.exponentialRampToValueAtTime(.0001,now+duration);o.connect(g);g.connect(c.destination);o.start(now);o.stop(now+duration+.025);}
+function sinxPlayEffect(kind){const map={click:[[520,.045,"sine",.045]],confirm:[[520,.07,"sine",.08],[780,.12,"sine",.07,.07]],card:[[660,.055,"triangle",.07],[880,.08,"sine",.05,.05]],trick:[[523,.09,"sine",.07],[659,.09,"sine",.07,.1],[784,.2,"sine",.08,.2]],win:[[523,.13,"sine",.08],[659,.13,"sine",.08,.14],[784,.13,"sine",.08,.28],[1046,.3,"sine",.09,.42]]};(map[kind]||map.click).forEach(a=>sinxTone(...a));}
+function sinxHaptic(kind="light"){const set=getSinxAudioSettings();if(!set.vibration||!navigator.vibrate)return;const p={light:12,move:18,success:[25,40,35],win:[30,50,30,50,80]};try{navigator.vibrate(p[kind]||12);}catch{}}
+const SINX_MELODY=[261.63,329.63,392,493.88,392,329.63,293.66,349.23,440,523.25,440,349.23,261.63,329.63,392,493.88];
+function sinxMusicTick(){const set=getSinxAudioSettings();if(!set.music||set.musicVolume<=0)return;const c=sinxAudio();if(!c)return;const i=sinxMusicStep++%SINX_MELODY.length,vol=.035*(set.musicVolume/35),now=c.currentTime,o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();o.type="sine";o.frequency.value=SINX_MELODY[i];f.type="lowpass";f.frequency.value=1500;g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(Math.max(.0002,vol),now+.08);g.gain.exponentialRampToValueAtTime(.0001,now+.34);o.connect(f);f.connect(g);g.connect(c.destination);o.start(now);o.stop(now+.36);}
+function syncSinxMusic(){const p=getSinxAudioSettings();if(p.music&&p.musicVolume>0){if(sinxMusicTimer===null){sinxMusicStep=0;sinxMusicTick();sinxMusicTimer=setInterval(sinxMusicTick,430);}}else if(sinxMusicTimer!==null){clearInterval(sinxMusicTimer);sinxMusicTimer=null;}}
+function initSinxAudio(){document.addEventListener("pointerdown",()=>{if(!sinxAudioGestureReady){sinxAudioGestureReady=true;sinxAudio();syncSinxMusic();}},{once:true});document.addEventListener("keydown",()=>{if(!sinxAudioGestureReady){sinxAudioGestureReady=true;sinxAudio();syncSinxMusic();}},{once:true});}
+window.addEventListener("storage",e=>{if(e.key==="sinx_audio_settings")syncSinxMusic();});
+initSinxAudio();
 const APP_VERSION="__APP_VERSION__";
 let updateOverlayShown=false;
 function compareVersion(a,b){const x=String(a||"0").split(".").map(Number),y=String(b||"0").split(".").map(Number);for(let i=0;i<3;i++){if((x[i]||0)!==(y[i]||0))return (x[i]||0)>(y[i]||0)?1:-1;}return 0;}
@@ -107,7 +120,9 @@ async function joinRoom(code){
  catch(e){say("menuFeedback",e.message);roomCode="";if(String(e.message).includes("نسخه بازی"))await checkForUpdate();}finally{setBusy(false);}
 }
 function acceptSnapshot(d){
+ const previousState=roomState,previousStatus=room?.status;
  room=d.room;roomCode=room.code;players=(d.players||[]).map(p=>({seat:Number(p.seat),name:p.player_name,isHost:!!p.is_host}));mySeat=Number(d.mySeat);myHand=d.myHand||[];roomState=room.game_state||{};host=players.some(p=>p.seat===mySeat&&p.isHost);
+ if(previousState&&roomState){const oldTrick=(previousState.trick||[]).length,newTrick=(roomState.trick||[]).length;const eventKey=[roomState.round_no,roomState.phase,newTrick,(roomState.series_points||[]).join("-")].join(":");if(newTrick>oldTrick){const latest=(roomState.trick||[]).slice(-1)[0];if(latest&&Number(latest.seat)!==mySeat){sinxPlayEffect("card");sinxHaptic("light");}}if((roomState.series_points||[]).some((v,i)=>Number(v)>Number(previousState.series_points?.[i]||0))){sinxPlayEffect("trick");sinxHaptic("success");}if(room.status==="finished"&&previousStatus!=="finished"){sinxPlayEffect("win");sinxHaptic("win");}lastHokmAudioKey=eventKey;}
  if(room.status==="playing"||room.status==="finished"){showGame();renderGame();}else{showLobby();renderLobby();}
 }
 async function refresh(){
@@ -149,9 +164,9 @@ function renderGame(){
  else if(gs.phase==="finished")say("gameFeed","🏆 تیم "+(gs.match_winner===0?"فیروزه‌ای":"بنفش")+" قهرمان شد!");
  else {const active=players.find(p=>p.seat===gs.turn);say("gameFeed",gs.turn===mySeat?"نوبت توست؛ یک کارت بازی کن.":"نوبت "+(active?.name||"بازیکن بعدی")+" است.");}
 }
-async function chooseTrump(suit){try{setBusy(true);const d=await api("hokm_trump",{suit});acceptSnapshot(d);}catch(e){say("gameFeed",e.message);}finally{setBusy(false);}}
-async function playCard(cardId){try{setBusy(true);const d=await api("hokm_play",{cardId});acceptSnapshot(d);}catch(e){say("gameFeed",e.message);}finally{setBusy(false);}}
-async function startGame(){try{setBusy(true);const d=await api("start");acceptSnapshot(d);say("gameFeed","بازی شروع شد؛ موفق باشید!");}catch(e){say("lobbyFeedback",e.message);}finally{setBusy(false);}}
+async function chooseTrump(suit){try{setBusy(true);sinxPlayEffect("confirm");sinxHaptic("light");const d=await api("hokm_trump",{suit});acceptSnapshot(d);}catch(e){say("gameFeed",e.message);}finally{setBusy(false);}}
+async function playCard(cardId){try{setBusy(true);sinxPlayEffect("card");sinxHaptic("light");const d=await api("hokm_play",{cardId});acceptSnapshot(d);}catch(e){say("gameFeed",e.message);}finally{setBusy(false);}}
+async function startGame(){try{setBusy(true);sinxPlayEffect("confirm");sinxHaptic("success");const d=await api("start");acceptSnapshot(d);say("gameFeed","بازی شروع شد؛ موفق باشید!");}catch(e){say("lobbyFeedback",e.message);}finally{setBusy(false);}}
 $("createBtn").addEventListener("click",createRoom);
 $("joinBtn").addEventListener("click",()=>{const c=$("joinCode").value.trim().toUpperCase();if(!c){say("menuFeedback","کد اتاق را وارد کن.");return;}joinRoom(c);});
 $("joinCode").addEventListener("keydown",e=>{if(e.key==="Enter")$("joinBtn").click();});
