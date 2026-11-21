@@ -706,7 +706,7 @@ async function joinOnlineRoom(){
 }
 async function startGame(){
  if(!roomCode){showSetup();return;}
- try{locked=true;render();const d=await api("start");applyState(d);sinxPlayEffect("confirm");sinxHaptic("success");document.getElementById("message").textContent="مسابقه شروع شد!";closeSetup();startPolling();}
+ try{locked=true;render();const d=await api("start");applyState(d);sinxPlayEffect("confirm");sinxHaptic("success");document.getElementById("message").textContent="مسابقه شروع شد!";document.getElementById("inviteFriendsBtn").style.display="none";closeSetup();startPolling();}
  catch(e){document.getElementById("message").textContent=e.message;}
  finally{locked=false;render();}
 }
