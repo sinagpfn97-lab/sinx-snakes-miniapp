@@ -249,6 +249,57 @@ async function loginAccount(body: any) {
 }
 
 // =========================================
+ // مدیریت دوستان SINX
+ // =========================================
+ async function friendsList(userId:string){
+   const {data,error}=await supabase.from("friendships").select("id,requester_id,addressee_id,status,created_at").or("requester_id.eq."+userId+",addressee_id.eq."+userId).order("created_at",{ascending:false});
+   if(error)throw error;
+   const rows=data||[], ids=[...new Set(rows.flatMap((r:any)=>[r.requester_id,r.addressee_id]).filter((id:string)=>id!==userId))];
+   const {data:profiles,error:pe}=ids.length?await supabase.from("profiles").select("user_id,username").in("user_id",ids):{data:[],error:null};
+   if(pe)throw pe;
+   const names=new Map((profiles||[]).map((p:any)=>[p.user_id,p.username]));
+   return {success:true, friends:rows.filter((r:any)=>r.status==="accepted").map((r:any)=>({id:r.id,username:names.get(r.requester_id===userId?r.addressee_id:r.requester_id)||"کاربر",created_at:r.created_at})), incoming:rows.filter((r:any)=>r.status==="pending"&&r.addressee_id===userId).map((r:any)=>({id:r.id,username:names.get(r.requester_id)||"کاربر",created_at:r.created_at})), outgoing:rows.filter((r:any)=>r.status==="pending"&&r.requester_id===userId).map((r:any)=>({id:r.id,username:names.get(r.addressee_id)||"کاربر",created_at:r.created_at}))};
+ }
+ async function friendSearch(userId:string,body:any){
+   const username=normalizeUsername(body.username).replace(/^@/,"");
+   if(!validUsername(username))throw new Error("شناسه باید ۳ تا ۲۰ حرف انگلیسی کوچک، عدد یا _ باشد");
+   const {data,error}=await supabase.from("profiles").select("user_id,username").eq("username",username).maybeSingle();
+   if(error)throw error;
+   if(!data||data.user_id===userId)throw new Error("کاربری با این شناسه پیدا نشد");
+   const {data:existing,error:ee}=await supabase.from("friendships").select("id,status,requester_id,addressee_id").or("and(requester_id.eq."+userId+",addressee_id.eq."+data.user_id+"),and(requester_id.eq."+data.user_id+",addressee_id.eq."+userId+")").maybeSingle();
+   if(ee)throw ee;
+   return {success:true,user:{username:data.username},relationship:existing?.status==="accepted"?"friends":existing?(existing.requester_id===userId?"outgoing":"incoming"):"none"};
+ }
+ async function friendRequest(userId:string,body:any){
+   const username=normalizeUsername(body.username).replace(/^@/,"");
+   if(!validUsername(username))throw new Error("شناسه کاربری معتبر نیست");
+   const {data:target,error}=await supabase.from("profiles").select("user_id,username").eq("username",username).maybeSingle();
+   if(error)throw error;if(!target||target.user_id===userId)throw new Error("کاربر پیدا نشد");
+   const {data:existing,error:ee}=await supabase.from("friendships").select("id,status,requester_id,addressee_id").or("and(requester_id.eq."+userId+",addressee_id.eq."+target.user_id+"),and(requester_id.eq."+target.user_id+",addressee_id.eq."+userId+")").maybeSingle();
+   if(ee)throw ee;
+   if(existing?.status==="accepted")throw new Error("این کاربر از قبل در فهرست دوستانت است");
+   if(existing?.status==="pending")throw new Error(existing.addressee_id===userId?"این کاربر قبلاً برایت درخواست فرستاده؛ درخواست ورودی را بررسی کن":"درخواست دوستی قبلاً ارسال شده است");
+   const {error:ie}=await supabase.from("friendships").insert({requester_id:userId,addressee_id:target.user_id});
+   if(ie)throw ie;
+   return {success:true,message:"درخواست دوستی ارسال شد"};
+ }
+ async function friendRespond(userId:string,body:any){
+   const id=String(body.requestId||"");
+   const decision=String(body.decision||"");
+   if(!/^[0-9a-f-]{36}$/i.test(id)||!["accept","reject"].includes(decision))throw new Error("درخواست نامعتبر است");
+   const {data:request,error}=await supabase.from("friendships").select("id").eq("id",id).eq("addressee_id",userId).eq("status","pending").maybeSingle();
+   if(error)throw error;if(!request)throw new Error("درخواست پیدا نشد یا قبلاً بررسی شده است");
+   if(decision==="reject"){const {error:de}=await supabase.from("friendships").delete().eq("id",id);if(de)throw de;}
+   else{const {error:ue}=await supabase.from("friendships").update({status:"accepted",updated_at:new Date().toISOString()}).eq("id",id);if(ue)throw ue;}
+   return {success:true,message:decision==="accept"?"درخواست پذیرفته شد":"درخواست رد شد"};
+ }
+ async function friendRemove(userId:string,body:any){
+   const id=String(body.friendshipId||"");
+   const {error}=await supabase.from("friendships").delete().eq("id",id).eq("status","accepted").or("requester_id.eq."+userId+",addressee_id.eq."+userId);
+   if(error)throw error;return {success:true};
+ }
+
+// =========================================
 // ساخت اتاق
 // =========================================
 
@@ -765,7 +816,7 @@ Deno.serve(async (req: Request) => {
     await enforceClientVersion(body, action, roomCode, userId);
 
     switch (action) {
-      case "create":
+      case "friends_list":\n        return response(await friendsList(userId));\n      case "friends_search":\n        return response(await friendSearch(userId, body));\n      case "friend_request":\n        return response(await friendRequest(userId, body));\n      case "friend_respond":\n        return response(await friendRespond(userId, body));\n      case "friend_remove":\n        return response(await friendRemove(userId, body));\n\n      case "create":
         return response(
           await createRoom(body, userId, username),
         );
