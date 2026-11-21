@@ -734,7 +734,7 @@ function saveHubSettings(){const p={music:document.getElementById("settingMusic"
 function loadHubSettings(){applyHubTheme(getHubTheme());const p=getSinxAudioSettings();document.getElementById("settingMusic").checked=!!p.music;document.getElementById("settingSound").checked=!!p.sound;document.getElementById("settingVibration").checked=!!p.vibration;document.getElementById("settingMusicVolume").value=p.musicVolume;document.getElementById("settingSoundVolume").value=p.soundVolume;updateAudioLabels();document.addEventListener("pointerdown",()=>{if(!sinxAudioGestureReady){sinxAudioGestureReady=true;sinxAudio();syncSinxMusic();}},{once:true});document.addEventListener("keydown",()=>{if(!sinxAudioGestureReady){sinxAudioGestureReady=true;sinxAudio();syncSinxMusic();}},{once:true});}
 window.addEventListener("storage",e=>{if(e.key==="sinx_theme")applyHubTheme(getHubTheme());if(e.key==="sinx_audio_settings")syncSinxMusic();});
 async function refreshProfile(){
- if(!sb)return;const {data:{session}}=await sb.auth.getSession();let username="";
+ if(!sb)return;const {data:{session}}=await sb.auth.getSession();currentUserId=session?.user?.id||"";let username="";
  if(session){const {data:{user}}=await sb.auth.getUser();username=user?.user_metadata?.username||"";}
  const signed=!!session,handle=username?"@"+username:"—";
  document.getElementById("hubUserChip").textContent=signed?handle:"مهمان";
@@ -756,7 +756,7 @@ async function searchFriend(){const username=document.getElementById("friendUser
 async function respondFriend(id,decision){try{await api("friend_respond",{requestId:id,decision});await loadFriends();}catch(e){alert(e.message);}}
 async function removeFriend(id){if(!confirm("این دوست از فهرست حذف شود؟"))return;try{await api("friend_remove",{friendshipId:id});await loadFriends();}catch(e){alert(e.message);}}
 
-let activeChatId="",activeChatUsername="",chatRealtimeChannel=null,chatRefreshBusy=false;
+let activeChatId="",activeChatUsername="",chatRealtimeChannel=null,chatRefreshBusy=false,currentUserId="";
 function chatFeedback(message){const el=document.getElementById("chatFeedback");if(el)el.textContent=message||"";}
 async function openConversationWithUsername(username){
  try{const d=await api("chat_open",{username});openHubTab("chat");await loadChatList();await openChatConversation(d.conversationId,d.username);}
