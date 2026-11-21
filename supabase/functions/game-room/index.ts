@@ -253,13 +253,10 @@ async function createRoom(
   userId: string,
   username: string,
 ) {
+  // Snakes and Ludo support 2–4 participants; Hokm is a fixed four-player game.
+  const gameType = ["snakes", "ludo", "hokm"].includes(body.gameType) ? body.gameType : "snakes";
   const maxPlayers = 4;
-  const gameType = ["ludo", "hokm"].includes(body.gameType) ? body.gameType : "snakes";
   const roundsToWin = [1, 3, 5, 7].includes(Number(body.roundsToWin)) ? Number(body.roundsToWin) : 3;
-
-  if (![2, 3, 4].includes(maxPlayers)) {
-    throw new Error("ظرفیت اتاق باید ۲، ۳ یا ۴ نفر باشد");
-  }
 
   const randomToken = crypto.randomUUID();
   const tokenHash = await hashToken(randomToken);
@@ -348,6 +345,14 @@ async function joinRoom(
 
   if (roomError) throw roomError;
   if (!room) throw new Error("اتاق پیدا نشد");
+
+  const expectedGameType = ["snakes", "ludo", "hokm"].includes(body.expectedGameType)
+    ? body.expectedGameType
+    : null;
+  const actualGameType = room.game_state?.game_type || "snakes";
+  if (expectedGameType && expectedGameType !== actualGameType) {
+    throw new Error("این لینک مخصوص بازی دیگری است؛ لینک همان بازی را باز کنید");
+  }
 
   const { data: existing, error: existingError } = await supabase
     .from("players")
@@ -570,9 +575,11 @@ async function startGame(
   if (playersError) throw playersError;
 
   const gameType = room.game_state?.game_type || "snakes";
-  const requiredPlayers = gameType === "hokm" ? 4 : 2;
-  if ((players || []).length !== (gameType === "hokm" ? 4 : (players || []).length) || (players || []).length < requiredPlayers) {
-    throw new Error(gameType === "hokm" ? "برای شروع حکم باید هر چهار صندلی پر باشد" : "برای شروع بازی حداقل دو بازیکن لازم است");
+  const playerCount = (players || []).length;
+  if (gameType === "hokm" ? playerCount !== 4 : playerCount < 2 || playerCount > Number(room.max_players || 4)) {
+    throw new Error(gameType === "hokm"
+      ? "حکم دقیقاً به چهار بازیکن نیاز دارد"
+      : "برای شروع مار و پله یا منچ حداقل دو بازیکن لازم است");
   }
   const firstSeat = gameType === "hokm" ? 0 : Math.min(...(players || []).map((p: any) => Number(p.seat)));
   const initialState = gameType === "hokm"
