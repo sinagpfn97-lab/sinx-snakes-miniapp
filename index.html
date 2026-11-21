@@ -360,10 +360,46 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .hub-switch{position:relative;display:inline-block;width:45px;height:25px;flex:0 0 45px}.hub-switch input{opacity:0;width:0;height:0}.hub-switch span{position:absolute;inset:0;border-radius:30px;background:#37364b;transition:.2s}.hub-switch span:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;border-radius:50%;background:#d9d5e8;transition:.2s}.hub-switch input:checked+span{background:#713de0}.hub-switch input:checked+span:before{transform:translateX(20px);background:white}
 @media(max-width:390px){.hub{padding-left:10px;padding-right:10px}.hub-game{gap:8px;padding:11px}.hub-game-icon{width:49px;height:49px;flex-basis:49px}.hub-play{padding:9px}.hub-nav-item small{font-size:8px}}
 
+/* SINX global light theme */
+.hub-theme-picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.hub-theme-option{display:grid;justify-items:center;gap:5px;padding:15px 8px;border:1px solid #48415f;border-radius:15px;background:#19182b;color:#eae6fa;font-family:inherit}
+.hub-theme-option span{font-size:25px}.hub-theme-option strong{font-size:13px}.hub-theme-option small{font-size:10px;color:#aaa4c9}
+.hub-theme-option.selected{border-color:#a879ff;box-shadow:0 0 0 2px #a879ff35,inset 0 0 22px #a879ff20;background:#2b2145}
+body.theme-light{--bg:#f3f5fc;--text:#20243a;--muted:#68718a;background:radial-gradient(ellipse at 50% -10%,#e4dcff 0%,transparent 50%),#f3f5fc!important;color:#20243a!important}
+body.theme-light .hub-brand,body.theme-light .logo{color:#6840bd;text-shadow:none}
+body.theme-light .hub-chip,body.theme-light .hub-page-title small,body.theme-light .hub-copy,body.theme-light .hub-section-head span,body.theme-light .hub-muted,body.theme-light .hub-game-info p{color:#68718a}
+body.theme-light .hub-hero{background:radial-gradient(circle at 85% 15%,#d8c8ff,transparent 42%),linear-gradient(135deg,#fff,#e9e8f8 72%);border-color:#d5c9ed;box-shadow:0 15px 38px #3d32651a}
+body.theme-light .hub-title,body.theme-light .hub-section-head strong,body.theme-light .hub-page-title strong,body.theme-light .hub-game-info strong{color:#24243a}
+body.theme-light .hub-card,body.theme-light .hub-game,body.theme-light .hub-person,body.theme-light .hub-profile-card{background:#fff;border-color:#dce0ec;box-shadow:0 8px 22px #29345a0b;color:#24243a}
+body.theme-light .hub-game-icon,body.theme-light .hub-page-title>span{background:#eee8fb;color:#6945b8;box-shadow:none}
+body.theme-light .hub-nav{background:#ffffffed;border-color:#dce0ec;box-shadow:0 10px 35px #29345a24}
+body.theme-light .hub-nav-item{color:#69718a}
+body.theme-light .hub-nav-item.active{background:linear-gradient(145deg,#8d5ae9,#7042cf);color:white}
+body.theme-light .hub-theme-option{background:#f7f7fc;border-color:#d9ddec;color:#252940}
+body.theme-light .hub-theme-option small{color:#68718a}
+body.theme-light .hub-theme-option.selected{background:#eee8fb;border-color:#8655df}
+body.theme-light .hub-room-entry input,body.theme-light .hub-inline input{background:#fff;color:#24243a;border-color:#cdd3e3}
+body.theme-light .hub-btn.ghost{background:#eeeaf7;color:#493875;border-color:#d5c9ed}
+body.theme-light .hub-empty{border-color:#d5dbea;color:#727b91}
+body.theme-light .hub-person button.subtle{background:#eeeaf7;color:#493875}
+body.theme-light #gameView{color:#20243a}
+body.theme-light #gameView header .subtitle,body.theme-light #gameView .players-count,body.theme-light #gameView .rules{color:#68718a}
+body.theme-light #gameView .panel,body.theme-light #gameView .game-lobby,body.theme-light #gameView .message,body.theme-light #gameView .player{background:#fff!important;border-color:#dce0ec!important;color:#24243a!important;box-shadow:0 8px 22px #29345a12}
+body.theme-light #gameView .status-label,body.theme-light #gameView .player-pos{color:#68718a}
+body.theme-light #gameView .turn-pill{background:#eee8fb;color:#563b91;border-color:#d6c8f0}
+body.theme-light #gameView .secondary{background:#eeeaf7;color:#493875;border-color:#d5c9ed}
+body.theme-light #gameView .room-meta{background:#fff;color:#493875;border-color:#d5c9ed}
+body.theme-light #gameView .player.active{background:#eef9ff!important;border-color:#7bbde9!important}
+body.theme-light #gameView .player.empty{background:#f6f7fb!important;border-color:#cdd3e3!important}
+body.theme-light #gameView .dialog{background:#fff!important;color:#24243a!important;border-color:#d5c9ed!important}
+body.theme-light #gameView .dialog p{color:#68718a}
+body.theme-light #gameView select,body.theme-light #gameView input{background:#fff;color:#24243a;border-color:#cdd3e3}
+body.theme-light #gameView .board-wrap{box-shadow:0 0 20px #7352ad20}
+@media(max-width:390px){.hub-theme-option{padding:12px 6px}}
+
 </style>
 </head>
 <body>
-<div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v__APP_VERSION__ · build __BUILD_VERSION__</div>
 <main class="hub" id="hubView">
   <header class="hub-top"><button class="profile-btn" onclick="openHubTab('profile')" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><span class="hub-chip" id="hubUserChip">مهمان</span></header>
   <section class="hub-page active" id="hubPage-games">
@@ -390,8 +426,8 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
   </section>
   <section class="hub-page" id="hubPage-settings">
     <div class="hub-page-title"><span>⚙️</span><div><strong>تنظیمات</strong><small>شخصی‌سازی تجربه بازی</small></div></div>
-    <div class="hub-card"><div class="hub-setting"><div><strong>صدای بازی</strong><small>فعال‌سازی صداهای محیط بازی</small></div><label class="hub-switch"><input id="settingSound" type="checkbox" onchange="saveHubSettings()"><span></span></label></div><div class="hub-setting"><div><strong>موسیقی</strong><small>فعال‌سازی موسیقی پس‌زمینه</small></div><label class="hub-switch"><input id="settingMusic" type="checkbox" onchange="saveHubSettings()"><span></span></label></div><div class="hub-setting"><div><strong>لرزش</strong><small>بازخورد لمسی در دستگاه‌های پشتیبانی‌شده</small></div><label class="hub-switch"><input id="settingVibration" type="checkbox" onchange="saveHubSettings()"><span></span></label></div></div>
-    <div class="hub-card"><div class="hub-row"><span>پوسته</span><strong>تیره نئونی</strong></div><div class="hub-row"><span>نسخه برنامه</span><strong>__APP_VERSION__</strong></div><p class="hub-muted">تنظیمات روی همین دستگاه ذخیره می‌شوند.</p></div>
+    <div class="hub-card"><div class="hub-setting"><div><strong>پوسته روشنایی</strong><small>انتخاب ظاهر برنامه در همه بخش‌ها و بازی‌ها</small></div></div><div class="hub-theme-picker" role="group" aria-label="انتخاب پوسته"><button type="button" id="themeDarkButton" class="hub-theme-option" onclick="setHubTheme('dark')"><span>🌙</span><strong>دارک</strong><small>تیره نئونی</small></button><button type="button" id="themeLightButton" class="hub-theme-option" onclick="setHubTheme('light')"><span>☀️</span><strong>لایت</strong><small>روشن و آرام</small></button></div><p class="hub-muted">انتخاب پوسته روی همین دستگاه ذخیره می‌شود و در بازی مار و پله، منچ و حکم نیز اعمال خواهد شد.</p></div>
+    <div class="hub-card"><div class="hub-row"><span>نسخه برنامه</span><strong>__APP_VERSION__</strong></div><p class="hub-muted">نسخه برنامه در این بخش نمایش داده می‌شود تا فضای بازی و دکمه‌های منو را نپوشاند.</p></div>
   </section>
   <nav class="hub-nav" aria-label="ناوبری اصلی">
     <button class="hub-nav-item active" data-tab="games" onclick="openHubTab('games')"><span>🎮</span><small>بازی‌ها</small></button>
@@ -633,9 +669,11 @@ function openHubTab(tab){
  if(tab==="friends")loadFriends();
  if(tab==="profile")refreshProfile();
 }
-function hubSettings(){try{return JSON.parse(localStorage.getItem("sinx_hub_settings")||'{"sound":true,"music":false,"vibration":true}')}catch{return {sound:true,music:false,vibration:true}}}
-function loadHubSettings(){const p=hubSettings();document.getElementById("settingSound").checked=!!p.sound;document.getElementById("settingMusic").checked=!!p.music;document.getElementById("settingVibration").checked=!!p.vibration;}
-function saveHubSettings(){const p={sound:document.getElementById("settingSound").checked,music:document.getElementById("settingMusic").checked,vibration:document.getElementById("settingVibration").checked};localStorage.setItem("sinx_hub_settings",JSON.stringify(p));}
+function getHubTheme(){try{return localStorage.getItem("sinx_theme")==="light"?"light":"dark"}catch{return "dark"}}
+function applyHubTheme(theme){const mode=theme==="light"?"light":"dark";document.documentElement.dataset.theme=mode;document.body.classList.toggle("theme-light",mode==="light");document.body.classList.toggle("theme-dark",mode==="dark");const dark=document.getElementById("themeDarkButton"),light=document.getElementById("themeLightButton");if(dark)dark.classList.toggle("selected",mode==="dark");if(light)light.classList.toggle("selected",mode==="light");const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=mode==="light"?"#f3f5fc":"#090817";}
+function setHubTheme(theme){try{localStorage.setItem("sinx_theme",theme==="light"?"light":"dark");}catch{}applyHubTheme(theme);}
+function loadHubSettings(){applyHubTheme(getHubTheme());}
+window.addEventListener("storage",e=>{if(e.key==="sinx_theme")applyHubTheme(getHubTheme());});
 async function refreshProfile(){
  if(!sb)return;const {data:{session}}=await sb.auth.getSession();let username="";
  if(session){const {data:{user}}=await sb.auth.getUser();username=user?.user_metadata?.username||"";}
