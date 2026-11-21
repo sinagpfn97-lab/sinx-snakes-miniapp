@@ -75,9 +75,9 @@ function showLobby(){ $("menuPanel").style.display="none";$("roomLobby").style.d
 function showGame(){ $("menuPanel").style.display="none";$("roomLobby").style.display="none";$("gamePanel").style.display="block";}
 function stopPolling(){if(poll){clearInterval(poll);poll=null;}}
 async function copyText(text){try{await navigator.clipboard.writeText(text);return true;}catch{const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();const ok=document.execCommand("copy");t.remove();return ok;}}
-function inviteUrl(){return location.origin+location.pathname+"?room="+encodeURIComponent(roomCode);}
-async function copyInvite(){if(!roomCode)return;const ok=await copyText(inviteUrl());say(room?.status==="waiting"?"lobbyFeedback":"gameFeed",ok?"لینک دعوت کپی شد؛ برای دوستانت بفرست.":"کپی خودکار انجام نشد.");}
-function getInviteCode(){return (new URLSearchParams(location.search).get("room")||"").trim().toUpperCase();}
+function inviteUrl(){return "https://t.me/SInsdownloaderbot?startapp="+encodeURIComponent("room_"+roomCode);}
+async function copyInvite(){if(!roomCode)return;const ok=await copyText(inviteUrl());say(room?.status==="waiting"?"lobbyFeedback":"gameFeed",ok?"لینک مینی‌اپ تلگرام کپی شد؛ برای دوستانت بفرست.":"کپی خودکار انجام نشد.");}
+function getInviteCode(){const q=new URLSearchParams(location.search);const start=window.Telegram?.WebApp?.initDataUnsafe?.start_param||q.get("startapp")||"";const match=start.match(/^room_([A-Za-z0-9_-]+)$/i);return (q.get("room")||(match?match[1]:"")).trim().toUpperCase();}
 async function createRoom(){
  try{setBusy(true);const d=await api("create",{gameType:"hokm",maxPlayers:4,roundsToWin:Number($("roundsSelect").value)});acceptSnapshot(d);history.replaceState(null,"",inviteUrl());showLobby();say("lobbyFeedback","اتاق ساخته شد؛ لینک دعوت را برای سه نفر دیگر بفرست.");startPolling();}
  catch(e){say("menuFeedback",e.message);}finally{setBusy(false);}
