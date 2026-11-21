@@ -334,40 +334,72 @@ select{width:100%;padding:12px;border-radius:10px;background:#10152b;color:white
 .board.ludo-board.legacy-ludo .ludo-home-slot[data-token="3"]{grid-row:5;grid-column:5}
 /* Visible build marker */
 #sinxBuildVersion{position:fixed;right:8px;bottom:7px;z-index:99999;padding:5px 9px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(8,12,30,.88);color:#fff;font:600 10px/1.2 system-ui,sans-serif;letter-spacing:.25px;direction:ltr;pointer-events:none;box-shadow:0 2px 10px #0005}
+
+/* SINX Main Dashboard */
+.hub{max-width:760px;margin:0 auto;padding:16px 12px 105px;min-height:100vh}
+.hub-top{display:flex;align-items:center;justify-content:space-between;margin:4px 0 22px;direction:ltr}
+.profile-btn{width:42px;height:42px;border-radius:14px;background:#292344;border:1px solid #62518c;color:#fff;font-size:20px}
+.hub-brand{font-size:22px;font-weight:900;letter-spacing:5px;color:#bd9aff;text-shadow:0 0 22px #a879ff66}
+.hub-chip{font-size:10px;padding:7px 11px;border:1px solid #4b4773;border-radius:30px;color:#c9c1e8;background:#17152c;direction:rtl}
+.hub-page{display:none}.hub-page.active{display:block;animation:hubFade .18s ease}@keyframes hubFade{from{opacity:.6;transform:translateY(4px)}to{opacity:1;transform:none}}
+.hub-hero{position:relative;overflow:hidden;padding:23px 19px;border-radius:25px;border:1px solid #51417a;background:radial-gradient(circle at 85% 15%,#6841a766,transparent 38%),linear-gradient(135deg,#211b40,#11152b 72%);box-shadow:0 18px 48px #0006}
+.hub-kicker{font-size:10px;letter-spacing:2px;color:#bd9aff;font-weight:900}.hub-title{font-size:clamp(28px,7vw,40px);line-height:1.3;font-weight:900;margin:12px 0 8px}.hub-copy{font-size:12px;line-height:2;color:#bcb5d9;max-width:430px}
+.hub-hero-art{position:absolute;left:12px;bottom:55px;font-size:90px;opacity:.12;pointer-events:none}.hub-room-entry{position:relative;margin-top:18px}.hub-room-entry label,.hub-card label{display:block;font-size:11px;font-weight:800;margin-bottom:8px}
+.hub-room-entry input,.hub-inline input{width:100%;min-width:0;padding:13px;border-radius:13px;background:#090f22;color:#fff;border:1px solid #514879;font-family:inherit;font-size:14px;letter-spacing:1px;text-align:center}
+.hub-room-buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.hub-btn{border-radius:13px;padding:12px;font-size:12px;font-family:inherit;font-weight:900;border:0}.hub-btn.primary{background:linear-gradient(120deg,#a879ff,#7439dd);color:white;box-shadow:0 7px 22px #8b61ed33}.hub-btn.ghost{background:#282344;color:#eee9ff;border:1px solid #514879}.hub-btn.full{width:100%;margin-top:9px}.hub-btn.danger{background:#472238;color:#ffc5d1;border:1px solid #85425d}
+.hub-section-head{display:flex;align-items:end;justify-content:space-between;margin:23px 2px 11px}.hub-section-head strong{font-size:14px}.hub-section-head span{font-size:10px;color:#a9a2c8}
+.hub-game{display:flex;align-items:center;gap:12px;padding:13px;margin-bottom:10px;border-radius:18px;border:1px solid #39354f;background:linear-gradient(120deg,#171d30,#121626);box-shadow:0 10px 24px #0004}
+.hub-game-icon{width:56px;height:56px;flex:0 0 56px;display:grid;place-items:center;border-radius:16px;font-size:30px;background:#25213e}.hub-game-info{flex:1;min-width:0}.hub-game-info strong{font-size:13px}.hub-game-info p{margin:5px 0 0;color:#aaa4c9;font-size:10px;line-height:1.8}.hub-play{padding:10px 12px;border-radius:11px;background:#713de0;color:#fff;border:0;font-family:inherit;font-size:11px;font-weight:800;white-space:nowrap}
+.hub-footer{text-align:center;color:#777391;font-size:9px;margin-top:22px}
+.hub-nav{position:fixed;z-index:900;bottom:max(8px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(calc(100% - 18px),540px);display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:8px 5px;border:1px solid #302d45;border-radius:22px;background:rgba(18,22,38,.96);backdrop-filter:blur(18px);box-shadow:0 12px 38px #0009}
+.hub-nav-item{display:grid;justify-items:center;gap:3px;padding:7px 1px;border:0;border-radius:14px;background:transparent;color:#9399ad;font-family:inherit}.hub-nav-item span{font-size:20px;line-height:1.2}.hub-nav-item small{font-size:9px}.hub-nav-item.active{background:linear-gradient(145deg,#8f51ef,#6630cf);color:#fff;box-shadow:0 5px 16px #713de055}
+.hub-page-title{display:flex;align-items:center;gap:12px;margin:8px 2px 17px}.hub-page-title>span{width:48px;height:48px;border-radius:15px;background:#292344;display:grid;place-items:center;font-size:23px}.hub-page-title strong{display:block;font-size:19px}.hub-page-title small{display:block;color:#a9a2c8;font-size:10px;margin-top:4px}
+.hub-card{padding:15px;margin:11px 0;border-radius:18px;border:1px solid #39354f;background:#151a2b}.hub-inline{display:flex;gap:8px}.hub-inline .hub-btn{flex:0 0 92px}.hub-feedback,.hub-muted{font-size:11px;color:#aaa4c9;line-height:1.9;margin:10px 0 0}.hub-stack{display:grid;gap:8px}.hub-person{display:flex;align-items:center;gap:9px;padding:11px;border-radius:14px;background:#171d30;border:1px solid #34334a}.hub-person .person-name{flex:1;font-size:12px;font-weight:800;direction:ltr;text-align:right}.hub-person button{border:0;border-radius:9px;padding:8px 10px;font:inherit;font-size:10px;background:#713de0;color:white}.hub-person button.subtle{background:#302b43;color:#d5cce9}.hub-empty{padding:13px;text-align:center;color:#888da3;font-size:11px;border:1px dashed #38364e;border-radius:13px}
+.hub-profile-card{display:flex;align-items:center;gap:13px;padding:18px;border-radius:18px;background:linear-gradient(130deg,#292044,#151a2b);border:1px solid #50416e}.hub-avatar{width:54px;height:54px;display:grid;place-items:center;border-radius:17px;background:#713de0;font-size:27px}.hub-profile-card strong{display:block;font-size:16px;direction:ltr;text-align:right}.hub-profile-card small{display:block;color:#a9a2c8;font-size:10px;margin-top:5px}.hub-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:11px;color:#aaa4c9}.hub-row strong{color:#f2edff;direction:ltr}
+.hub-setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #ffffff12}.hub-setting:last-child{border:0}.hub-setting strong{display:block;font-size:12px}.hub-setting small{display:block;color:#969bb1;font-size:10px;margin-top:4px}
+.hub-switch{position:relative;display:inline-block;width:45px;height:25px;flex:0 0 45px}.hub-switch input{opacity:0;width:0;height:0}.hub-switch span{position:absolute;inset:0;border-radius:30px;background:#37364b;transition:.2s}.hub-switch span:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;border-radius:50%;background:#d9d5e8;transition:.2s}.hub-switch input:checked+span{background:#713de0}.hub-switch input:checked+span:before{transform:translateX(20px);background:white}
+@media(max-width:390px){.hub{padding-left:10px;padding-right:10px}.hub-game{gap:8px;padding:11px}.hub-game-icon{width:49px;height:49px;flex-basis:49px}.hub-play{padding:9px}.hub-nav-item small{font-size:8px}}
+
 </style>
 </head>
 <body>
 <div id="sinxBuildVersion" aria-label="نسخه برنامه">SINX · v__APP_VERSION__ · build __BUILD_VERSION__</div>
 <main class="hub" id="hubView">
-  <div class="hub-top"><button class="profile-btn" onclick="showProfile()" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><div style="width:39px"></div></div>
-  <section class="hub-hero">
-    <div class="hub-kicker">WELCOME TO SINX ARCADE</div>
-    <div class="hub-title">بازی، رقابت،<br>دورهمی آنلاین.</div>
-    <div class="hub-copy">بازی مورد علاقه‌ات رو انتخاب کن، اتاق بساز و دوستانت رو با لینک یا کد دعوت کن.</div>
-    <div class="hub-hero-art">🎮</div>
-    <div class="hub-room-entry">
-      <label for="hubRoomCode">کد اتاق را وارد کن</label>
-      <input id="hubRoomCode" maxlength="8" placeholder="کد دعوت اتاق" autocomplete="off">
-      <div class="hub-room-buttons"><button class="hub-btn primary" onclick="joinFromHub()">ورود به اتاق</button><button class="hub-btn ghost" onclick="openGamePicker()">＋ ساخت اتاق</button></div>
-    </div>
+  <header class="hub-top"><button class="profile-btn" onclick="openHubTab('profile')" aria-label="حساب کاربری">👤</button><div class="hub-brand">S I N X</div><span class="hub-chip" id="hubUserChip">مهمان</span></header>
+  <section class="hub-page active" id="hubPage-games">
+    <section class="hub-hero"><div class="hub-kicker">WELCOME TO SINX ARCADE</div><div class="hub-title">بازی، رقابت،<br>دورهمی آنلاین.</div><div class="hub-copy">بازی مورد علاقه‌ات رو انتخاب کن، اتاق بساز و دوستانت رو به رقابت دعوت کن.</div><div class="hub-hero-art">🎮</div><div class="hub-room-entry"><label for="hubRoomCode">کد اتاق را وارد کن</label><input id="hubRoomCode" maxlength="8" placeholder="کد دعوت اتاق" autocomplete="off"><div class="hub-room-buttons"><button class="hub-btn primary" onclick="joinFromHub()">ورود به اتاق</button><button class="hub-btn ghost" onclick="openGamePicker()">＋ ساخت اتاق</button></div></div></section>
+    <div class="hub-section-head"><strong>بازی‌های آنلاین</strong><span>انتخاب بازی</span></div>
+    <section class="hub-game"><div class="hub-game-icon">🐍</div><div class="hub-game-info"><strong>مار و پله نئونی</strong><p>۲ تا ۴ بازیکن · شروع با حداقل ۲ نفر</p></div><button class="hub-play" onclick="launchSnakes()">بازی کن</button></section>
+    <section class="hub-game"><div class="hub-game-icon">🎲</div><div class="hub-game-info"><strong>منچ چهار نفره</strong><p>۴ رنگ و ۱۶ مهره · ۲ تا ۴ بازیکن</p></div><button class="hub-play" onclick="launchLudo()">بازی کن</button></section>
+    <section class="hub-game"><div class="hub-game-icon">🂡</div><div class="hub-game-info"><strong>حکم چهار نفره</strong><p>بازی تیمی · دقیقاً ۴ بازیکن</p></div><button class="hub-play" onclick="launchHokm()">بازی کن</button></section>
+    <div class="hub-footer">SINX ARCADE · یک خانه برای تمام بازی‌ها</div>
   </section>
-  <div class="hub-section-head"><strong>کتابخانه بازی‌ها</strong><span>بازی‌های قابل اجرا</span></div>
-  <section class="hub-game">
-    <div class="hub-game-icon">🐍</div>
-    <div class="hub-game-info"><strong>مار و پله نئونی</strong><p>بازی آنلاین · ۲ تا ۴ بازیکن (شروع با حداقل ۲ نفر)</p></div>
-    <button class="hub-play" onclick="launchSnakes()">ورود به بازی</button>
+  <section class="hub-page" id="hubPage-friends">
+    <div class="hub-page-title"><span>👥</span><div><strong>دوستان من</strong><small>با شناسه اختصاصی SINX دوست پیدا کن</small></div></div>
+    <div class="hub-card"><label for="friendUsername">شناسه دوست</label><div class="hub-inline"><input id="friendUsername" placeholder="@username" maxlength="21" autocomplete="off"><button class="hub-btn primary" onclick="searchFriend()">جستجو</button></div><p id="friendSearchResult" class="hub-feedback"></p></div>
+    <div class="hub-section-head"><strong>درخواست‌های دریافتی</strong><span id="incomingCount">۰</span></div><div id="incomingFriends" class="hub-stack"><div class="hub-empty">برای مشاهده، وارد حساب شو.</div></div>
+    <div class="hub-section-head"><strong>دوستان</strong><span id="friendsCount">۰</span></div><div id="friendsList" class="hub-stack"><div class="hub-empty">فهرست دوستان اینجا نمایش داده می‌شود.</div></div>
+    <div class="hub-section-head"><strong>درخواست‌های ارسالی</strong></div><div id="outgoingFriends" class="hub-stack"><div class="hub-empty">درخواستی ارسال نشده است.</div></div>
   </section>
-  <section class="hub-game">
-    <div class="hub-game-icon">🎲</div>
-    <div class="hub-game-info"><strong>منچ چهار نفره</strong><p>چهار رنگ · ۱۶ مهره · بازی با ۲ تا ۴ نفر</p></div>
-    <button class="hub-play" onclick="launchLudo()">ورود به بازی</button>
+  <section class="hub-page" id="hubPage-chat"><div class="hub-page-title"><span>💬</span><div><strong>گفتگو</strong><small>بخش گفتگو بدون تغییر در نظر گرفته شده است</small></div></div><div class="hub-card"><p>برای حفظ نسخه فعلی گفتگو، این بخش به رابط موجود متصل می‌شود و منطق آن تغییر داده نشده است.</p></div></section>
+  <section class="hub-page" id="hubPage-profile">
+    <div class="hub-page-title"><span>👤</span><div><strong>حساب کاربری</strong><small>مدیریت حساب SINX</small></div></div>
+    <div class="hub-profile-card"><div class="hub-avatar">👤</div><div><strong id="profileUsername">مهمان</strong><small id="profileStatus">وارد حساب نشده‌ای</small></div></div>
+    <div class="hub-card"><div class="hub-row"><span>شناسه اختصاصی</span><strong id="profileHandle">—</strong></div><button class="hub-btn ghost full" onclick="copyProfileHandle()">کپی شناسه</button><button class="hub-btn primary full" id="profileLoginButton" onclick="showProfile()">ورود / ساخت حساب</button><button class="hub-btn danger full" id="profileLogoutButton" onclick="logoutAccount()" style="display:none">خروج از حساب</button></div>
+    <div class="hub-card"><div class="hub-row"><span>وضعیت حساب</span><strong id="profileAccountState">مهمان</strong></div><p class="hub-muted">نام کاربری ثبت‌شده در SINX همان شناسه اختصاصی تو برای پیدا کردن دوستان است.</p></div>
   </section>
-  <section class="hub-game">
-    <div class="hub-game-icon">🂡</div>
-    <div class="hub-game-info"><strong>حکم چهار نفره</strong><p>اتاق آنلاین چهارنفره · ساخت اتاق و ورود با کد</p></div>
-    <button class="hub-play" onclick="launchHokm()">ورود به بازی</button>
+  <section class="hub-page" id="hubPage-settings">
+    <div class="hub-page-title"><span>⚙️</span><div><strong>تنظیمات</strong><small>شخصی‌سازی تجربه بازی</small></div></div>
+    <div class="hub-card"><div class="hub-setting"><div><strong>صدای بازی</strong><small>فعال‌سازی صداهای محیط بازی</small></div><label class="hub-switch"><input id="settingSound" type="checkbox" onchange="saveHubSettings()"><span></span></label></div><div class="hub-setting"><div><strong>موسیقی</strong><small>فعال‌سازی موسیقی پس‌زمینه</small></div><label class="hub-switch"><input id="settingMusic" type="checkbox" onchange="saveHubSettings()"><span></span></label></div><div class="hub-setting"><div><strong>لرزش</strong><small>بازخورد لمسی در دستگاه‌های پشتیبانی‌شده</small></div><label class="hub-switch"><input id="settingVibration" type="checkbox" onchange="saveHubSettings()"><span></span></label></div></div>
+    <div class="hub-card"><div class="hub-row"><span>پوسته</span><strong>تیره نئونی</strong></div><div class="hub-row"><span>نسخه برنامه</span><strong>__APP_VERSION__</strong></div><p class="hub-muted">تنظیمات روی همین دستگاه ذخیره می‌شوند.</p></div>
   </section>
-  <div class="hub-footer">SINX ARCADE · یک خانه برای تمام بازی‌ها</div>
+  <nav class="hub-nav" aria-label="ناوبری اصلی">
+    <button class="hub-nav-item active" data-tab="games" onclick="openHubTab('games')"><span>🎮</span><small>بازی‌ها</small></button>
+    <button class="hub-nav-item" data-tab="friends" onclick="openHubTab('friends')"><span>👥</span><small>دوستان</small></button>
+    <button class="hub-nav-item" data-tab="chat" onclick="openHubTab('chat')"><span>💬</span><small>گفتگو</small></button>
+    <button class="hub-nav-item" data-tab="profile" onclick="openHubTab('profile')"><span>👤</span><small>پروفایل</small></button>
+    <button class="hub-nav-item" data-tab="settings" onclick="openHubTab('settings')"><span>⚙️</span><small>تنظیمات</small></button>
+  </nav>
 </main>
 <div id="gameView" class="lobby-mode" style="display:none">
 <div class="app">
@@ -594,7 +626,38 @@ async function startGame(){
  catch(e){document.getElementById("message").textContent=e.message;}
  finally{locked=false;render();}
 }
-function showHub(){stopPolling();document.getElementById("roomCodeDisplay").classList.remove("visible");document.getElementById("connectionStatus").textContent="";document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
+function openHubTab(tab){
+ document.querySelectorAll(".hub-page").forEach(el=>el.classList.toggle("active",el.id==="hubPage-"+tab));
+ document.querySelectorAll(".hub-nav-item").forEach(el=>el.classList.toggle("active",el.dataset.tab===tab));
+ if(tab==="friends")loadFriends();
+ if(tab==="profile")refreshProfile();
+}
+function hubSettings(){try{return JSON.parse(localStorage.getItem("sinx_hub_settings")||'{"sound":true,"music":false,"vibration":true}')}catch{return {sound:true,music:false,vibration:true}}}
+function loadHubSettings(){const p=hubSettings();document.getElementById("settingSound").checked=!!p.sound;document.getElementById("settingMusic").checked=!!p.music;document.getElementById("settingVibration").checked=!!p.vibration;}
+function saveHubSettings(){const p={sound:document.getElementById("settingSound").checked,music:document.getElementById("settingMusic").checked,vibration:document.getElementById("settingVibration").checked};localStorage.setItem("sinx_hub_settings",JSON.stringify(p));}
+async function refreshProfile(){
+ if(!sb)return;const {data:{session}}=await sb.auth.getSession();let username="";
+ if(session){const {data:{user}}=await sb.auth.getUser();username=user?.user_metadata?.username||"";}
+ const signed=!!session,handle=username?"@"+username:"—";
+ document.getElementById("hubUserChip").textContent=signed?handle:"مهمان";
+ document.getElementById("profileUsername").textContent=signed?handle:"مهمان";
+ document.getElementById("profileHandle").textContent=handle;
+ document.getElementById("profileStatus").textContent=signed?"حساب SINX فعال":"وارد حساب نشده‌ای";
+ document.getElementById("profileAccountState").textContent=signed?"متصل":"مهمان";
+ document.getElementById("profileLoginButton").style.display=signed?"none":"block";
+ document.getElementById("profileLogoutButton").style.display=signed?"block":"none";
+}
+async function copyProfileHandle(){const value=document.getElementById("profileHandle").textContent;if(value==="—")return;try{await navigator.clipboard.writeText(value);document.getElementById("profileStatus").textContent="شناسه کپی شد";}catch{document.getElementById("profileStatus").textContent="کپی شناسه ممکن نشد";}}
+async function logoutAccount(){if(!sb)return;const {error}=await sb.auth.signOut();if(error){alert(error.message);return;}accountFeedback("از حساب خارج شدی.");await refreshProfile();openHubTab("games");}
+async function loadFriends(){
+ if(!sb)return;const {data:{session}}=await sb.auth.getSession();if(!session){document.getElementById("incomingFriends").innerHTML='<div class="hub-empty">برای مدیریت دوستان ابتدا وارد حساب شو.</div>';document.getElementById("friendsList").innerHTML="";document.getElementById("outgoingFriends").innerHTML="";return;}
+ try{const d=await api("friends_list");renderFriendGroup("incomingFriends",d.incoming||[],"incoming");renderFriendGroup("friendsList",d.friends||[],"friends");renderFriendGroup("outgoingFriends",d.outgoing||[],"outgoing");document.getElementById("incomingCount").textContent=String((d.incoming||[]).length);document.getElementById("friendsCount").textContent=String((d.friends||[]).length);}catch(e){document.getElementById("incomingFriends").textContent=e.message;}
+}
+function renderFriendGroup(id,items,type){const box=document.getElementById(id);box.replaceChildren();if(!items.length){const empty=document.createElement("div");empty.className="hub-empty";empty.textContent=type==="friends"?"هنوز دوستی اضافه نکرده‌ای.":type==="incoming"?"درخواست دریافتی نداری.":"درخواست ارسالی نداری.";box.append(empty);return;}items.forEach(item=>{const row=document.createElement("div");row.className="hub-person";const name=document.createElement("strong");name.className="person-name";name.textContent="@"+item.username;row.append(name);if(type==="incoming"){const yes=document.createElement("button");yes.textContent="تأیید";yes.onclick=()=>respondFriend(item.id,"accept");const no=document.createElement("button");no.className="subtle";no.textContent="رد";no.onclick=()=>respondFriend(item.id,"reject");row.append(yes,no);}else if(type==="outgoing"){const status=document.createElement("small");status.textContent="در انتظار";status.style.color="#b6a2df";row.append(status);}else{const remove=document.createElement("button");remove.className="subtle";remove.textContent="حذف";remove.onclick=()=>removeFriend(item.id);row.append(remove);}box.append(row);});}
+async function searchFriend(){const username=document.getElementById("friendUsername").value.trim();const out=document.getElementById("friendSearchResult");if(!username){out.textContent="شناسه را وارد کن.";return;}try{const d=await api("friends_search",{username});out.textContent=d.relationship==="friends"?"این کاربر از دوستان تو است.":d.relationship==="incoming"?"این کاربر برایت درخواست فرستاده؛ درخواست‌های دریافتی را بررسی کن.":d.relationship==="outgoing"?"درخواست دوستی قبلاً ارسال شده.":"کاربر @"+d.user.username+" پیدا شد.";if(d.relationship==="none"){const b=document.createElement("button");b.className="hub-btn primary";b.textContent="ارسال درخواست دوستی";b.style.marginTop="8px";b.onclick=async()=>{try{const x=await api("friend_request",{username:d.user.username});out.textContent=x.message;await loadFriends();}catch(e){out.textContent=e.message;}};out.append(document.createElement("br"),b);}}catch(e){out.textContent=e.message;}}
+async function respondFriend(id,decision){try{await api("friend_respond",{requestId:id,decision});await loadFriends();}catch(e){alert(e.message);}}
+async function removeFriend(id){if(!confirm("این دوست از فهرست حذف شود؟"))return;try{await api("friend_remove",{friendshipId:id});await loadFriends();}catch(e){alert(e.message);}}
+function showHub(){stopPolling();openHubTab("games");document.getElementById("roomCodeDisplay").classList.remove("visible");document.getElementById("connectionStatus").textContent="";document.getElementById("hubView").style.display="block";document.getElementById("gameView").style.display="none";document.getElementById("setupOverlay").style.display="none";document.getElementById("gamePickerOverlay").style.display="none";document.getElementById("profileOverlay").style.display="none";document.getElementById("winOverlay").style.display="none";}
 function showGame(){document.getElementById("hubView").style.display="none";document.getElementById("gameView").style.display="block";document.getElementById("gameView").classList.add("lobby-mode");}
 function launchSnakes(){selectedGameType="snakes";roomGameType="snakes";renderedGameType="snakes";showGame();closeSetup();document.getElementById("lobbyGameTitle").textContent="🐍 اتاق مار و پله";document.getElementById("createRoomBtn").textContent="＋ ساخت اتاق مار و پله";document.querySelector("#gameView h1").textContent="🐍 مار و پله";document.querySelector("#gameView .subtitle").textContent="مسابقه نئونی تا خانه ۱۰۰";createBoard();render();}
 function launchHokm(){window.location.href="./preview/hokm/";}
@@ -909,7 +972,7 @@ async function restoreSession(){
   if(!invited)await checkForUpdate();
  }
 }
-createBoard();render();
+createBoard();render();loadHubSettings();refreshProfile().catch(()=>{});
 const invitedRoom=getInviteRoomCode();
 if(invitedRoom)document.getElementById("roomCodeInput").value=invitedRoom.toUpperCase();
 restoreSession().catch(e=>{document.getElementById("accountStatus").textContent=e.message;showHub();});
