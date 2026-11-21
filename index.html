@@ -757,7 +757,7 @@ async function searchFriend(){const username=document.getElementById("friendUser
 async function respondFriend(id,decision){try{await api("friend_respond",{requestId:id,decision});await loadFriends();}catch(e){alert(e.message);}}
 async function removeFriend(id){if(!confirm("این دوست از فهرست حذف شود؟"))return;try{await api("friend_remove",{friendshipId:id});await loadFriends();}catch(e){alert(e.message);}}
 
-let activeChatId="",activeChatUsername="",chatRealtimeChannel=null,chatRefreshBusy=false,currentUserId="";
+let activeChatId="",activeChatUsername="",chatRealtimeChannel=null,chatListRealtimeChannel=null,chatRefreshBusy=false,currentUserId="";
 function chatFeedback(message){const el=document.getElementById("chatFeedback");if(el)el.textContent=message||"";}
 async function openConversationWithUsername(username){
  try{const d=await api("chat_open",{username});openHubTab("chat");await loadChatList();await openChatConversation(d.conversationId,d.username);}
@@ -765,6 +765,7 @@ async function openConversationWithUsername(username){
 }
 async function loadChatList(){
  const box=document.getElementById("chatConversationList");if(!box)return;
+ if(sb&&currentUserId&&!chatListRealtimeChannel){chatListRealtimeChannel=sb.channel("sinx-chat-list-"+currentUserId).on("postgres_changes",{event:"*",schema:"public",table:"messages",filter:"recipient_id=eq."+currentUserId},()=>{loadChatList();if(activeChatId)loadChatMessages();}).subscribe();}
  try{
   const d=await api("chat_list");box.replaceChildren();
   if(!(d.conversations||[]).length){box.innerHTML='<div class="hub-empty">هنوز گفتگویی نداری. از بخش دوستان روی «گفتگو» بزن.</div>';return;}
