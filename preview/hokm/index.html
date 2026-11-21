@@ -1,365 +1,142 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070b16">
-<title>SINX HOKM · Cyber Neon Preview</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#091321"><title>SINX | حکم چهار نفره</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap');
-:root{color-scheme:dark;--bg:#070b16;--panel:#0e1728;--cyan:#43e8ff;--purple:#b38aff;--pink:#ff5caa;--muted:#91a2bd;--line:#203b56}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#173e5c 0,transparent 55%),radial-gradient(ellipse at 100% 75%,#30204d 0,transparent 38%),var(--bg);color:#f5f8ff;font-family:Vazirmatn,sans-serif;padding:18px 12px 34px}.app{max-width:760px;margin:auto}header{text-align:center;margin:4px 0 16px}.brand{font-size:11px;letter-spacing:6px;color:var(--cyan);font-weight:900;text-shadow:0 0 16px #43e8ff88}h1{font-size:28px;margin:4px 0;font-weight:900}.sub{font-size:11px;color:var(--muted)}.back{position:absolute;right:14px;top:16px;border:1px solid var(--line);background:#111b2c;color:#dce8fa;border-radius:11px;padding:8px 12px;font:inherit;font-size:11px;text-decoration:none}
-.panel{background:linear-gradient(145deg,#101e32,#0b1220);border:1px solid #25445f;border-radius:22px;padding:14px;box-shadow:0 18px 50px #0007,0 0 28px #43e8ff0b;margin:12px 0}.setup{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.field label{display:block;font-size:11px;color:#c2cee0;margin-bottom:6px}.field select,.field button{width:100%;background:#0a1424;color:#f5f8ff;border:1px solid #36536d;border-radius:11px;padding:11px;font:inherit;font-size:12px}.primary{background:linear-gradient(100deg,#147b9b,#6242a4)!important;border:0!important;color:white!important;font-weight:900!important;box-shadow:0 0 18px #43e8ff20}.secondary{background:#15243a;color:#dce8fa;border:1px solid #2a4965;border-radius:11px;padding:10px 13px;font:inherit;font-size:11px;font-weight:800}.status{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}.pill{font-size:10px;color:var(--cyan);background:#123247;border:1px solid #28617a;border-radius:30px;padding:6px 10px}.scores{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.score{padding:11px;border-radius:14px;background:#ffffff08;border:1px solid #ffffff12;text-align:center;min-width:0}.score-head{display:flex;align-items:center;justify-content:space-between;gap:6px;font-weight:900;font-size:12px}.score-members{font-size:9px;color:var(--muted);margin:5px 0 8px}.score strong{display:block;font-size:36px;line-height:1.05;font-weight:1000;text-shadow:0 0 9px currentColor,0 0 22px currentColor}.score .series-caption{font-size:9px;color:var(--muted);margin-top:6px}.score-lights{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.score-light{height:9px;border-radius:5px;background:#253448;border:1px solid #496078}.score-light.on.cyan{background:#42eaff;border-color:#b9faff;box-shadow:0 0 6px #43e8ff,0 0 13px #43e8ff99}.score-light.on.purple{background:#b17aff;border-color:#e2c8ff;box-shadow:0 0 6px #ad72ff,0 0 13px #ad72ff99}.cyan{color:var(--cyan)}.purple{color:var(--purple)}.trump-banner{display:flex;justify-content:center;align-items:center;gap:9px;margin:0 0 10px;padding:9px 12px;border:1px solid #43e8ff55;border-radius:13px;background:linear-gradient(100deg,#0c2638,#211a3b);color:#eafaff;font-size:12px;font-weight:900;box-shadow:0 0 18px #43e8ff18}.trump-banner b{font-size:22px;color:#fff;text-shadow:0 0 12px #43e8ff}.table{border:1px solid #23506b;border-radius:20px;background:radial-gradient(ellipse at center,#152d43,#091321 72%);padding:12px;position:relative;overflow:hidden;box-shadow:inset 0 0 30px #42eaff0c,0 0 22px #42eaff0b}.table:before{content:"";position:absolute;inset:5px;border:1px solid #43e8ff30;border-radius:16px;pointer-events:none}.seat{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:7px;min-height:34px;color:#aebed3;font-size:10px}.seat b{color:#fff}.hakem-tag{display:block;color:#ffe28a;font-size:9px;font-weight:900;text-shadow:0 0 8px #ffd45a99;white-space:nowrap}.seat .tag{font-size:9px;color:var(--muted)}.seat.active b{color:var(--cyan);text-shadow:0 0 10px #43e8ff88}.seat.north{flex-direction:column}.seat.south{flex-direction:column}.seat.side{position:absolute;top:48%;transform:translateY(-50%);width:85px;flex-direction:column}.seat.west{left:5px}.seat.east{right:5px}.center{position:relative;z-index:1;min-height:230px;display:grid;place-items:center;margin:6px 78px}.trick{display:grid;grid-template-columns:58px 58px 58px;grid-template-rows:82px 82px 82px;gap:7px;align-items:center;justify-items:center}.played{width:54px;height:94px;border:0;border-radius:6px;background:transparent;position:relative;overflow:visible;filter:drop-shadow(0 0 5px #43e8ff66)}.played .card-face{width:100%;height:100%;object-fit:contain;border-radius:6px;display:block}.played.red{filter:drop-shadow(0 0 5px #ff4fae88)}.played:after{content:"";position:absolute;inset:3px;border:1px solid #d28bff99;border-radius:6px;pointer-events:none}.played:before,.played:after,.card:before,.card:after{display:none!important}.played:before{content:attr(data-suit);position:absolute;top:12px;left:0;right:0;text-align:center;font-size:35px;line-height:1;color:inherit;opacity:.88;text-shadow:0 0 8px currentColor,0 0 18px currentColor}.played span{position:relative;z-index:1;align-self:flex-start;margin:3px 5px;font-size:13px}.played .by{display:none!important}.played.red{color:#ff75bc;border-color:#ff83ce;box-shadow:0 0 8px #ff4faeaa,inset 0 0 12px #f52c8b66}.played.empty{background:#ffffff08;border:1px dashed #42617c;color:#54718d;box-shadow:none}.played.empty:before,.played.empty:after{display:none}.played.seat-0{grid-column:2;grid-row:1}.played.seat-1{grid-column:3;grid-row:2}.played.seat-2{grid-column:2;grid-row:3}.played.seat-3{grid-column:1;grid-row:2}.trump-label{font-size:10px;color:var(--cyan);margin-top:9px;text-align:center}.hand-wrap{margin-top:14px}.hand-title{display:flex;justify-content:space-between;color:#c4d3e5;font-size:11px;margin-bottom:8px}.hand{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;direction:ltr}.card{width:clamp(52px,8vw,64px);height:112px;flex:0 0 auto;position:relative;overflow:visible;border:0;border-radius:8px;background:transparent;padding:0;cursor:pointer;transition:transform .15s,filter .15s;filter:drop-shadow(0 0 5px #43e8ff66)}.card img{width:100%;height:100%;display:block;object-fit:contain;border-radius:8px}.card.red{filter:drop-shadow(0 0 6px #ff4fae88)}.card:before{content:attr(data-suit);position:absolute;inset:17px 0 auto;text-align:center;font-size:36px;line-height:1;color:inherit;opacity:.9;text-shadow:0 0 8px currentColor,0 0 20px currentColor;pointer-events:none}.card:after{content:"";position:absolute;inset:3px;border:1px solid #d28bff99;border-radius:6px;pointer-events:none}.card.red{color:#ff75bc;border-color:#ff83ce;box-shadow:0 0 8px #ff4fae99,inset 0 0 13px #f52c8b66}.card:disabled{opacity:.58;cursor:not-allowed}.card:not(:disabled):hover{transform:translateY(-7px);border-color:#fff;box-shadow:0 0 14px currentColor,0 0 24px #43e8ff66}
-@keyframes cardDealIn{0%{opacity:0;transform:translateY(24px) rotate(5deg) scale(.82);filter:brightness(1.8) drop-shadow(0 0 18px #43e8ff)}70%{opacity:1;transform:translateY(-5px) rotate(-1deg) scale(1.03)}100%{opacity:1;transform:translateY(0) rotate(0) scale(1);filter:drop-shadow(0 0 5px #43e8ff66)}}
-@keyframes cardPlayIn{0%{opacity:0;transform:translateY(42px) scale(.72) rotate(-9deg);filter:brightness(2) drop-shadow(0 0 22px #43e8ff)}65%{opacity:1;transform:translateY(-7px) scale(1.08) rotate(2deg)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
-@keyframes tablePulse{0%{box-shadow:inset 0 0 0 #43e8ff00}45%{box-shadow:inset 0 0 38px #43e8ff30}100%{box-shadow:inset 0 0 0 #43e8ff00}}
-.card.deal-in{animation:cardDealIn .48s cubic-bezier(.2,.8,.2,1) both}
-.played.play-in{animation:cardPlayIn .38s cubic-bezier(.18,.85,.25,1) both}
-.table.card-action{animation:tablePulse .48s ease-out}
-@media(prefers-reduced-motion:reduce){.card.deal-in,.played.play-in,.table.card-action{animation:none!important}}.flight-card{position:fixed;z-index:9999;width:58px;height:102px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 0 14px #43e8ffbb);will-change:transform,opacity}.table.trick-win{animation:trickWin .72s ease-out}.table.big-win{animation:bigWin 1.15s ease-out}.table.match-win{animation:matchWin 1.6s ease-out}@keyframes trickWin{0%{filter:brightness(1)}35%{filter:brightness(1.65) drop-shadow(0 0 18px #43e8ff)}100%{filter:brightness(1)}}@keyframes bigWin{0%,100%{transform:translateX(0);filter:brightness(1)}15%,45%,75%{transform:translateX(-2px);filter:brightness(1.8) drop-shadow(0 0 20px #ffd45a)}30%,60%,90%{transform:translateX(2px)}}@keyframes matchWin{0%{filter:brightness(1)}25%,65%{filter:brightness(2) drop-shadow(0 0 28px #ffe28a)}100%{filter:brightness(1)}}@media(prefers-reduced-motion:reduce){.flight-card{display:none!important}.table.trick-win,.table.big-win,.table.match-win{animation:none!important}}
-.card small{position:relative;z-index:1;font-size:12px}.card span{position:relative;z-index:1;font-size:11px;line-height:1}.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}.trump-choices{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0}.trump{width:54px;height:48px;border:1px solid #3b5e7a;border-radius:12px;background:#132238;color:white;font-size:25px}.trump.red{color:#ff6b91}.trump.selected{outline:2px solid var(--cyan);box-shadow:0 0 15px #43e8ff55}.feed{font-size:11px;color:#b5c4d8;text-align:center;min-height:22px;margin-top:10px}.notice{font-size:10px;line-height:1.9;color:#90a2ba;text-align:center;margin-top:12px}.online-note{display:none;margin-top:10px;padding:10px;border:1px dashed #49617a;border-radius:12px;color:#a8bad0;font-size:10px;line-height:1.9}.winner{font-size:13px;font-weight:900;color:#ffe28a;text-align:center;margin:10px 0}
-@media(max-width:520px){body{padding:16px 9px 28px}.panel{padding:11px}.setup{grid-template-columns:1fr}.seat.side{width:58px;font-size:9px}.center{margin:4px 48px;min-height:205px}.trick{grid-template-columns:48px 48px 48px;grid-template-rows:68px 68px 68px;gap:4px}.played{width:48px;height:84px;font-size:18px}.played .by{display:none!important}.card{width:48px;height:88px}.back{position:static;display:inline-block;margin-bottom:10px}}
-
-/* Card polish: keep neon illumination inside each card's own bounds. */
-.card,.card.red,.card:not(:disabled):hover{
-  filter:none!important;
-  overflow:hidden;
-  border:1px solid #43e8ff55;
-  box-shadow:inset 0 0 5px #43e8ff18!important;
-}
-.card.red{
-  border-color:#ff5caa88;
-  box-shadow:inset 0 0 6px #ff5caa22!important;
-}
-.card:not(:disabled):hover{
-  transform:translateY(-4px);
-  box-shadow:inset 0 0 8px #43e8ff33!important;
-}
-.played,.played.red{
-  filter:none!important;
-  overflow:hidden;
-  border:1px solid #43e8ff66;
-  box-shadow:inset 0 0 5px #43e8ff18!important;
-}
-.played.red{
-  border-color:#ff5caa88;
-  box-shadow:inset 0 0 6px #ff5caa22!important;
-}
-.flight-card{filter:none!important}
-@keyframes cardDealIn{
-  0%{opacity:0;transform:translateY(18px) rotate(3deg) scale(.9)}
-  70%{opacity:1;transform:translateY(-4px) rotate(-1deg) scale(1.02)}
-  100%{opacity:1;transform:translateY(0) rotate(0) scale(1)}
-}
-@keyframes cardPlayIn{
-  0%{opacity:0;transform:translateY(24px) scale(.88) rotate(-4deg)}
-  65%{opacity:1;transform:translateY(-4px) scale(1.03) rotate(1deg)}
-  100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}
-}
-
-
-/* Match every card frame to the real 440x640 WebP artwork ratio. */
-:root{--hokm-card-w:clamp(52px,8vw,64px);--hokm-card-h:calc(var(--hokm-card-w) * 1.454545);--hokm-card-radius:8px;--hokm-trick-gap:7px}
-.card{width:var(--hokm-card-w)!important;height:var(--hokm-card-h)!important;border-radius:var(--hokm-card-radius)!important;box-sizing:border-box}
-.card img{width:100%;height:100%;object-fit:fill;border-radius:inherit;display:block}
-.trick{grid-template-columns:repeat(3,var(--hokm-card-w))!important;grid-template-rows:repeat(3,var(--hokm-card-h))!important;gap:var(--hokm-trick-gap)!important}
-.played{width:var(--hokm-card-w)!important;height:var(--hokm-card-h)!important;aspect-ratio:440/640;border-radius:var(--hokm-card-radius)!important;box-sizing:border-box}
-.played .card-face{width:100%;height:100%;object-fit:fill;border-radius:inherit;display:block}
-.center{min-height:calc(3 * var(--hokm-card-h) + 2 * var(--hokm-trick-gap))!important}
-@media(max-width:520px){
- :root{--hokm-card-w:48px;--hokm-card-h:calc(var(--hokm-card-w) * 1.454545);--hokm-trick-gap:4px}
- .card{width:var(--hokm-card-w)!important;height:var(--hokm-card-h)!important}
- .trick{grid-template-columns:repeat(3,var(--hokm-card-w))!important;grid-template-rows:repeat(3,var(--hokm-card-h))!important}
- .played{width:var(--hokm-card-w)!important;height:var(--hokm-card-h)!important}
- .center{min-height:calc(3 * var(--hokm-card-h) + 2 * var(--hokm-card-gap, var(--hokm-trick-gap)))!important}
-}
+:root{--bg:#091321;--panel:#122237;--line:#29455f;--cyan:#43eaff;--purple:#b17aff;--text:#f4f7ff;--muted:#aabbd0;--pink:#ff5bbd;--card-w:clamp(48px,12vw,68px);--card-h:calc(var(--card-w)*1.454545)}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:14px 10px 30px;background:radial-gradient(ellipse at 50% -10%,#1d4260,transparent 55%),linear-gradient(180deg,#0a1524,#091321);color:var(--text);font-family:Vazirmatn,sans-serif}.app{max-width:720px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 18px}.back,.pill{color:#d8e6f7;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:8px 11px;background:#102035;font-size:11px}.brand{color:var(--cyan);font-weight:900;letter-spacing:4px;font-size:12px}h1{font-size:24px;margin:6px 0;text-align:center}.sub{text-align:center;color:var(--muted);font-size:10px;letter-spacing:1px;margin-bottom:18px}
+.panel{padding:16px;border:1px solid #294b68;border-radius:20px;background:linear-gradient(145deg,#142b40,#0d1a2b);box-shadow:0 15px 40px #0006;margin:12px 0}.menu-title{text-align:center;font-size:19px;font-weight:900;margin:2px 0 5px}.menu-copy{text-align:center;color:var(--muted);font-size:11px;line-height:2;margin-bottom:16px}.field{margin:12px 0}.field label{display:block;font-size:11px;font-weight:800;margin-bottom:7px}.field select,.field input{width:100%;padding:13px;border-radius:12px;background:#091625;color:white;border:1px solid #34516b;font:inherit;font-size:13px;text-align:center}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:12px;padding:13px 12px;font:inherit;font-size:12px;font-weight:900;cursor:pointer}.primary{background:linear-gradient(110deg,#157e9c,#6847a9);color:white;box-shadow:0 5px 18px #36d9ef20}.secondary{background:#1b3048;color:#dbe8f8;border:1px solid #3b5873}.btn:disabled{opacity:.4;cursor:not-allowed}.feedback{min-height:22px;text-align:center;font-size:11px;color:#ffd98a;margin-top:10px;line-height:1.8}
+#roomLobby,#gamePanel{display:none}.room-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.room-code{font-size:17px;font-weight:900;color:var(--cyan);letter-spacing:2px}.seat-list{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}.seat-card{display:flex;align-items:center;gap:9px;padding:12px;border-radius:13px;background:#0b1929;border:1px dashed #405a72;min-height:62px}.seat-card.filled{border-style:solid;border-color:#3a7185;background:#10283a}.seat-icon{font-size:21px}.seat-name{font-size:11px;font-weight:800}.seat-state{font-size:9px;color:var(--muted);margin-top:3px}.room-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.room-note{text-align:center;color:var(--muted);font-size:10px;line-height:1.9;margin:12px 0 0}
+.status-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.score-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.score{padding:10px;border-radius:13px;background:#ffffff08;text-align:center}.score strong{display:block;font-size:27px}.score small{font-size:9px;color:var(--muted)}.score.cyan strong{color:var(--cyan)}.score.purple strong{color:var(--purple)}.table{position:relative;min-height:430px;border-radius:20px;border:1px solid #24516b;background:radial-gradient(ellipse at center,#17334a,#0a1726 75%);padding:12px;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:72px 1fr 72px;gap:5px;overflow:hidden}.seat{display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:11px;color:#d5e1f0;gap:3px}.seat b{font-size:12px}.seat.active b{color:var(--cyan);text-shadow:0 0 12px #43eaff88}.seat .hakem{color:#ffe18b;font-size:9px}.seat.north{grid-column:2;grid-row:1}.seat.east{grid-column:3;grid-row:2}.seat.south{grid-column:2;grid-row:3}.seat.west{grid-column:1;grid-row:2}.trick{grid-column:1/4;grid-row:2;align-self:center;justify-self:center;width:min(100%,330px);display:grid;grid-template-columns:repeat(3,var(--card-w));grid-template-rows:repeat(3,var(--card-h));gap:7px;justify-content:center;align-content:center}.played{width:var(--card-w);height:var(--card-h);border-radius:8px;overflow:hidden;background:#ffffff08;border:1px dashed #41617b;display:grid;place-items:center;color:#52728d}.played img{width:100%;height:100%;object-fit:fill}.played.seat-0{grid-column:2;grid-row:1}.played.seat-1{grid-column:3;grid-row:2}.played.seat-2{grid-column:2;grid-row:3}.played.seat-3{grid-column:1;grid-row:2}.trump-line{text-align:center;font-size:12px;color:#ffe18b;margin:10px 0}.hand-wrap{margin-top:15px}.hand-title{display:flex;justify-content:space-between;color:#c6d5e6;font-size:11px;margin-bottom:9px}.hand{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;direction:ltr}.card{width:var(--card-w);height:var(--card-h);padding:0;border:0;border-radius:8px;background:transparent;overflow:hidden;cursor:pointer;filter:drop-shadow(0 0 5px #43eaff55)}.card img{width:100%;height:100%;object-fit:fill;display:block}.card:disabled{opacity:.48;cursor:not-allowed}.card:not(:disabled):active{transform:translateY(-5px)}.trump-choices{display:flex;justify-content:center;gap:10px;margin:12px 0}.trump{width:58px;height:52px;border:1px solid #45627e;border-radius:12px;background:#102238;color:white;font-size:28px;cursor:pointer}.trump.red{color:#ff77ad}.feed{text-align:center;color:#c8d8e9;font-size:11px;line-height:1.9;min-height:25px;margin-top:12px}.hidden{display:none!important}.game-footer{display:flex;justify-content:center;gap:8px;margin-top:12px}
+@media(max-width:520px){body{padding:10px 7px 22px}.panel{padding:12px}.table{min-height:370px;padding:7px;grid-template-rows:58px 1fr 58px}.trick{gap:4px}.seat{font-size:9px}.seat b{font-size:10px}.buttons,.room-actions{grid-template-columns:1fr}.seat-list{gap:6px}.seat-card{padding:9px;min-height:55px}}
 </style>
 </head>
-<body>
-<div class="app">
-<a class="back" href="index.html">← منوی SINX</a>
-<header><div class="brand">S I N X · ARCADE</div><h1>🃏 SINX HOKM</h1><div class="sub">CLASSIC HOKM · CYBER NEON TABLE</div></header>
-<section class="panel">
- <div class="setup">
-  <div class="field"><label for="roundsPerHand">تعداد راند لازم برای قهرمانی</label><select id="roundsPerHand"><option value="1">۱ راند</option><option value="3" selected>۳ راند</option><option value="5">۵ راند</option><option value="7">۷ راند</option></select></div>
-  <button class="primary" id="newMatch">شروع مسابقه آزمایشی</button>
- </div>
- <div class="online-note" id="onlineNote">حالت آنلاین در معماری نسخه اصلی پیش‌بینی شده است؛ این صفحه فعلاً پیش‌نمایش تعاملی محلی با سه ربات است و هنوز به اتاق‌های Supabase متصل نیست.</div>
- <div class="actions"><button class="secondary" id="showOnline">حالت آنلاین</button><button class="secondary" id="showBots">بازی با ربات‌ها</button></div>
+<body><main class="app">
+<div class="top"><a class="back" href="../../">← گیم‌روم</a><div class="brand">S I N X · ARCADE</div><span class="pill">حکم ۴ نفره</span></div>
+<h1>🃏 حکم چهار نفره</h1><div class="sub">CLASSIC HOKM · ONLINE ROOM</div>
+
+<section class="panel" id="menuPanel">
+ <div class="menu-title">شروع بازی حکم</div><div class="menu-copy">اتاق بساز و دوستانت را دعوت کن، یا با کد وارد اتاق آن‌ها شو.</div>
+ <div class="field"><label for="roundsSelect">تعداد امتیاز راند برای قهرمانی</label><select id="roundsSelect"><option value="1">۱ راند</option><option value="3" selected>۳ راند</option><option value="5">۵ راند</option><option value="7">۷ راند</option></select></div>
+ <button class="btn primary" id="createBtn" style="width:100%">＋ ساخت اتاق حکم</button>
+ <div class="field"><label for="joinCode">کد اتاق برای ورود</label><input id="joinCode" maxlength="8" placeholder="مثلاً A7K9PQ" autocomplete="off"></div>
+ <button class="btn secondary" id="joinBtn" style="width:100%">ورود به اتاق</button>
+ <div class="feedback" id="menuFeedback">برای ساخت یا ورود به اتاق، وارد حساب SINX شو.</div>
+ <a class="btn secondary" href="../../" style="display:block;text-align:center;text-decoration:none;margin-top:8px">ورود / ثبت‌نام در SINX</a>
 </section>
-<section class="panel">
- <div class="status"><span class="pill" id="phase">آماده شروع</span><span class="pill" id="round">راند ۱ از ۳</span></div>
-  <div class="trump-banner" id="trumpLabel">خال حکم <b>—</b><span>در انتظار انتخاب</span></div>
- <div class="scores">
-  <div class="score"><div class="score-head cyan"><span>تیم فیروزه‌ای</span><strong id="seriesA" class="cyan">۰</strong></div><div class="score-members" id="membersA">شما و ربات ۱</div><div class="score-lights" id="lightsA"></div><div class="series-caption">راندهای برده‌شده</div></div>
-  <div class="score"><div class="score-head purple"><span>تیم بنفش</span><strong id="seriesB" class="purple">۰</strong></div><div class="score-members" id="membersB">ربات ۲ و ربات ۳</div><div class="score-lights" id="lightsB"></div><div class="series-caption">راندهای برده‌شده</div></div>
- </div>
+
+<section class="panel" id="roomLobby">
+ <div class="room-head"><div><div style="font-size:10px;color:var(--muted)">کد دعوت اتاق</div><div class="room-code" id="roomCode">------</div></div><span class="pill" id="roomCount">۰ از ۴ بازیکن</span></div>
+ <div class="seat-list" id="seatList"></div>
+ <div class="room-actions"><button class="btn secondary" id="copyLinkBtn">🔗 کپی لینک دعوت</button><button class="btn primary" id="startBtn" disabled>▶ شروع بازی</button></div>
+ <p class="room-note" id="lobbyNote">پس از پر شدن هر چهار صندلی، میزبان می‌تواند بازی را شروع کند.</p>
+ <div class="feedback" id="lobbyFeedback"></div>
+</section>
+
+<section class="panel" id="gamePanel">
+ <div class="status-row"><span class="pill" id="phaseLabel">در حال بازی</span><span class="pill" id="roundLabel">راند ۱</span></div>
+ <div class="score-row"><div class="score cyan"><strong id="scoreA">۰</strong><small>تیم صندلی ۱ و ۳</small></div><div class="score purple"><strong id="scoreB">۰</strong><small>تیم صندلی ۲ و ۴</small></div></div>
  <div class="table">
-  <div class="seat north" id="seat0"><b>ربات ۱</b></div>
-  <div class="seat side west" id="seat3"><b>ربات ۳</b></div>
-  <div class="seat side east" id="seat1"><b>ربات ۲</b></div>
-  <div class="center">
-   <div><div class="trick" id="trick"></div></div>
-  </div>
-  <div class="seat south" id="seat2"><b id="humanName">شما</b></div>
+  <div class="seat north" id="seat0"></div><div class="seat east" id="seat1"></div><div class="seat south" id="seat2"></div><div class="seat west" id="seat3"></div>
+  <div class="trick" id="trick"></div>
  </div>
- <div class="hand-wrap"><div class="hand-title"><span>کارت‌های شما</span><span id="handCount">۰ کارت</span></div><div class="hand" id="hand"></div></div>
- <div id="trumpPicker" style="display:none"><div class="feed">شما حاکم هستید؛ خال حکم را انتخاب کنید.</div><div class="trump-choices" id="trumpChoices"></div></div>
- <div class="winner" id="winner"></div>
- <div class="feed" id="feed">برای شروع، مسابقه آزمایشی را بزنید.</div>
- <div class="actions"><button class="secondary" id="soundToggle" aria-pressed="true">🔊 صدا روشن</button><button class="secondary" id="nextHand" style="display:none">راند بعدی</button><button class="secondary" id="restart">شروع مجدد</button></div>
+ <div class="trump-line" id="trumpLine">در انتظار انتخاب خال حکم</div>
+ <div id="trumpPicker" class="hidden"><div class="feed">حاکم هستی؛ خال حکم را انتخاب کن.</div><div class="trump-choices" id="trumpChoices"></div></div>
+ <div class="hand-wrap"><div class="hand-title"><span>کارت‌های دست تو</span><span id="handCount">۰ کارت</span></div><div class="hand" id="hand"></div></div>
+ <div class="feed" id="gameFeed"></div>
+ <div class="game-footer"><button class="btn secondary" id="copyGameLink">کپی لینک اتاق</button></div>
 </section>
-<p class="notice">این نسخه برای نمایش ظاهر و چرخه بازی است. در نسخه آنلاین نهایی، توزیع کارت، نوبت‌ها، امتیازدهی و کارت‌های خصوصی باید سمت سرور و در RPCهای امن اجرا شوند.</p>
-</div>
+</main>
 <script>
-(()=> {
-"use strict";
-const SUITS=["♠","♣","♦","♥"],RED=["♦","♥"],RANKS=["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
-function cardImageUrl(card){const suitFile={"♠":"spades","♣":"clubs","♦":"diamonds","♥":"hearts"}[card.suit];return "../../assets/cards/"+suitFile+"-"+card.rank+".webp?v=28";}
-const VALUE=Object.fromEntries(RANKS.map((r,i)=>[r,i]));
-const NAMES={"♠":"پیک","♣":"گشنیز","♦":"خشت","♥":"دل"};
-const $=id=>document.getElementById(id);
-const state={hands:[[],[],[],[]],scores:[0,0],seriesWins:[0,0],roundsPerHand:3,tricks:[0,0],trick:[],trump:null,turn:0,leader:0,hakem:0,lastHakem:0,round:0,target:7,phase:"idle",human:2,matchOver:false,roundWinner:null,dealNo:0,playedCards:[],lastTrickLeadSuit:null,lastTrickWinnerTeam:null};
+(()=>{"use strict";
+const API_URL="https://tefzctytomzmipobfvep.supabase.co/functions/v1/game-room";
+const PUBLIC_KEY="sb_publishable_5StO0MaWc5G75d-b8I_zSg_xIyZ-ZI2";
+const SUPABASE_URL="https://tefzctytomzmipobfvep.supabase.co";
+const sb=window.supabase?.createClient?window.supabase.createClient(SUPABASE_URL,PUBLIC_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}}):null;
+const tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand();tg.setHeaderColor("#091321");tg.setBackgroundColor("#091321");}
+const $=id=>document.getElementById(id),SUITS=["♠","♣","♦","♥"],RANKS=["2","3","4","5","6","7","8","9","10","J","Q","K","A"],SUIT_NAMES={"♠":"پیک","♣":"گشنیز","♦":"خشت","♥":"دل"},ICONS=["🔴","🔵","🟢","🟣"];
+let roomCode="",room=null,players=[],mySeat=-1,myHand=[],poll=null,busy=false,host=false,roomState=null,lastNotice="";
 const persian=n=>String(n).replace(/[0-9]/g,d=>"۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function makeDeck(){return shuffle(SUITS.flatMap(s=>RANKS.map(r=>({suit:s,rank:r,id:r+s,value:VALUE[r]}))));}
-function team(seat){return seat%2===0?0:1;}
-function labelTeam(t){return t===0?"تیم فیروزه‌ای":"تیم بنفش";}
-function sortHand(hand){hand.sort((a,b)=>SUITS.indexOf(a.suit)-SUITS.indexOf(b.suit)||b.value-a.value);}
-function startRound(first=false){state.round++;state.scores=[0,0];state.matchOver=false;state.roundWinner=null;state.dealNo=0;if(first){state.hakem=Math.floor(Math.random()*4);state.lastHakem=state.hakem;}startDeal();}
-function startDeal(){state._dealAnim=true;state.dealNo++;state.tricks=[0,0];state.trick=[];state.playedCards=[];state.lastTrickLeadSuit=null;state.lastTrickWinnerTeam=null;state.trump=null;const deck=makeDeck();state.hands=[[],[],[],[]];for(let i=0;i<5;i++)for(let offset=0;offset<4;offset++)state.hands[(state.hakem+offset)%4].push(deck.pop());state.hands.forEach(sortHand);state.turn=state.hakem;state.leader=state.hakem;state.phase="choose";$("feed").textContent="دست جدید؛ "+seatName(state.hakem)+" حاکم است و خال حکم را انتخاب می‌کند.";if(state.hakem!==state.human){const chosen=chooseBotTrump(state.hands[state.hakem]);setTimeout(()=>{if(state.phase==="choose")selectTrump(chosen);},650);}render();}
-function chooseBotTrump(hand){
- const options=SUITS.map(s=>{
-  const cards=hand.filter(c=>c.suit===s).sort((a,b)=>b.value-a.value);
-  const count=cards.length;
-  const honors=cards.reduce((n,c)=>n+({A:8,K:5,Q:3,J:1,10:.5}[c.rank]||0),0);
-  const ace=cards.some(c=>c.rank==="A");
-  const king=cards.some(c=>c.rank==="K");
-  const aceKing=ace&&king;
-  const topCount=cards.filter(c=>["A","K","Q"].includes(c.rank)).length;
-  const singletonAce=count===1&&ace;
-  const voids=SUITS.filter(other=>other!==s&&!hand.some(c=>c.suit===other)).length;
-  // A long suit with top control is strongest; a singleton/void can help later,
-  // but a short, weak trump suit should not be selected just for its honors.
-  let score=count*5.2+honors+topCount*2.2;
-  if(count>=5)score+=5;
-  if(count>=6)score+=3;
-  if(aceKing)score+=5;
-  if(singletonAce)score+=2;
-  if(count<=1&&!ace)score-=4;
-  score+=Math.min(voids,2)*.8;
-  return {s,score};
- });
- return options.sort((a,b)=>b.score-a.score)[0].s;
+function say(id,msg){$(id).textContent=msg||"";}
+async function api(action,extra={}){
+ if(!sb)throw new Error("اتصال آنلاین برقرار نیست.");
+ const {data:{session}}=await sb.auth.getSession();
+ if(!session?.access_token)throw new Error("ابتدا در گیم‌روم SINX وارد حساب شو و دوباره به حکم برگرد.");
+ const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":PUBLIC_KEY,"Authorization":"Bearer "+session.access_token},body:JSON.stringify({action,roomCode,...extra})});
+ const data=await res.json();if(!res.ok||data.success===false)throw new Error(data.error||"خطای ارتباط با سرور");return data;
 }
-function legalCards(seat){
- const hand=state.hands[seat],lead=state.trick[0]?.card?.suit;
- if(!lead)return hand.slice();
- const same=hand.filter(c=>c.suit===lead);return same.length?same:hand.slice();
+function setBusy(v){busy=v;$("createBtn").disabled=v;$("joinBtn").disabled=v;$("startBtn").disabled=v||!host||players.length!==4||room?.status!=="waiting";}
+function showMenu(){stopPolling();$("menuPanel").style.display="block";$("roomLobby").style.display="none";$("gamePanel").style.display="none";}
+function showLobby(){ $("menuPanel").style.display="none";$("roomLobby").style.display="block";$("gamePanel").style.display="none";}
+function showGame(){ $("menuPanel").style.display="none";$("roomLobby").style.display="none";$("gamePanel").style.display="block";}
+function stopPolling(){if(poll){clearInterval(poll);poll=null;}}
+async function copyText(text){try{await navigator.clipboard.writeText(text);return true;}catch{const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();const ok=document.execCommand("copy");t.remove();return ok;}}
+function inviteUrl(){return location.origin+location.pathname+"?room="+encodeURIComponent(roomCode);}
+async function copyInvite(){if(!roomCode)return;const ok=await copyText(inviteUrl());say(room?.status==="waiting"?"lobbyFeedback":"gameFeed",ok?"لینک دعوت کپی شد؛ برای دوستانت بفرست.":"کپی خودکار انجام نشد.");}
+function getInviteCode(){return (new URLSearchParams(location.search).get("room")||"").trim().toUpperCase();}
+async function createRoom(){
+ try{setBusy(true);const d=await api("create",{gameType:"hokm",maxPlayers:4,roundsToWin:Number($("roundsSelect").value)});acceptSnapshot(d);history.replaceState(null,"",inviteUrl());showLobby();say("lobbyFeedback","اتاق ساخته شد؛ لینک دعوت را برای سه نفر دیگر بفرست.");startPolling();}
+ catch(e){say("menuFeedback",e.message);}finally{setBusy(false);}
 }
-function winnerOfCards(items){
- const lead=items[0].card.suit;
- return items.reduce((best,item)=>{
-  const a=item.card,b=best.card;
-  const rank=c=>c.suit===state.trump?2:c.suit===lead?1:0;
-  if(rank(a)>rank(b)||(rank(a)===rank(b)&&a.value>b.value))return item;
-  return best;
- }).seat;
+async function joinRoom(code){
+ try{setBusy(true);roomCode=code.trim().toUpperCase();const d=await api("join",{roomCode});acceptSnapshot(d);history.replaceState(null,"",inviteUrl());if(room.status==="playing")showGame();else showLobby();startPolling();}
+ catch(e){say("menuFeedback",e.message);roomCode="";}finally{setBusy(false);}
 }
-let soundEnabled=true,audioCtx=null;
-function tone(freq,duration=.11,type="sine",volume=.045,delay=0){if(!soundEnabled)return;try{const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;audioCtx=audioCtx||new Ctx();if(audioCtx.state==="suspended")audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,audioCtx.currentTime+delay);g.gain.setValueAtTime(.0001,audioCtx.currentTime+delay);g.gain.exponentialRampToValueAtTime(volume,audioCtx.currentTime+delay+.012);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+delay+duration);o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime+delay);o.stop(audioCtx.currentTime+delay+duration+.02);}catch(e){}}
-function playSfx(kind){if(!soundEnabled)return;const notes={card:[[520,.07],[680,.08]],trump:[[392,.12],[523,.13],[659,.18]],trick:[[523,.12],[659,.14],[784,.2]],kot:[[523,.12],[659,.12],[784,.16],[1046,.32]],hakemkot:[[392,.13],[523,.13],[659,.13],[784,.18],[1046,.4]],champion:[[523,.14],[659,.14],[784,.14],[1046,.18],[1318,.55]]};(notes[kind]||[]).forEach((n,i)=>tone(n[0],n[1],"sine",kind==="card"?.025:.05,i*.085));}
-function tableEffect(kind){const el=document.querySelector(".table");if(!el)return;el.classList.remove("trick-win","big-win","match-win");void el.offsetWidth;el.classList.add(kind);if(kind==="trick-win"||kind==="big-win"||kind==="match-win"){if(navigator.vibrate)navigator.vibrate(kind==="trick-win"?35:kind==="big-win"?[45,35,65]:[60,40,90,40,130]);}setTimeout(()=>el.classList.remove(kind),1800);}
-function animateCardFlight(seat,card){const handBtn=[...$("hand").querySelectorAll(".card")].find(b=>b.querySelector("img")?.alt===card.id);const source=handBtn||$("seat"+seat);const target=$("trick").querySelector(".played.seat-"+seat);if(!source||!target||!source.getBoundingClientRect)return;const a=source.getBoundingClientRect(),b=target.getBoundingClientRect();const img=document.createElement("img");img.className="flight-card";img.src=cardImageUrl(card);img.style.left=a.left+"px";img.style.top=a.top+"px";document.body.append(img);const dx=b.left+b.width/2-(a.left+a.width/2),dy=b.top+b.height/2-(a.top+a.height/2);const anim=img.animate([{transform:"translate(0,0) scale(1) rotate(0)",opacity:1},{transform:"translate("+dx+"px,"+dy+"px) scale(.78) rotate(5deg)",opacity:.92}],{duration:420,easing:"cubic-bezier(.2,.8,.25,1)"});anim.onfinish=()=>img.remove();setTimeout(()=>img.remove(),600);}
-function winnerOfTrick(){return winnerOfCards(state.trick);}
-function selectTrump(suit){
- if(state.phase!=="choose"||!SUITS.includes(suit))return;
- state.trump=suit;playSfx("trump");
- const deck=state._deck||null;
- // The remaining 32 cards are dealt after the first five-card auction.
- const used=new Set(state.hands.flat().map(c=>c.id));
- const rest=SUITS.flatMap(s=>RANKS.map(r=>({suit:s,rank:r,id:r+s,value:VALUE[r]}))).filter(c=>!used.has(c.id));
- shuffle(rest);for(let i=0;i<4;i++)for(let j=0;j<8;j++)state.hands[(state.hakem+i)%4].push(rest.pop());
- state.hands.forEach(sortHand);state.phase="play";state.turn=state.hakem;state.leader=state.hakem;
- $("feed").textContent="حکم "+NAMES[suit]+" شد؛ بازی شروع شد.";
- render();scheduleBot();
+function acceptSnapshot(d){
+ room=d.room;roomCode=room.code;players=(d.players||[]).map(p=>({seat:Number(p.seat),name:p.player_name,isHost:!!p.is_host}));mySeat=Number(d.mySeat);myHand=d.myHand||[];roomState=room.game_state||{};host=players.some(p=>p.seat===mySeat&&p.isHost);
+ if(room.status==="playing"||room.status==="finished"){showGame();renderGame();}else{showLobby();renderLobby();}
 }
-
-function playCard(seat,cardId){
- if(state.phase!=="play"||state.turn!==seat)return;
- const hand=state.hands[seat],idx=hand.findIndex(c=>c.id===cardId);if(idx<0)return;
- const card=hand[idx];if(!legalCards(seat).some(c=>c.id===cardId)){ $("feed").textContent="باید از خال شروع‌شده بازی کنید.";return;}
- animateCardFlight(seat,card);playSfx("card");hand.splice(idx,1);state.playedCards.push({seat,card});state.trick.push({seat,card});state.turn=(seat+1)%4;render();
- if(state.trick.length===4){const leadSuit=state.trick[0].card.suit;const win=winnerOfTrick(),winningTeam=team(win);state.lastTrickLeadSuit=leadSuit;state.lastTrickWinnerTeam=winningTeam;state._lastTrickWinner=win;state.tricks[winningTeam]++;state.scores[winningTeam]++;state.turn=win;state.leader=win;$("feed").textContent="برنده این تریک: "+seatName(win)+" · یک امتیاز برای "+labelTeam(winningTeam);playSfx("trick");tableEffect("trick-win");render();if(state.scores[winningTeam]>=7){finishRound(winningTeam);}else{setTimeout(()=>{state.trick=[];render();scheduleBot();},850);}}
- else scheduleBot();
-}
-
-function seatName(s){return s===state.human?(window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name||"شما"):"ربات "+(s===0?1:s===1?2:3); }
-
-function botChoose(seat){
- const legal=legalCards(seat);
- if(!legal.length)return null;
- const hand=state.hands[seat];
- const played=new Set(state.playedCards.map(x=>x.card.id));
- const inTrick=new Set(state.trick.map(x=>x.card.id));
- const unseenHigher=(card)=>RANKS.some(rank=>VALUE[rank]>card.value&&!played.has(rank+card.suit)&&!inTrick.has(rank+card.suit)&&!hand.some(x=>x.id===rank+card.suit));
- const cardCost=(card)=>card.value+(card.suit===state.trump?16:0);
- const lowest=(cards)=>cards.slice().sort((a,b)=>cardCost(a)-cardCost(b))[0];
-
- // When following, first determine who is currently taking the trick.
- if(state.trick.length){
-  const currentWinner=winnerOfTrick();
-  const partnerWinning=team(currentWinner)===team(seat);
-  if(partnerWinning){
-   // Estimate whether an opponent still to act can overtake our partner.
-   const leadSuit=state.trick[0].card.suit;
-   const currentCard=state.trick.find(x=>x.seat===currentWinner)?.card;
-   const remaining=[];
-   let next=(seat+1)%4;
-   while(next!==state.trick[0].seat&&remaining.length<3){
-    if(!state.trick.some(x=>x.seat===next))remaining.push(next);
-    next=(next+1)%4;
-   }
-   const unseen=SUITS.flatMap(s=>RANKS.map(rank=>({suit:s,rank,id:rank+s,value:VALUE[rank]})))
-    .filter(c=>!played.has(c.id)&&!inTrick.has(c.id)&&!hand.some(x=>x.id===c.id));
-   const canOvertake=unseen.filter(c=>{
-    if(!currentCard)return false;
-    if(c.suit===state.trump&&currentCard.suit!==state.trump)return true;
-    return c.suit===currentCard.suit&&c.value>currentCard.value;
-   }).length;
-   let threat=0;
-   for(const opponent of remaining){
-    if(team(opponent)===team(seat)||!state.hands[opponent]?.length)continue;
-    const slots=state.hands[opponent].length;
-    const pool=Math.max(1,unseen.length);
-    threat+=1-Math.pow(Math.max(0,1-canOvertake/pool),slots);
-   }
-   const winningCards=legal.filter(card=>winnerOfCards([...state.trick,{seat,card}])===seat);
-   if(threat>=0.38&&winningCards.length){
-    // Spend the smallest card that secures the trick when partner is exposed.
-    return winningCards.sort((a,b)=>cardCost(a)-cardCost(b))[0];
-   }
-   // Otherwise preserve partner's lead and shed a point card if possible.
-   const safe=legal.filter(card=>winnerOfCards([...state.trick,{seat,card}])===currentWinner);
-   const candidates=safe.length?safe:legal.filter(c=>c.suit!==state.trump);
-   const pool=candidates.length?candidates:legal;
-   const points={A:4,K:3,Q:2,J:1};
-   return pool.slice().sort((a,b)=>(points[b.rank]||0)-(points[a.rank]||0)||cardCost(a)-cardCost(b))[0];
+async function refresh(){
+ if(!roomCode||busy)return;
+ try{
+  await api("heartbeat");
+  const d=await api("state");acceptSnapshot(d);
+  if(room.status==="playing"){
+   const a=await api("auto");
+   if(a.bot||a.newHand) {const latest=await api("state");acceptSnapshot(latest);if(a.bot)say("gameFeed","⏱️ ۱۵ ثانیه حرکتی انجام نشد؛ ربات به‌جای بازیکن حرکت کرد.");}
   }
-  // If an opponent is winning, use the cheapest legal card that can overtake.
-  const winningCards=legal.filter(card=>winnerOfCards([...state.trick,{seat,card}])===seat);
-  if(winningCards.length){
-   return winningCards.sort((a,b)=>{
-    const costA=cardCost(a),costB=cardCost(b);
-    return costA-costB||a.value-b.value;
-   })[0];
-  }
-  // The trick cannot be won: discard a low card and preserve trump/high cards.
-  const cheapSide=legal.filter(c=>c.suit!==state.trump);
-  return lowest(cheapSide.length?cheapSide:legal);
- }
-
- // Leading: cash a card only when it is currently the highest unseen card.
- // Prefer long side suits, and avoid spending trump unnecessarily.
- const suitCounts=Object.fromEntries(SUITS.map(s=>[s,hand.filter(c=>c.suit===s).length]));
- // Infer only public void information: a player failed to follow the led suit.
- const voidIn=(player,suit)=>{
-  const history=state.playedCards;
-  for(let i=0;i+3<history.length;i+=4){
-   const leadSuit=history[i].card.suit;
-   for(let j=1;j<4;j++)if(history[i+j].seat===player&&history[i+j].card.suit!==leadSuit&&leadSuit===suit)return true;
-  }
-  if(state.trick.length){
-   const leadSuit=state.trick[0].card.suit;
-   if(leadSuit===suit&&state.trick.some(x=>x.seat===player&&x.card.suit!==suit))return true;
-  }
-  return false;
- };
- const opponents=[(seat+1)%4,(seat+3)%4];
- // Estimate where unseen higher cards could still be. Only hand sizes and
- // public play history are used; opponents' private card identities are never read.
- const unseenPool=SUITS.flatMap(s=>RANKS.map(rank=>({suit:s,rank,id:rank+s,value:VALUE[rank]})))
-  .filter(c=>!played.has(c.id)&&!hand.some(x=>x.id===c.id));
- const higherRisk=(card)=>{
-  const higher=unseenPool.filter(c=>c.suit===card.suit&&c.value>card.value).length;
-  if(!higher)return 0;
-  const poolSize=Math.max(1,unseenPool.length);
-  let risk=0;
-  for(const opponent of opponents){
-   if(voidIn(opponent,card.suit))continue;
-   const slots=state.hands[opponent]?.length||0;
-   if(!slots)continue;
-   const noHigher=Math.pow(Math.max(0,1-higher/poolSize),slots);
-   risk+=1-noHigher;
-  }
-  return Math.min(1,risk);
- };
- const scored=legal.map(card=>{
-  const top=!unseenHigher(card);
-  const isAce=card.rank==="A";
-  const isKing=card.rank==="K";
-  const suitLength=suitCounts[card.suit]||0;
-  const trump=card.suit===state.trump;
-  const higherInHand=hand.filter(x=>x.suit===card.suit&&x.value>card.value).length;
-  const opponentVoid=opponents.some(p=>voidIn(p,card.suit));
-  const risk=higherRisk(card);
-  let score=0;
-  if(top)score+=28;
-  if(isAce)score+=9;
-  if(isKing&&top)score+=5;
-  score+=suitLength*2.8;
-  score+=card.value*0.18;
-  // A nominally high card loses value when unseen higher cards are likely
-  // to be held by an opponent; a known void removes that opponent from risk.
-  score-=risk*24;
-  if(trump)score-=suitLength>=5?1:9;
-  // Draw opposing trumps only when the lead is likely to retain control.
-  if(trump&&suitLength>=4&&top){
-   score+=suitLength>=5?19:14;
-   if(isAce||isKing)score+=4;
-  }
-  if(opponentVoid&&!trump)score-=5;
-  if(state.lastTrickWinnerTeam===team(seat)&&state.lastTrickLeadSuit===card.suit&&suitLength>=2)score+=7;
-  score-=higherInHand*3;
-  return {card,score,risk};
- });
- scored.sort((a,b)=>b.score-a.score||b.card.value-a.card.value);
- return scored[0].card;
+ }catch(e){if(!lastNotice||lastNotice!==e.message){say(room?.status==="waiting"?"lobbyFeedback":"gameFeed",e.message);lastNotice=e.message;}}
 }
-function scheduleBot(){
- if(state.phase==="choose"&&state.hakem!==state.human){setTimeout(()=>{if(state.phase==="choose")selectTrump(chooseBotTrump(state.hands[state.hakem]));},450);return;}
- if(state.phase!=="play"||state.turn===state.human)return;
- const seat=state.turn;setTimeout(()=>{if(state.phase==="play"&&state.turn===seat){const c=botChoose(seat);playCard(seat,c.id);}},450);
+function startPolling(){stopPolling();poll=setInterval(refresh,1200);}
+function renderLobby(){
+ $("roomCode").textContent=roomCode||"------";$("roomCount").textContent=persian(players.length)+" از ۴ بازیکن";
+ $("seatList").innerHTML="";
+ for(let s=0;s<4;s++){const p=players.find(x=>x.seat===s),el=document.createElement("div");el.className="seat-card"+(p?" filled":"");el.innerHTML='<span class="seat-icon">'+ICONS[s]+'</span><div><div class="seat-name"></div><div class="seat-state"></div></div>';el.querySelector(".seat-name").textContent=p?(p.name+(p.seat===mySeat?" · شما":"")):"صندلی "+persian(s+1);el.querySelector(".seat-state").textContent=p?(p.isHost?"میزبان":"آماده بازی"):"در انتظار بازیکن";$("seatList").append(el);}
+ $("startBtn").style.display=host?"block":"none";$("startBtn").disabled=busy||!host||players.length!==4||room?.status!=="waiting";
+ $("lobbyNote").textContent=players.length===4?(host?"هر چهار بازیکن حاضرند؛ می‌توانی بازی را شروع کنی.":"هر چهار بازیکن حاضرند؛ منتظر شروع میزبان بمان."):"برای شروع، "+persian(4-players.length)+" بازیکن دیگر باید وارد شوند.";
 }
-function finishDeal(){const winner=state.scores[0]>state.scores[1]?0:1;finishRound(winner);}
-function finishRound(winner){const hakemTeam=team(state.hakem);const loser=1-winner;const isKot=state.scores[winner]===7&&state.scores[loser]===0;const points=isKot?(winner===hakemTeam?2:3):1;const bonusName=points===3?"حاکم‌کوت":points===2?"کوت":"";state.seriesWins[winner]+=points;state.phase="round-end";state.matchOver=state.seriesWins[winner]>=state.roundsPerHand;$("winner").textContent=(state.matchOver?"🏆 برنده کل مسابقه: ":"🏆 برنده راند "+persian(state.round)+": ")+labelTeam(winner);$("feed").textContent=(bonusName?bonusName+"؛ ":"")+"این تیم "+persian(points)+" راند به راندهای برده‌شده‌اش اضافه کرد."+(state.matchOver?" قهرمانی قطعی شد.":" راند بعدی تا لحظاتی دیگر خودکار آغاز می‌شود.");render();if(points===3){playSfx("hakemkot");tableEffect("big-win");}else if(points===2){playSfx("kot");tableEffect("big-win");}if(state.matchOver){playSfx("champion");tableEffect("match-win");}if(!state.matchOver){const lastWinner=state._lastTrickWinner;state.hakem=Number.isInteger(lastWinner)&&team(lastWinner)===winner?lastWinner:(winner===0?0:1);state.lastHakem=state.hakem;setTimeout(()=>{if(state.phase==="round-end"&&!state.matchOver)startRound(false);},2200);}}
-function render(){
- $("seriesA").textContent=persian(state.seriesWins[0]);$("seriesB").textContent=persian(state.seriesWins[1]);$("membersA").textContent=seatName(0)+" و "+seatName(2);$("membersB").textContent=seatName(1)+" و "+seatName(3);for(let t=0;t<2;t++){const host=$("lights"+(t===0?"A":"B"));host.innerHTML="";for(let i=0;i<7;i++){const light=document.createElement("span");light.className="score-light"+(i<Math.min(7,state.scores[t])?" on "+(t===0?"cyan":"purple"):"");host.append(light);}}
- $("round").textContent="راند "+persian(state.round||1)+" · هدف قهرمانی "+persian(state.roundsPerHand)+" راند";
- $("phase").textContent=state.phase==="choose"?"انتخاب حکم":state.phase==="play"?"در حال بازی":state.phase==="round-end"?(state.matchOver?"پایان مسابقه":"پایان راند"):"آماده شروع";
- $("trumpLabel").innerHTML="خال حکم <b>"+(state.trump||"—")+"</b><span>"+(state.trump?NAMES[state.trump]:"در انتظار انتخاب")+"</span>";
- for(let s=0;s<4;s++){const seatEl=$("seat"+s);seatEl.classList.toggle("active",state.turn===s&&state.phase==="play");let crown=seatEl.querySelector(".hakem-tag");if(state.hakem===s){if(!crown){crown=document.createElement("span");crown.className="hakem-tag";crown.textContent="حاکم 👑";seatEl.append(crown);}}else if(crown)crown.remove();}
+function cardUrl(card){const map={"♠":"spades","♣":"clubs","♦":"diamonds","♥":"hearts"};return "../../assets/cards/"+map[card.suit]+"-"+card.rank+".webp?v=29";}
+function renderGame(){
+ const gs=roomState||{},names=players.reduce((o,p)=>(o[p.seat]=p.name,o),{});
+ $("roundLabel").textContent="راند "+persian(gs.round_no||1)+" · هدف "+persian(gs.rounds_to_win||3);
+ $("scoreA").textContent=persian(gs.series_points?.[0]||0);$("scoreB").textContent=persian(gs.series_points?.[1]||0);
+ $("phaseLabel").textContent=gs.phase==="choose"?"انتخاب حکم":gs.phase==="round_end"?"پایان دست":gs.phase==="finished"?"پایان مسابقه":"در حال بازی";
+ for(let s=0;s<4;s++){const p=players.find(x=>x.seat===s),el=$("seat"+s);el.classList.toggle("active",gs.turn===s&&gs.phase==="play");el.innerHTML="<b></b><span></span>";el.querySelector("b").textContent=(p?p.name:"بازیکن "+(s+1))+(s===mySeat?" · شما":"");el.querySelector("span").className="hakem";el.querySelector("span").textContent=gs.hakem===s?"حاکم 👑":"";}
+ $("trumpLine").textContent=gs.trump?"خال حکم: "+gs.trump+" · "+SUIT_NAMES[gs.trump]:"در انتظار انتخاب خال حکم";
  $("trick").innerHTML="";
- const positions=[0,1,2,3];const slots=[0,1,2,3];
- for(let i=0;i<4;i++){const item=state.trick.find(x=>x.seat===i);const isNewest=!!item&&state.trick.length>0&&state.trick[state.trick.length-1]===item;const el=document.createElement("div");el.className="played seat-"+i+(item&&RED.includes(item.card.suit)?" red":"")+(item?"":" empty")+(isNewest?" play-in":"");if(item){const img=document.createElement("img");img.className="card-face";img.alt=item.card.rank+item.card.suit;img.src=cardImageUrl(item.card);el.append(img);}else{el.textContent="·";}$("trick").append(el);}
- const hand=state.hands[state.human]||[];$("handCount").textContent=persian(hand.length)+" کارت";$("hand").innerHTML="";
- hand.forEach((c,index)=>{const btn=document.createElement("button");btn.className="card"+(RED.includes(c.suit)?" red":"")+(state._dealAnim?" deal-in":"");if(state._dealAnim)btn.style.animationDelay=(index*42)+"ms";btn.dataset.suit=c.suit;const img=document.createElement("img");img.alt=c.rank+c.suit;img.loading="lazy";img.decoding="async";img.src=cardImageUrl(c);btn.append(img);const legal=state.phase==="play"&&state.trick.length<4&&state.turn===state.human&&legalCards(state.human).some(x=>x.id===c.id);btn.disabled=!legal;btn.onclick=()=>playCard(state.human,c.id);$("hand").append(btn);});
- $("trumpPicker").style.display=state.phase==="choose"&&state.hakem===state.human?"block":"none";
- $("trumpChoices").innerHTML="";for(const s of SUITS){const b=document.createElement("button");b.className="trump"+(RED.includes(s)?" red":"");b.textContent=s;b.title=NAMES[s];b.onclick=()=>selectTrump(s);$("trumpChoices").append(b);}
- $("nextHand").style.display="none";
- state._dealAnim=false;
- $("newMatch").textContent=state.round?"شروع دست جدید":"شروع دست آزمایشی";
+ const trick=gs.trick||[];
+ for(let s=0;s<4;s++){const item=trick.find(x=>Number(x.seat)===s),el=document.createElement("div");el.className="played seat-"+s;if(item){const im=document.createElement("img");im.src=cardUrl(item.card);im.alt=item.card.rank+item.card.suit;el.append(im);}else el.textContent="·";$("trick").append(el);}
+ $("hand").innerHTML="";myHand.forEach(card=>{const b=document.createElement("button");b.className="card";const im=document.createElement("img");im.src=cardUrl(card);im.alt=card.rank+card.suit;b.append(im);const legal=gs.phase==="play"&&gs.turn===mySeat; b.disabled=!legal;b.onclick=()=>playCard(card.id);$("hand").append(b);});
+ $("handCount").textContent=persian(myHand.length)+" کارت";
+ $("trumpPicker").classList.toggle("hidden",!(gs.phase==="choose"&&gs.hakem===mySeat));
+ $("trumpChoices").innerHTML="";for(const suit of SUITS){const b=document.createElement("button");b.className="trump"+(["♦","♥"].includes(suit)?" red":"");b.textContent=suit;b.title=SUIT_NAMES[suit];b.onclick=()=>chooseTrump(suit);$("trumpChoices").append(b);}
+ if(gs.phase==="choose")say("gameFeed",gs.hakem===mySeat?"تو حاکم هستی؛ خال حکم را انتخاب کن.":"منتظر انتخاب خال حکم توسط حاکم...");
+ else if(gs.phase==="round_end")say("gameFeed","این دست تمام شد؛ دست بعدی به‌صورت خودکار آغاز می‌شود.");
+ else if(gs.phase==="finished")say("gameFeed","🏆 تیم "+(gs.match_winner===0?"فیروزه‌ای":"بنفش")+" قهرمان شد!");
+ else {const active=players.find(p=>p.seat===gs.turn);say("gameFeed",gs.turn===mySeat?"نوبت توست؛ یک کارت بازی کن.":"نوبت "+(active?.name||"بازیکن بعدی")+" است.");}
 }
-function startMatch(){state.scores=[0,0];state.seriesWins=[0,0];state.round=0;state.roundsPerHand=Number($("roundsPerHand").value);state.target=7;state._lastTrickWinner=null;state.phase="idle";$("winner").textContent="";startRound(true);}
-$("soundToggle").addEventListener("click",()=>{soundEnabled=!soundEnabled;$("soundToggle").textContent=soundEnabled?"🔊 صدا روشن":"🔇 صدا خاموش";$("soundToggle").setAttribute("aria-pressed",String(soundEnabled));if(soundEnabled)playSfx("card");});
-$("newMatch").addEventListener("click",startMatch);
-$("restart").addEventListener("click",startMatch);
-const tgUser=window.Telegram?.WebApp?.initDataUnsafe?.user;if(tgUser?.first_name){$("humanName").textContent=tgUser.first_name;}
-$("showOnline").addEventListener("click",()=>{$("onlineNote").style.display="block";});
-$("showBots").addEventListener("click",()=>{$("onlineNote").style.display="none";});
-
-render();
+async function chooseTrump(suit){try{setBusy(true);const d=await api("hokm_trump",{suit});acceptSnapshot(d);}catch(e){say("gameFeed",e.message);}finally{setBusy(false);}}
+async function playCard(cardId){try{setBusy(true);const d=await api("hokm_play",{cardId});acceptSnapshot(d);}catch(e){say("gameFeed",e.message);}finally{setBusy(false);}}
+async function startGame(){try{setBusy(true);const d=await api("start");acceptSnapshot(d);say("gameFeed","بازی شروع شد؛ موفق باشید!");}catch(e){say("lobbyFeedback",e.message);}finally{setBusy(false);}}
+$("createBtn").addEventListener("click",createRoom);
+$("joinBtn").addEventListener("click",()=>{const c=$("joinCode").value.trim().toUpperCase();if(!c){say("menuFeedback","کد اتاق را وارد کن.");return;}joinRoom(c);});
+$("joinCode").addEventListener("keydown",e=>{if(e.key==="Enter")$("joinBtn").click();});
+$("startBtn").addEventListener("click",startGame);
+$("copyLinkBtn").addEventListener("click",copyInvite);$("copyGameLink").addEventListener("click",copyInvite);
+const invite=getInviteCode();if(invite){$("joinCode").value=invite;joinRoom(invite);}else showMenu();
 })();
-</script>
-</body>
-</html>
+</script></body></html>
