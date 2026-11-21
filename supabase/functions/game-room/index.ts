@@ -494,8 +494,9 @@ async function hokmAction(roomCode:string,userId:string,action:string,payload:an
  if(action==="trump")hokmApplyTrump(gs,player.seat,String(payload.suit||""));
  else if(action==="play")hokmApplyPlay(gs,player.seat,String(payload.cardId||""));
  else throw new Error("حرکت حکم نامعتبر است");
- const {error:ue}=await supabase.from("rooms").update({game_state:gs,current_turn:gs.turn,updated_at:new Date().toISOString()}).eq("id",room.id);
+ const {data:updated,error:ue}=await supabase.from("rooms").update({game_state:gs,current_turn:gs.turn,updated_at:new Date().toISOString()}).eq("id",room.id).eq("updated_at",room.updated_at).select("id").maybeSingle();
  if(ue)throw ue;
+ if(!updated)throw new Error("نوبت هم‌زمان تغییر کرد؛ وضعیت را تازه‌سازی کنید");
  return await getRoomSnapshot(code,userId);
 }
 async function hokmAuto(room:any){
@@ -504,8 +505,9 @@ async function hokmAuto(room:any){
    const winner=Number(gs.last_hand?.winner_team??0), last=Number(gs.last_trick_winner??winner);
    const hakem=(last%2===(winner%2))?last:(winner===0?0:1);
    const next=hokmStartHand(gs,hakem,Number(gs.round_no||1)+1);
-   const {error}=await supabase.from("rooms").update({game_state:next,current_turn:hakem,updated_at:new Date().toISOString()}).eq("id",room.id);
+   const {data:updated,error}=await supabase.from("rooms").update({game_state:next,current_turn:hakem,updated_at:new Date().toISOString()}).eq("id",room.id).eq("updated_at",room.updated_at).select("id").maybeSingle();
    if(error)throw error;
+   if(!updated)return {success:false,skipped:true};
    return {success:true,bot:false,newHand:true};
  }
  if(!["choose","play"].includes(gs.phase)||Date.now()-Number(gs.turn_started_at||Date.now())<15000)return {success:false,skipped:true};
@@ -519,8 +521,9 @@ async function hokmAuto(room:any){
    hokmApplyPlay(gs,seat,card.id);
  }
  gs.last_bot_action_at=Date.now();
- const {error}=await supabase.from("rooms").update({game_state:gs,current_turn:gs.turn,updated_at:new Date().toISOString()}).eq("id",room.id);
+ const {data:updated,error}=await supabase.from("rooms").update({game_state:gs,current_turn:gs.turn,updated_at:new Date().toISOString()}).eq("id",room.id).eq("updated_at",room.updated_at).select("id").maybeSingle();
  if(error)throw error;
+ if(!updated)return {success:false,skipped:true};
  return {success:true,bot:true,seat};
 }
 
