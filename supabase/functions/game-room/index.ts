@@ -816,7 +816,18 @@ Deno.serve(async (req: Request) => {
     await enforceClientVersion(body, action, roomCode, userId);
 
     switch (action) {
-      case "friends_list":\n        return response(await friendsList(userId));\n      case "friends_search":\n        return response(await friendSearch(userId, body));\n      case "friend_request":\n        return response(await friendRequest(userId, body));\n      case "friend_respond":\n        return response(await friendRespond(userId, body));\n      case "friend_remove":\n        return response(await friendRemove(userId, body));\n\n      case "create":
+      case "friends_list":
+        return response(await friendsList(userId));
+      case "friends_search":
+        return response(await friendSearch(userId, body));
+      case "friend_request":
+        return response(await friendRequest(userId, body));
+      case "friend_respond":
+        return response(await friendRespond(userId, body));
+      case "friend_remove":
+        return response(await friendRemove(userId, body));
+
+      case "create":
         return response(
           await createRoom(body, userId, username),
         );
