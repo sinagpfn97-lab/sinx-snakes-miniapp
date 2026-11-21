@@ -494,6 +494,16 @@ body.theme-light .chat-invite small{color:#665b7c}
 body.theme-light .chat-compose input{background:#fff;color:#24243a;border-color:#cdd3e3}
 @media(min-width:520px){.chat-layout{grid-template-columns:145px minmax(0,1fr)}.chat-conversations{max-height:520px;overflow:auto}}
 
+
+/* Final responsive overrides for messenger layout */
+@media(max-width:620px){
+ .chat-shell .chat-sidebar{display:block}
+ .chat-shell .chat-thread{display:none}
+ .chat-shell.chat-open .chat-sidebar{display:none}
+ .chat-shell.chat-open .chat-thread{display:flex}
+ .chat-shell .chat-back{display:block}
+}
+
 </style>
 </head>
 <body>
