@@ -76,15 +76,15 @@ function showLobby(){ $("menuPanel").style.display="none";$("roomLobby").style.d
 function showGame(){ $("menuPanel").style.display="none";$("roomLobby").style.display="none";$("gamePanel").style.display="block";}
 function stopPolling(){if(poll){clearInterval(poll);poll=null;}}
 async function copyText(text){try{await navigator.clipboard.writeText(text);return true;}catch{const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();const ok=document.execCommand("copy");t.remove();return ok;}}
-function inviteUrl(){if(!roomCode)return "";return "https://t.me/SInsdownloaderbot?startapp="+encodeURIComponent("room_"+roomCode);}
+function inviteUrl(){if(!roomCode)return "";return "https://t.me/SInsdownloaderbot?startapp="+encodeURIComponent("hokm_"+roomCode);}
 async function copyInvite(){if(!roomCode){say(room?.status==="waiting"?"lobbyFeedback":"gameFeed","کد اتاق هنوز آماده نیست؛ دوباره تلاش کن.");return;}const link=inviteUrl();const ok=await copyText(link);say(room?.status==="waiting"?"lobbyFeedback":"gameFeed",ok?"لینک بات تلگرام کپی شد: "+link:"کپی خودکار انجام نشد؛ لینک: "+link);}
-function getInviteCode(){const q=new URLSearchParams(location.search);const start=window.Telegram?.WebApp?.initDataUnsafe?.start_param||q.get("startapp")||"";const match=start.match(/^room_([A-Za-z0-9_-]+)$/i);return (q.get("room")||(match?match[1]:"")).trim().toUpperCase();}
+function getInviteCode(){const q=new URLSearchParams(location.search);const start=window.Telegram?.WebApp?.initDataUnsafe?.start_param||q.get("startapp")||"";const match=start.match(/^(?:hokm_|room_)([A-Za-z0-9_-]+)$/i);return (q.get("room")||(match?match[1]:"")).trim().toUpperCase();}
 async function createRoom(){
  try{setBusy(true);const d=await api("create",{gameType:"hokm",maxPlayers:4,roundsToWin:Number($("roundsSelect").value)});acceptSnapshot(d);history.replaceState(null,"","?room="+encodeURIComponent(roomCode));showLobby();say("lobbyFeedback","اتاق ساخته شد؛ لینک دعوت را برای سه نفر دیگر بفرست.");startPolling();}
  catch(e){say("menuFeedback",e.message);}finally{setBusy(false);}
 }
 async function joinRoom(code){
- try{setBusy(true);roomCode=code.trim().toUpperCase();const d=await api("join",{roomCode});acceptSnapshot(d);history.replaceState(null,"",inviteUrl());if(room.status==="playing")showGame();else showLobby();startPolling();}
+ try{setBusy(true);roomCode=code.trim().toUpperCase();const d=await api("join",{roomCode});acceptSnapshot(d);history.replaceState(null,"","?room="+encodeURIComponent(roomCode));if(room.status==="playing")showGame();else showLobby();startPolling();}
  catch(e){say("menuFeedback",e.message);roomCode="";}finally{setBusy(false);}
 }
 function acceptSnapshot(d){
