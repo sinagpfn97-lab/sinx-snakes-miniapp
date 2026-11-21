@@ -1,3 +1,11 @@
+## 1.0.60 — 2026-11-22
+- Redesigned the chat area as a messenger-style inbox with separate conversation and friends lists.
+- Added a global chat accessible to signed-in users, with only the latest six messages retained in the database.
+- Added realtime delivery for global chat messages and a lightweight six-message history load.
+- Added an in-chat game menu for Snakes, Ludo, and Hokm room creation.
+- Added rich room invitation cards in private chats with direct join actions; Hokm invitations open the dedicated Hokm client.
+- Preserved private conversation history and existing friend relationships.
+
 ## 1.0.59 — 2026-11-22
 - Added persistent one-to-one private conversations for accepted SINX friends.
 - Added authenticated text messaging with per-conversation message history, read receipts, and live updates through Supabase Realtime.
