@@ -526,6 +526,7 @@ async function accountAction(action){
   accountFeedback("ورود موفق: @"+username);
   document.getElementById("passwordInput").value="";
   await continueInviteIfReady();
+  await refreshProfile();
   await checkForUpdate();
  }catch(e){accountFeedback(e.message||"خطا در احراز هویت");}
  finally{document.getElementById("registerBtn").disabled=false;document.getElementById("loginBtn").disabled=false;}
@@ -964,7 +965,7 @@ async function restoreSession(){
   const {data:{user}}=await sb.auth.getUser();
   const username=user?.user_metadata?.username||"";
   if(username)document.getElementById("playerNameInput").value=username;
-  document.getElementById("accountStatus").textContent=username?"وارد حساب @"+username+" هستی.":"حساب متصل است.";
+  document.getElementById("accountStatus").textContent=username?"وارد حساب @"+username+" هستی.":"حساب متصل است.";await refreshProfile();
   if(invited)await continueInviteIfReady();
   await checkForUpdate();
  }else{
