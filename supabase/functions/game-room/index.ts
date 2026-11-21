@@ -521,7 +521,7 @@ async function hokmAuto(room:any){
    hokmApplyPlay(gs,seat,card.id);
  }
  gs.last_bot_action_at=Date.now();
- const {data:updated,error}=await supabase.from("rooms").update({game_state:gs,current_turn:gs.turn,updated_at:new Date().toISOString()}).eq("id",room.id).eq("updated_at",room.updated_at).select("id").maybeSingle();
+ const {data:updated,error}=await supabase.from("rooms").update({game_state:gs,current_turn:gs.turn,status:gs.phase==="finished"?"finished":"playing",updated_at:new Date().toISOString()}).eq("id",room.id).eq("updated_at",room.updated_at).select("id").maybeSingle();
  if(error)throw error;
  if(!updated)return {success:false,skipped:true};
  return {success:true,bot:true,seat};
