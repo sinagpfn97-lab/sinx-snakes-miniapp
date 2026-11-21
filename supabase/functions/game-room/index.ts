@@ -18,9 +18,9 @@ const authClient = createClient(SUPABASE_URL, ANON_KEY, {
   },
 });
 
-const APP_VERSION = "1.0.56";
-const MIN_SUPPORTED_APP_VERSION = "1.0.56";
-const RELEASE_NOTES = "داشبورد پنج‌بخشی SINX، مدیریت حساب و تنظیمات، و سیستم درخواست دوستی با شناسه اختصاصی.";
+const APP_VERSION = "1.0.57";
+const MIN_SUPPORTED_APP_VERSION = "1.0.57";
+const RELEASE_NOTES = "پوسته روشن و تیره سراسری در داشبورد و بازی‌ها؛ حذف کنترل‌های بی‌اثر صدا و انتقال نمایش نسخه به تنظیمات.";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
